@@ -1,0 +1,379 @@
+{
+  "name": "projects/7529641220560354026",
+  "title": "Akilil Wellness Platform UI",
+  "visibility": "PRIVATE",
+  "createTime": "2026-11-02T06:48:13.387626Z",
+  "updateTime": "2026-11-02T07:17:52.320791Z",
+  "projectType": "TEXT_TO_UI_PRO",
+  "thumbnailScreenshot": {
+    "name": "projects/7529641220560354026/screens/a120bd364fc248af9116a992683a919e/fileEntries/screenshot",
+    "downloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1Womw5YQj5bkMctFLPP8Oer6p-VCCEz6kfC97GxO-6sZal4LTyQpW28E54y_mB09VHookV9-b4C3oD_re_NGTp-VjMyENF2FvDS45wsz3zwyy22Jq37idXUW04pBh2N4TXRjB3pAkzzCtIPdtsnE5lf_hJC_G0yaHKwiOnYKLVptHN0z1ZuaqVjdiEWwPU06_KrLetSr0ozA7QfI0iS_R8PnsHWX5X5LGffghv57g-zmArO4ufZwPpMOwE"
+  },
+  "origin": "STITCH",
+  "deviceType": "MOBILE",
+  "designTheme": {
+    "colorMode": "LIGHT",
+    "font": "NOTO_SERIF",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#0f382e",
+    "headlineFont": "NOTO_SERIF",
+    "bodyFont": "PLUS_JAKARTA_SANS",
+    "labelFont": "PLUS_JAKARTA_SANS",
+    "namedColors": {
+      "error": "#ba1a1a",
+      "on_secondary": "#ffffff",
+      "tertiary_fixed": "#bcedd6",
+      "inverse_on_surface": "#e8f3ed",
+      "error_container": "#ffdad6",
+      "inverse_surface": "#28332e",
+      "on_error": "#ffffff",
+      "secondary": "#7f5700",
+      "primary_container": "#0f382e",
+      "surface_container": "#e5f1ea",
+      "surface_container_highest": "#dae5de",
+      "on_secondary_fixed": "#281900",
+      "tertiary_fixed_dim": "#a0d1bb",
+      "on_secondary_container": "#6f4b00",
+      "secondary_fixed": "#ffdeae",
+      "on_primary_fixed": "#002019",
+      "on_tertiary_fixed": "#002116",
+      "on_primary": "#ffffff",
+      "surface_container_low": "#ebf6ef",
+      "on_background": "#141e1a",
+      "background": "#f1fcf5",
+      "surface_dim": "#d1ddd6",
+      "on_secondary_fixed_variant": "#604100",
+      "tertiary": "#002217",
+      "on_surface": "#141e1a",
+      "outline_variant": "#c0c8c4",
+      "surface_container_lowest": "#ffffff",
+      "on_tertiary_fixed_variant": "#204f3e",
+      "primary_fixed_dim": "#a6cfc1",
+      "secondary_container": "#fdba45",
+      "surface_tint": "#3f665a",
+      "inverse_primary": "#a6cfc1",
+      "on_error_container": "#93000a",
+      "primary": "#00221a",
+      "surface_bright": "#f1fcf5",
+      "on_tertiary_container": "#74a38f",
+      "primary_fixed": "#c1ecdd",
+      "on_tertiary": "#ffffff",
+      "tertiary_container": "#053929",
+      "on_surface_variant": "#414845",
+      "on_primary_fixed_variant": "#274e43",
+      "secondary_fixed_dim": "#fdba45",
+      "surface": "#f1fcf5",
+      "surface_variant": "#dae5de",
+      "outline": "#717975",
+      "on_primary_container": "#7aa295",
+      "surface_container_high": "#dfebe4"
+    },
+    "designMd": "---\nname: Royal Sanctuary\ncolors:\n  surface: '#f1fcf5'\n  surface-dim: '#d1ddd6'\n  surface-bright: '#f1fcf5'\n  surface-container-lowest: '#ffffff'\n  surface-container-low: '#ebf6ef'\n  surface-container: '#e5f1ea'\n  surface-container-high: '#dfebe4'\n  surface-container-highest: '#dae5de'\n  on-surface: '#141e1a'\n  on-surface-variant: '#414845'\n  inverse-surface: '#28332e'\n  inverse-on-surface: '#e8f3ed'\n  outline: '#717975'\n  outline-variant: '#c0c8c4'\n  surface-tint: '#3f665a'\n  primary: '#00221a'\n  on-primary: '#ffffff'\n  primary-container: '#0f382e'\n  on-primary-container: '#7aa295'\n  inverse-primary: '#a6cfc1'\n  secondary: '#7f5700'\n  on-secondary: '#ffffff'\n  secondary-container: '#fdba45'\n  on-secondary-container: '#6f4b00'\n  tertiary: '#002217'\n  on-tertiary: '#ffffff'\n  tertiary-container: '#053929'\n  on-tertiary-container: '#74a38f'\n  error: '#ba1a1a'\n  on-error: '#ffffff'\n  error-container: '#ffdad6'\n  on-error-container: '#93000a'\n  primary-fixed: '#c1ecdd'\n  primary-fixed-dim: '#a6cfc1'\n  on-primary-fixed: '#002019'\n  on-primary-fixed-variant: '#274e43'\n  secondary-fixed: '#ffdeae'\n  secondary-fixed-dim: '#fdba45'\n  on-secondary-fixed: '#281900'\n  on-secondary-fixed-variant: '#604100'\n  tertiary-fixed: '#bcedd6'\n  tertiary-fixed-dim: '#a0d1bb'\n  on-tertiary-fixed: '#002116'\n  on-tertiary-fixed-variant: '#204f3e'\n  background: '#f1fcf5'\n  on-background: '#141e1a'\n  surface-variant: '#dae5de'\ntypography:\n  headline-xl:\n    fontFamily: Noto Serif\n    fontSize: 48px\n    fontWeight: '600'\n    lineHeight: 58px\n    letterSpacing: -0.02em\n  headline-xl-mobile:\n    fontFamily: Noto Serif\n    fontSize: 32px\n    fontWeight: '600'\n    lineHeight: 40px\n    letterSpacing: -0.01em\n  headline-lg:\n    fontFamily: Noto Serif\n    fontSize: 36px\n    fontWeight: '600'\n    lineHeight: 44px\n    letterSpacing: -0.015em\n  headline-lg-mobile:\n    fontFamily: Noto Serif\n    fontSize: 26px\n    fontWeight: '600'\n    lineHeight: 34px\n    letterSpacing: -0.01em\n  headline-md:\n    fontFamily: Noto Serif\n    fontSize: 28px\n    fontWeight: '500'\n    lineHeight: 36px\n  headline-sm:\n    fontFamily: Noto Serif\n    fontSize: 22px\n    fontWeight: '500'\n    lineHeight: 30px\n  title-lg:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 20px\n    fontWeight: '600'\n    lineHeight: 28px\n  title-md:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 17px\n    fontWeight: '600'\n    lineHeight: 24px\n  title-sm:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 15px\n    fontWeight: '600'\n    lineHeight: 22px\n  body-lg:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 17px\n    fontWeight: '400'\n    lineHeight: 28px\n  body-md:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 15px\n    fontWeight: '400'\n    lineHeight: 24px\n  body-sm:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 13px\n    fontWeight: '400'\n    lineHeight: 20px\n  label-lg:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 14px\n    fontWeight: '600'\n    lineHeight: 20px\n    letterSpacing: 0.02em\n  label-md:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 12px\n    fontWeight: '600'\n    lineHeight: 16px\n    letterSpacing: 0.04em\n  label-sm:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 11px\n    fontWeight: '500'\n    lineHeight: 14px\n    letterSpacing: 0.05em\nrounded:\n  sm: 0.25rem\n  DEFAULT: 0.5rem\n  md: 0.75rem\n  lg: 1rem\n  xl: 1.5rem\n  full: 9999px\nspacing:\n  gutter: 1.5rem\n  gutter-mobile: 1rem\n  margin: 3rem\n  margin-mobile: 1.25rem\n  margin-tablet: 2rem\n  space-xs: 0.25rem\n  space-sm: 0.5rem\n  space-md: 1rem\n  space-lg: 1.5rem\n  space-xl: 2.5rem\n---\n\n## Brand & Style\n\nThis design system expresses a serene union of Ethiopian sovereign heritage and compassionate clinical psychology. It communicates therapeutic dignity, ancestral warmth, and modern psychiatric clarity. The visual language rejects both sterile institutional hospital aesthetics and detached Silicon Valley wellness clich\u00e9s, choosing instead a grounded, reverent space where vulnerability is met with nobility.\n\n### Visual Style: Sovereign Humanism\nThe aesthetic balances warm editorial minimalism with tactile organic dignity:\n- **Atmospheric Warmth:** A foundational canvas inspired by sun-cured linen and parchment, banishing harsh digital whites.\n- **Regal Authority:** Deep forest emerald evokes sacred highland flora, ancient stone sanctuaries, and enduring resilience, while luminous honey amber provides golden illumination and guidance.\n- **Empathetic Tactility:** Uncluttered layouts, calm breathing margins, and rounded interfaces that invite gentle touch without appearing juvenile.\n- **Bilingual Typographic Harmony:** Layouts designed from the ground up to gracefully handle both Latin script and Ge'ez (Amharic) typographic characteristics with balanced x-heights and generous vertical breathing room.\n\n## Colors\n\nThe palette establishes an emotional gradient ranging from deep grounding stability to luminous hopeful warmth. \n\n### Palette Architecture\n- **Primary Sovereign Emerald (`#0F382E`):** Represents ancient Abyssinian sanctuary and clinical mastery. Used for primary navigational anchors, high-level headers, primary call-to-action buttons, and active therapeutic states.\n- **Secondary Ethiopian Amber (`#D99B26`):** Evokes the radiant warmth of sunrise over the highlands and refined royal gold. Reserved for focal points, high-value highlights, therapeutic progress milestones, and empathetic badges.\n- **Tertiary Highland Sage (`#4A7865`):** A soft botanical tone providing intermediate contrast for secondary actions, interactive toggles, supportive illustrations, and data visualizations.\n- **Primary Ink Typography (`#18221E`):** A deep espresso-tinted black with an organic undertone, ensuring AAA accessibility against warm backgrounds while preventing optical fatigue.\n- **Canvas Linen Base (`#FBF9F4`):** The primary soothing surface foundation, softening contrast and delivering emotional calm.\n- **Surface Tint Sage (`#E7EFE9`):** Card backdrops, subtle containers, callout blocks, and interactive element hover states.\n\n### Status & Clinical Tones\n- **Clinical Assurance / Trust:** Deep Slate Teal (`#1F4E5B`) paired with Tinted Ice (`#E4F0F2`).\n- **Supportive Alert / Caution:** Rich Ochre (`#A8681A`) paired with Flaxen Wash (`#FCF4E6`).\n- **Emergency / Crisis Assistance:** Terracotta Madder (`#9E3B33`) paired with Gentle Rose (`#F9EBEA`).\n\n## Typography\n\nThe typographic hierarchy pairs the editorial, historical gravitas of **Noto Serif** with the humane, highly legible geometry of **Plus Jakarta Sans**.\n\n### Font Roles & Script Integration\n- **Display & Headlines (Noto Serif):** Delivers literary dignity and clinical gravitas. Handles Ge'ez/Amharic glyphs alongside Latin typography with consistent balance and native stroke modulation.\n- **Body & Clinical UI (Plus Jakarta Sans):** Chosen for its open apertures, gentle curves, and unstrained readability across therapy transcripts, reflection prompts, and medication notes.\n- **Bilingual Balance:** When pairing Latin and Amharic text side-by-side (e.g., *\u1230\u120b\u121d / Selam*), line heights are intentionally expanded by 10-15% above standard software defaults to provide clearance for Ge'ez diacritics and ascenders.\n\n## Layout & Spacing\n\nThe layout philosophy relies on an intentional rhythm of breathing room and sanctuary margins. Mental wellness platforms require low cognitive load: layouts avoid dense, hyper-packed grids in favor of purposeful focus areas.\n\n### Spatial Engine\n- **Grid Architecture:** 12-column responsive fluid grid on desktop (max content width: 1200px) centered with spacious margins; 8-column layout on tablet; 4-column layout on mobile.\n- **Rhythm & Safe Margin:** Therapeutic journals and therapist consultation views center reading columns within a dedicated 680px focus spine to preserve focus and reading ease.\n- **Breakpoints:**\n  - `Mobile (< 640px):` Vertical single-column stacking, edge-to-edge interactive cards with internal padding, simplified headers.\n  - `Tablet (641px - 1024px):` Adaptive dual-column splits, sticky session action docks.\n  - `Desktop (> 1025px):` Asymmetric master-detail layouts with calm whitespace gutters.\n\n## Elevation & Depth\n\nThis design system avoids high-contrast drop shadows and artificial neomorphic depths, utilizing instead **Tonal Layering** grounded by **Amber-Emerald Ambient Warmth**.\n\n### Depth Tiers\n- **Canvas Base (Level 0):** Unraised canvas painted in Sand Linen (`#FBF9F4`).\n- **Surface Tier 1 (Level 1):** Subtle elevations for non-interactive cards, journal backdrops, and clinical group containers. Achieved using Soft Sage (`#E7EFE9`) or crisp White (`#FFFFFF`) with a delicate translucent outline (`rgba(15, 56, 46, 0.06)`).\n- **Interactive Elevated (Level 2):** Applied to active assessment panels, doctor profiles, and dialogue bubbles. Uses a multi-layered ambient shadow:\n  - `0 4px 16px -2px rgba(15, 56, 46, 0.05), 0 12px 32px -4px rgba(217, 155, 38, 0.06)`\n- **Overlay & Critical Sanctuary (Level 3):** Modal dialogues, panic support drawers, and emergency telehealth triggers. Uses an emerald-tinted backdrop blur (`backdrop-filter: blur(12px); background: rgba(15, 56, 46, 0.45)`) combined with deep floating ambient elevation (`0 20px 48px -8px rgba(15, 56, 46, 0.2)`).\n\n## Shapes\n\nThe interface embraces organic, soothing roundedness (Level 2: `0.5rem` / 8px baseline) that eliminates sharp digital aggression while retaining the architectural posture required for medical trustworthiness.\n\n### Shape Geometry Rules\n- **Base Components (Inputs, Buttons, Pills):** 8px (`0.5rem`) corner radius ensures soft, approachable hand feel.\n- **Medium Panels (Cards, Group Sessions):** 16px (`1rem`) to frame conversational and clinical content smoothly.\n- **Modal Sheets & Sanctuary Drawers:** 24px (`1.5rem`) top-rounded curves simulating rolled linen paper and traditional curved archways.\n- **Pill Tags & Status Badges:** Fully circular (`9999px`) to distinguish categorical metadata from primary interactive surfaces.\n\n## Components\n\n### Buttons\n- **Primary (Royal Sanctuary):** Deep Emerald background (`#0F382E`), Linen text (`#FBF9F4`), 8px border radius. Hover state transitions softly to lighter emerald with a subtle Amber glow (`box-shadow: 0 4px 14px rgba(217, 155, 38, 0.25)`). Height: 48px for accessible touch target.\n- **Secondary (Golden Warmth):** Linen base with Amber outline (`1.5px solid #D99B26`), Emerald text (`#0F382E`). Hover brings a gentle amber wash (`#D99B26` at 8% opacity).\n- **Crisis / Immediate Support Action:** Terracotta Madder background (`#9E3B33`) with crisp white typography, reserved exclusively for urgent care contact and hotlines.\n\n### Chips & Mood Badges\n- Compact 32px height, pill-shaped (`9999px`).\n- Unselected chips feature Soft Sage surface (`#E7EFE9`) with Charcoal Ink text (`#18221E`).\n- Selected state adopts Deep Emerald fill with Linen text, or Amber fill (`#D99B26`) when indicating clinical milestones and positive emotional reflections.\n\n### Inputs & Field Containers\n- Minimum 48px height with 8px radius.\n- Background in White (`#FFFFFF`) framed by a low-contrast boundary (`1px solid rgba(15, 56, 46, 0.15)`).\n- **Focus State:** Transitions to a 1.5px solid Emerald outline accompanied by a gentle Sage ambient halo (`0 0 0 3px rgba(74, 120, 101, 0.15)`).\n- **Bilingual Hint Text:** Amharic placeholder text placed alongside English labels in lighter muted ink (`rgba(24, 34, 30, 0.6)`).\n\n### Selection Controls (Checkboxes & Radios)\n- Radios are 20px circles; checkboxes are 20px rounded squares (4px radius).\n- Inactive state: Bordered in deep slate ink at 30% opacity.\n- Active state: Filled with Sovereign Emerald containing an Amber check or central dot, providing distinct visual feedback.\n\n### Cards & Sanctuary Tiles\n- Base background in pure White or Soft Sage, framed with an ultra-fine border (`1px solid rgba(15, 56, 46, 0.05)`).\n- 16px internal padding on mobile; 24px on tablet/desktop.\n- Distinct subtle gold accent header line (2px height) on premium psychiatric provider cards to indicate verified practitioner credentials.\n\n### Distinctive Domain Components\n- **Bilingual Welcome Banner (*\u1230\u120b\u121d Anchor*):** Features an illuminated gold greeting motif alongside patient wellbeing metrics.\n- **Daily Reflection Journal Tile:** Soft sage paper texture, uncluttered serene typography, providing a dedicated space for mindfulness and voice notes.\n- **Crisis Breathing Beacon:** A slow-pulsing circular widget alternating between Emerald and Sage at an 8-second restorative respiration cadence.",
+    "colorVariant": "FIDELITY",
+    "overridePrimaryColor": "#0f382e",
+    "overrideSecondaryColor": "#d99b26",
+    "overrideTertiaryColor": "#4a7865",
+    "overrideNeutralColor": "#18221e",
+    "spacingScale": 2,
+    "typography": {
+      "label-sm": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "11px",
+        "fontWeight": "500",
+        "lineHeight": "14px",
+        "letterSpacing": "0.05em"
+      },
+      "title-md": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "17px",
+        "fontWeight": "600",
+        "lineHeight": "24px"
+      },
+      "body-md": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "15px",
+        "fontWeight": "400",
+        "lineHeight": "24px"
+      },
+      "headline-xl": {
+        "fontFamily": "Noto Serif",
+        "fontSize": "48px",
+        "fontWeight": "600",
+        "lineHeight": "58px",
+        "letterSpacing": "-0.02em"
+      },
+      "headline-md": {
+        "fontFamily": "Noto Serif",
+        "fontSize": "28px",
+        "fontWeight": "500",
+        "lineHeight": "36px"
+      },
+      "headline-sm": {
+        "fontFamily": "Noto Serif",
+        "fontSize": "22px",
+        "fontWeight": "500",
+        "lineHeight": "30px"
+      },
+      "label-lg": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "14px",
+        "fontWeight": "600",
+        "lineHeight": "20px",
+        "letterSpacing": "0.02em"
+      },
+      "title-lg": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "20px",
+        "fontWeight": "600",
+        "lineHeight": "28px"
+      },
+      "body-sm": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "13px",
+        "fontWeight": "400",
+        "lineHeight": "20px"
+      },
+      "headline-lg-mobile": {
+        "fontFamily": "Noto Serif",
+        "fontSize": "26px",
+        "fontWeight": "600",
+        "lineHeight": "34px",
+        "letterSpacing": "-0.01em"
+      },
+      "label-md": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "12px",
+        "fontWeight": "600",
+        "lineHeight": "16px",
+        "letterSpacing": "0.04em"
+      },
+      "body-lg": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "17px",
+        "fontWeight": "400",
+        "lineHeight": "28px"
+      },
+      "title-sm": {
+        "fontFamily": "Plus Jakarta Sans",
+        "fontSize": "15px",
+        "fontWeight": "600",
+        "lineHeight": "22px"
+      },
+      "headline-lg": {
+        "fontFamily": "Noto Serif",
+        "fontSize": "36px",
+        "fontWeight": "600",
+        "lineHeight": "44px",
+        "letterSpacing": "-0.015em"
+      },
+      "headline-xl-mobile": {
+        "fontFamily": "Noto Serif",
+        "fontSize": "32px",
+        "fontWeight": "600",
+        "lineHeight": "40px",
+        "letterSpacing": "-0.01em"
+      }
+    },
+    "spacing": {
+      "margin-tablet": "2rem",
+      "margin": "3rem",
+      "space-xs": "0.25rem",
+      "gutter-mobile": "1rem",
+      "gutter": "1.5rem",
+      "space-xl": "2.5rem",
+      "space-lg": "1.5rem",
+      "space-md": "1rem",
+      "margin-mobile": "1.25rem",
+      "space-sm": "0.5rem"
+    },
+    "headlineFontFamily": "Noto Serif",
+    "bodyFontFamily": "Plus Jakarta Sans",
+    "labelFontFamily": "Plus Jakarta Sans"
+  },
+  "screenInstances": [
+    {
+      "id": "07b34cdfa3be42f2815b3d9d81c654ae",
+      "sourceScreen": "projects/7529641220560354026/screens/07b34cdfa3be42f2815b3d9d81c654ae",
+      "x": 1816,
+      "y": 7995,
+      "width": 390,
+      "height": 1306,
+      "label": "Akilil Pro - Clinician Command Center"
+    },
+    {
+      "id": "30fda1229ef94699b4ad6363a758dd71",
+      "sourceScreen": "projects/7529641220560354026/screens/30fda1229ef94699b4ad6363a758dd71",
+      "x": 454,
+      "y": 7995,
+      "width": 390,
+      "height": 1580,
+      "label": "Akilil - Cognitive Restructuring Worksheet"
+    },
+    {
+      "id": "39d140eed1a046938f678ff219e125c5",
+      "sourceScreen": "projects/7529641220560354026/screens/39d140eed1a046938f678ff219e125c5",
+      "x": 1362,
+      "y": 7995,
+      "width": 390,
+      "height": 1573,
+      "label": "Akilil - Somatic Reset Chamber"
+    },
+    {
+      "id": "4cf893868cac443192af2a9c6aa8b6f8",
+      "sourceScreen": "projects/7529641220560354026/screens/4cf893868cac443192af2a9c6aa8b6f8",
+      "x": 1478,
+      "width": 390,
+      "height": 1477,
+      "label": "Akilil Pro - Clinician Dashboard",
+      "hidden": true
+    },
+    {
+      "id": "4defcb0824f040c389c341a3dc879603",
+      "sourceScreen": "projects/7529641220560354026/screens/4defcb0824f040c389c341a3dc879603",
+      "x": 1024,
+      "width": 390,
+      "height": 1384,
+      "label": "Akilil - User Sanctuary Today",
+      "hidden": true
+    },
+    {
+      "id": "50e5c7793d0842a083895a5d07ec7806",
+      "sourceScreen": "projects/7529641220560354026/screens/50e5c7793d0842a083895a5d07ec7806",
+      "x": 2386,
+      "width": 390,
+      "height": 1217,
+      "label": "Akilil - Discover & Book Therapists",
+      "hidden": true
+    },
+    {
+      "id": "77e4dd5400de459c82e1bc63e771ab54",
+      "sourceScreen": "projects/7529641220560354026/screens/77e4dd5400de459c82e1bc63e771ab54",
+      "x": 1024,
+      "y": 3972,
+      "width": 390,
+      "height": 1394,
+      "label": "Akilil Sanctuary - Today",
+      "hidden": true
+    },
+    {
+      "id": "7f92d517c67a48b28769c7ceae53ccc4",
+      "sourceScreen": "projects/7529641220560354026/screens/7f92d517c67a48b28769c7ceae53ccc4",
+      "y": 7995,
+      "width": 390,
+      "height": 1072,
+      "label": "Akilil - Live Sanctuary Chamber"
+    },
+    {
+      "id": "85a8ceb00c6f4b84862542e11dd80896",
+      "sourceScreen": "projects/7529641220560354026/screens/85a8ceb00c6f4b84862542e11dd80896",
+      "x": 908,
+      "y": 5974,
+      "width": 390,
+      "height": 1581,
+      "label": "Akilil - Wallet & Top-Up Gateway"
+    },
+    {
+      "id": "90553743f2f94e188b222963af9538d7",
+      "sourceScreen": "projects/7529641220560354026/screens/90553743f2f94e188b222963af9538d7",
+      "x": 1478,
+      "y": 1995,
+      "width": 390,
+      "height": 1721,
+      "label": "Akilil Meet - Live Consultation & Notes",
+      "hidden": true
+    },
+    {
+      "id": "a120bd364fc248af9116a992683a919e",
+      "sourceScreen": "projects/7529641220560354026/screens/a120bd364fc248af9116a992683a919e",
+      "x": 1932,
+      "width": 390,
+      "height": 1739,
+      "label": "Akilil Meet - Live Consultation & Notes",
+      "hidden": true
+    },
+    {
+      "id": "ab177b39496349029114daaf042569c7",
+      "sourceScreen": "projects/7529641220560354026/screens/ab177b39496349029114daaf042569c7",
+      "y": 5974,
+      "width": 390,
+      "height": 1572,
+      "label": "Akilil - Clinician Profile & Credentials"
+    },
+    {
+      "id": "assets_07ef7472da644abf9a5e778bc08c4b4c",
+      "width": 960,
+      "height": 540,
+      "hidden": true,
+      "sourceAsset": "assets/07ef7472da644abf9a5e778bc08c4b4c",
+      "type": "DESIGN_SYSTEM_INSTANCE"
+    },
+    {
+      "id": "assets_7d2c59c0173846f2a240601f3253768a",
+      "y": 1995,
+      "width": 960,
+      "height": 540,
+      "hidden": true,
+      "sourceAsset": "assets/7d2c59c0173846f2a240601f3253768a",
+      "type": "DESIGN_SYSTEM_INSTANCE"
+    },
+    {
+      "id": "assets_a001fe0fedeb4a918b309fd943c77bb8",
+      "y": 3972,
+      "width": 960,
+      "height": 540,
+      "hidden": true,
+      "sourceAsset": "assets/a001fe0fedeb4a918b309fd943c77bb8",
+      "type": "DESIGN_SYSTEM_INSTANCE"
+    },
+    {
+      "id": "b61070909f284043967d7fcef2a16958",
+      "sourceScreen": "projects/7529641220560354026/screens/b61070909f284043967d7fcef2a16958",
+      "x": 1362,
+      "y": 5974,
+      "width": 390,
+      "height": 1765,
+      "label": "Akilil - Clinical Matching Intake"
+    },
+    {
+      "id": "bd3ef2d2c39e45d4ab4e36e3e50bca5c",
+      "sourceScreen": "projects/7529641220560354026/screens/bd3ef2d2c39e45d4ab4e36e3e50bca5c",
+      "x": 1478,
+      "y": 3972,
+      "width": 390,
+      "height": 1746,
+      "label": "Akilil - Discover & Book Therapists",
+      "hidden": true
+    },
+    {
+      "id": "d6e0c4ca8a354252a9fae6abd0aa1928",
+      "sourceScreen": "projects/7529641220560354026/screens/d6e0c4ca8a354252a9fae6abd0aa1928",
+      "x": 1816,
+      "y": 5974,
+      "width": 390,
+      "height": 1153,
+      "label": "Akilil - Pre-Flight Waiting Room"
+    },
+    {
+      "id": "d7b8ee69161c43deb0aba354f120a002",
+      "sourceScreen": "projects/7529641220560354026/screens/d7b8ee69161c43deb0aba354f120a002",
+      "x": 908,
+      "y": 7995,
+      "width": 390,
+      "height": 2138,
+      "label": "Akilil Pro - Patient Clinical Dossier"
+    },
+    {
+      "id": "f07cd04d403144e2979660342b3e664d",
+      "sourceScreen": "projects/7529641220560354026/screens/f07cd04d403144e2979660342b3e664d",
+      "x": 1024,
+      "y": 1995,
+      "width": 390,
+      "height": 1488,
+      "label": "Akilil - User Sanctuary Today",
+      "hidden": true
+    }
+  ],
+  "metadata": {
+    "userRole": "OWNER"
+  }
+}

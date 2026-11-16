@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
+class CommunityReport extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'reporter_id', 'subject_type', 'subject_id',
+        'reason', 'description', 'status',
+        'resolved_by', 'resolved_at', 'resolution_notes',
+    ];
+
+    protected function casts(): array
+    {
+        return ['resolved_at' => 'datetime'];
+    }
+
+    public function reporter(): BelongsTo     { return $this->belongsTo(User::class, 'reporter_id'); }
+    public function resolver(): BelongsTo     { return $this->belongsTo(User::class, 'resolved_by'); }
+    public function subject(): MorphTo        { return $this->morphTo(); }
+}

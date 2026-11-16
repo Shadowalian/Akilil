@@ -1,0 +1,76 @@
+# Local secrets / MCP credentials — do not commit API keys
+.cursor/mcp.json
+.cursor/
+.env
+**/.env
+**/.env.local
+**/.env.*.local
+**/*.env
+!**/.env.example
+!**/.env.sample
+deploy/SECRETS_NOTE.txt
+deploy/jitsi.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.iml
+
+# Flutter / Dart
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+!friend-flutter/**/pubspec.lock
+**/*.iml
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/android/.gradle/
+**/android/local.properties
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+**/windows/flutter/ephemeral/
+**/linux/flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+
+# Laravel / PHP
+friend-backend/vendor/
+friend-backend/node_modules/
+friend-backend/storage/*.key
+friend-backend/storage/logs/*
+friend-backend/storage/framework/cache/*
+friend-backend/storage/framework/sessions/*
+friend-backend/storage/framework/views/*
+!friend-backend/storage/logs/.gitignore
+!friend-backend/storage/framework/cache/.gitignore
+!friend-backend/storage/framework/sessions/.gitignore
+!friend-backend/storage/framework/views/.gitignore
+friend-backend/public/hot
+friend-backend/public/storage
+friend-backend/bootstrap/cache/*.php
+!friend-backend/bootstrap/cache/.gitignore
+
+# Node
+**/node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Local extract / temp tooling (large mockup dumps)
+_akilil_screens_extract/
+_extract_*.py
+*.log
+*.tmp
+
+# APKs / binaries
+*.apk
+*.aab
+*.ipa
+Desktop/Akilil-APKs/

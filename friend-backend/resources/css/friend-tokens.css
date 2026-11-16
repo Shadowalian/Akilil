@@ -1,0 +1,275 @@
+/* =====================================================================
+ *  Akilil Platform — Design Tokens (CSS custom properties)
+ *
+ *  Single source of truth for the web side. Mirrors
+ *  packages/core/lib/src/theme/design_tokens.dart on the Flutter side.
+ *
+ *  USAGE
+ *    Anywhere in CSS / Tailwind utility extensions / inline styles,
+ *    reference these vars:
+ *      background-color: var(--friend-bg);
+ *      color: var(--friend-text-primary);
+ *      border-radius: var(--friend-radius-md);
+ *
+ *  NEVER hardcode a hex value in a screen component — read it from
+ *  here. Task 11 production-deployment will:
+ *    1. Self-host Fraunces + Inter (drop the @import below)
+ *    2. Add a build step that fails the CI if any hardcoded hex is
+ *       found outside this file.
+ * ===================================================================== */
+
+/* ---- Fonts --------------------------------------------------------- */
+/* Dev: Google Fonts CDN. Replace with self-hosted woff2 in Task 11. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---- 1. Background — creamy white -------------------------------- */
+  --friend-bg:           #FBF7F1;
+  --friend-surface:      #FFFCFA;
+  --friend-recessed:     #F0F7F5;
+
+  /* ---- 2. Light expensive green ----------------------------------- */
+  --friend-primary:      #8FD4A8;
+  --friend-primary-soft: #E5F6EC;
+  --friend-primary-deep: #2F8F6B;
+  --friend-on-primary:   #1A2E2B;
+
+  /* ---- 3. Aqua blue ----------------------------------------------- */
+  --friend-accent:       #3DB8C5;
+  --friend-accent-deep:  #2A9AA6;
+  --friend-on-accent:    #FFFFFF;
+
+  /* ---- 3b. Soft aqua washes --------------------------------------- */
+  --friend-aqua:         #5EC8D4;
+  --friend-aqua-soft:    #D8F2F4;
+
+  /* ---- 4. Text --------------------------------------------------- */
+  --friend-text-primary:   #1A2E2B;
+  --friend-text-secondary: #5A736C;
+  --friend-text-muted:     #8FA39C;
+  --friend-text-inverse:   #FBF7F1;
+
+  /* ---- 5. Lines / dividers / borders ---------------------------- */
+  --friend-border:   #E4EDE8;
+  --friend-divider:  #F0F5F2;
+
+  /* ---- 6. Status ------------------------------------------------ */
+  --friend-error:    #E07070;
+  --friend-error-bg: #FDECEC;
+  --friend-info:     #3DB8C5;
+  --friend-success:  var(--friend-primary);
+
+  /* ---- 7. Type scale (matches Flutter design_tokens.dart) ------ */
+  --friend-font-display: 'Fraunces', Georgia, serif;
+  --friend-font-body:    'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  --friend-text-display-lg:   2.5rem;   /* 40 */
+  --friend-text-display-md:   2rem;     /* 32 */
+  --friend-text-display-sm:   1.75rem;  /* 28 */
+  --friend-text-headline-lg:  1.5rem;   /* 24 */
+  --friend-text-headline-md:  1.25rem;  /* 20 */
+  --friend-text-headline-sm:  1.125rem; /* 18 */
+  --friend-text-body-lg:      1rem;     /* 16 */
+  --friend-text-body-md:      0.875rem; /* 14 */
+  --friend-text-body-sm:      0.75rem;  /* 12 */
+  --friend-text-caption:      0.6875rem;/* 11 */
+
+  /* ---- 8. Radii (12 / 16 / 20 / pill) --------------------------- */
+  --friend-radius-sm:   12px;
+  --friend-radius-md:   16px;
+  --friend-radius-lg:   20px;
+  --friend-radius-pill: 999px;
+
+  /* ---- 9. Elevation (soft, low-opacity shadows only) ------------ */
+  --friend-shadow-card:   0 4px 16px 0 rgba(62, 207, 142, 0.08);
+  --friend-shadow-button: 0 2px 8px  0 rgba(62, 207, 142, 0.10);
+  --friend-shadow-pop:    0 8px 24px 0 rgba(62, 207, 142, 0.12);
+
+  /* ---- 10. Spacing scale (Tailwind's 4px base, exposed here so
+   * Blade views / inline styles don't reinvent it) ---------------- */
+  --friend-space-1:  4px;
+  --friend-space-2:  8px;
+  --friend-space-3:  12px;
+  --friend-space-4:  16px;
+  --friend-space-5:  24px;
+  --friend-space-6:  32px;
+  --friend-space-8:  48px;
+  --friend-space-10: 64px;
+  --friend-space-12: 96px;
+
+  /* ---- 11. Focus ring (accessibility) --------------------------- */
+  --friend-focus-ring: 0 0 0 3px rgba(62, 207, 142, 0.35);
+}
+
+/* =====================================================================
+ *  Dark mode (Task 7+ adds a toggle; admin dashboard stays light by
+ *  default per the brief — this block is opt-in via [data-theme="dark"]
+ *  on a wrapper element).
+ * ===================================================================== */
+
+[data-theme='dark'] {
+  --friend-bg:           #101816;
+  --friend-surface:      #1A2421;
+  --friend-recessed:     #222E2A;
+
+  --friend-primary:      #5FE0A8;
+  --friend-primary-soft: #2A8F62;
+  --friend-on-primary:   #101816;
+
+  --friend-accent:       #FF8B5C;
+  --friend-accent-deep:  #F06A3A;
+
+  --friend-aqua:         #7EE8DE;
+  --friend-aqua-soft:    #1E3A36;
+
+  --friend-text-primary:   #EFF8F4;
+  --friend-text-secondary: #B0C7BE;
+
+  --friend-border:   #2A3833;
+  --friend-divider:  #222E2A;
+}
+
+/* =====================================================================
+ *  Base element styling — applies the design system at the HTML level.
+ *  Blade views / Filament should inherit from here, not redefine.
+ * ===================================================================== */
+
+html, body {
+  background-color: var(--friend-bg);
+  color: var(--friend-text-primary);
+  font-family: var(--friend-font-body);
+  font-size: var(--friend-text-body-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--friend-font-display);
+  color: var(--friend-text-primary);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+h1 { font-size: var(--friend-text-display-md); line-height: 1.15; }
+h2 { font-size: var(--friend-text-headline-lg); line-height: 1.25; }
+h3 { font-size: var(--friend-text-headline-md); line-height: 1.3; }
+h4 { font-size: var(--friend-text-headline-sm); line-height: 1.35; }
+
+a {
+  color: var(--friend-primary);
+  text-decoration: none;
+}
+a:hover { color: var(--friend-primary-deep); }
+
+/* Focus ring — applies to any focusable element. */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--friend-focus-ring);
+  border-radius: var(--friend-radius-sm);
+}
+
+/* ---- Akilil utility classes (used by marketing site, Task 12) --- */
+.friend-card {
+  background-color: var(--friend-surface);
+  border: 1px solid var(--friend-border);
+  border-radius: var(--friend-radius-md);
+  box-shadow: var(--friend-shadow-card);
+  padding: var(--friend-space-5);
+}
+
+.friend-pill {
+  background-color: var(--friend-primary-soft);
+  color: var(--friend-primary-deep);
+  border-radius: var(--friend-radius-pill);
+  padding: 4px 12px;
+  font-size: var(--friend-text-body-sm);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.friend-pill--accent {
+  background-color: rgba(255, 139, 92, 0.15);
+  color: var(--friend-accent-deep);
+}
+
+.friend-pill--aqua {
+  background-color: var(--friend-aqua-soft);
+  color: var(--friend-text-primary);
+}
+
+/* Buttons — pill by default, soft shadow, never a hard edge. */
+.friend-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--friend-space-2);
+  padding: 13px var(--friend-space-5);
+  border: 1px solid transparent;
+  border-radius: var(--friend-radius-pill);
+  background-color: var(--friend-primary);
+  color: var(--friend-on-primary);
+  box-shadow: var(--friend-shadow-button);
+  font-family: var(--friend-font-body);
+  font-size: var(--friend-text-body-md);
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.friend-btn:hover {
+  background-color: var(--friend-primary-deep);
+  color: var(--friend-on-primary);
+  transform: translateY(-1px);
+}
+
+.friend-btn--accent {
+  background-color: var(--friend-accent);
+  color: var(--friend-on-accent);
+}
+
+.friend-btn--accent:hover {
+  background-color: var(--friend-accent-deep);
+  color: var(--friend-on-accent);
+}
+
+.friend-btn--ghost {
+  background-color: var(--friend-surface);
+  border-color: var(--friend-border);
+  color: var(--friend-primary-deep);
+  box-shadow: none;
+}
+
+.friend-btn--ghost:hover {
+  background-color: var(--friend-recessed);
+  color: var(--friend-primary-deep);
+}
+
+/* Form fields — used by the marketing contact form. */
+.friend-input {
+  width: 100%;
+  background-color: var(--friend-surface);
+  border: 1px solid var(--friend-border);
+  border-radius: var(--friend-radius-sm);
+  padding: 12px var(--friend-space-4);
+  font-family: var(--friend-font-body);
+  font-size: var(--friend-text-body-md);
+  color: var(--friend-text-primary);
+}
+
+.friend-input::placeholder { color: var(--friend-text-muted); }
+
+.friend-input--invalid { border-color: var(--friend-error); }
+
+.friend-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--friend-text-body-sm);
+  font-weight: 500;
+  color: var(--friend-text-secondary);
+}

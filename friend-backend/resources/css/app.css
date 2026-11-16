@@ -1,0 +1,19 @@
+/* Tailwind entry — pulls in the design-system tokens (single source of
+ * truth) and lets Tailwind utility classes read from the same palette
+ * the Flutter apps use. */
+
+@import './friend-tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    /* friend-tokens.css already sets background/color/font; this just
+     * layers Tailwind's preflight on top without clobbering our tokens. */
+    background-color: var(--friend-bg);
+    color: var(--friend-text-primary);
+    font-family: var(--friend-font-body);
+  }
+}

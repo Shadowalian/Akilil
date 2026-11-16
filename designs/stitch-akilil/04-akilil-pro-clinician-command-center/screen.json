@@ -1,0 +1,17 @@
+{
+  "name": "projects/7529641220560354026/screens/07b34cdfa3be42f2815b3d9d81c654ae",
+  "title": "Akilil Pro - Clinician Command Center",
+  "screenshot": {
+    "name": "projects/7529641220560354026/screens/07b34cdfa3be42f2815b3d9d81c654ae/fileEntries/screenshot",
+    "downloadUrl": "https://stitch.googleapis.com/v1/projects/7529641220560354026/files/screenshot_00065f45dcc64d8c045ad52d42220770:download",
+    "mimeType": "image/png"
+  },
+  "htmlCode": {
+    "name": "projects/7529641220560354026/screens/07b34cdfa3be42f2815b3d9d81c654ae/fileEntries/html",
+    "downloadUrl": "https://stitch.googleapis.com/v1/projects/7529641220560354026/files/07b34cdfa3be42f2815b3d9d81c654ae:download",
+    "mimeType": "text/html"
+  },
+  "width": "780",
+  "height": "2612",
+  "deviceType": "MOBILE"
+}

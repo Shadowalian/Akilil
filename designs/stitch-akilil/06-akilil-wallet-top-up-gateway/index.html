@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><title>Akilil Stack Shell</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary": "#006194", "primary-fixed-dim": "#6cd3f7", "error-container": "#ffdad6", "surface-container": "#ebedfb", "primary-fixed": "#b7eaff", "on-tertiary-fixed-variant": "#004b73", "background": "#faf9ff", "on-error-container": "#93000a", "inverse-on-surface": "#eef0fe", "on-primary-container": "#fafdff", "surface-container-high": "#e5e8f5", "on-secondary-fixed": "#002020", "on-primary-fixed-variant": "#004e61", "surface": "#faf9ff", "on-background": "#181b25", "primary": "#00647c", "surface-container-lowest": "#ffffff", "surface-variant": "#dfe2ef", "on-secondary-fixed-variant": "#004f50", "on-secondary": "#ffffff", "on-error": "#ffffff", "outline": "#6e797e", "error": "#ba1a1a", "tertiary-fixed-dim": "#93ccff", "outline-variant": "#bdc8ce", "on-surface-variant": "#3e484d", "surface-tint": "#006780", "secondary": "#006a6a", "on-primary-fixed": "#001f28", "on-secondary-container": "#007071", "inverse-surface": "#2c303a", "on-tertiary-fixed": "#001d31", "on-tertiary-container": "#fdfcff", "on-surface": "#181b25", "on-primary": "#ffffff", "tertiary-fixed": "#cce5ff", "surface-container-low": "#f1f3ff", "on-tertiary": "#ffffff", "secondary-fixed-dim": "#26dcdd", "surface-bright": "#faf9ff", "tertiary-container": "#007bb9", "secondary-fixed": "#56f9f9", "surface-container-highest": "#dfe2ef", "primary-container": "#007f9d", "surface-dim": "#d7d9e7", "secondary-container": "#56f9f9", "inverse-primary": "#6cd3f7" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin-sm": "1rem", "space-sm": "0.5rem", "gutter": "1rem", "space-md": "0.75rem", "space-xs": "0.25rem", "margin": "1.25rem", "space-xl": "2rem", "gutter-sm": "0.75rem", "space-lg": "1.25rem" }, "fontFamily": { "label-md": ["Inter"], "display-hero": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "label-micro": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "body-md": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "numeric-metric": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"] }, "fontSize": { "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "display-hero": ["38px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "label-micro": ["10px", { "lineHeight": "12px", "letterSpacing": "0.06em", "fontWeight": "700" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "numeric-metric": ["26px", { "lineHeight": "30px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "display-hero-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;font-feature-settings:"cv02","cv03","cv04","cv11";-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}.pb-safe{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 0.75rem);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}*{-ms-overflow-style:none;scrollbar-width:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="Go back" class="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-low transition-colors active:scale-95" onclick="history.back()"><span class="material-symbols-outlined text-[20px]">arrow_back</span></button><div class="flex flex-col"><h1 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight line-clamp-1">Secure Checkout &amp; Wallet</h1><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed-dim"></span><span class="font-label-micro text-label-micro text-secondary uppercase tracking-wider">E2EE Session</span></div></div></div><div class="flex items-center gap-space-sm"><a class="h-8 px-2.5 rounded-full bg-error-container text-on-error-container flex items-center gap-1 font-label-md text-label-md transition-transform active:scale-95" data-path="sos-crisis" href="#"><span class="material-symbols-outlined text-[15px]">emergency</span><span>SOS</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-surface"><div class="flex flex-col w-full pb-safe">
+<!-- Atmospheric Top Glow Wash -->
+<div class="relative px-margin pt-space-md flex flex-col gap-space-lg">
+<!-- Hero Sovereign Balance Card -->
+<div class="relative w-full rounded-xl bg-gradient-to-br from-primary via-primary-container to-tertiary text-on-primary shadow-xl overflow-hidden p-space-lg">
+<!-- Ambient kinetic glow blobs -->
+<div class="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-secondary-fixed/20 blur-2xl pointer-events-none"></div>
+<div class="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-primary-fixed-dim/15 blur-3xl pointer-events-none"></div>
+<!-- Header row inside card -->
+<div class="relative z-10 flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-xs bg-surface-container-lowest/15 backdrop-blur-md px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[15px] text-secondary-fixed">shield_lock</span>
+<span class="font-label-micro text-label-micro tracking-wider uppercase text-on-primary font-bold">Akilil Care Credit Vault</span>
+</div>
+<div class="flex items-center gap-1 bg-secondary-fixed/20 text-secondary-fixed px-2 py-0.5 rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed animate-ping"></span>
+<span class="font-label-micro text-label-micro font-bold uppercase tracking-wider">E2EE Sealed</span>
+</div>
+</div>
+<!-- Balance Core Metric -->
+<div class="relative z-10 flex flex-col">
+<span class="font-label-md text-label-md text-primary-fixed uppercase tracking-wider">Available Sovereign Balance</span>
+<div class="flex items-baseline gap-2 mt-0.5">
+<span class="font-display-hero-mobile text-display-hero-mobile font-bold tracking-tight text-on-primary">1,850.00</span>
+<span class="font-headline-sm text-headline-sm text-secondary-fixed font-bold">ETB</span>
+</div>
+<div class="flex items-center gap-1.5 mt-1 text-primary-fixed">
+<span class="material-symbols-outlined text-[14px]">swap_horizontal_circle</span>
+<span class="font-body-sm text-body-sm font-medium">≈ $16.20 USD clinical therapeutic value</span>
+</div>
+</div>
+<!-- Capacity Narrative Bar -->
+<div class="relative z-10 mt-space-md pt-space-md bg-surface-container-lowest/10 backdrop-blur-sm rounded-lg p-space-sm flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed/25 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary-fixed text-[18px]">psychology</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-primary/90 leading-snug">
+          Sufficient for <strong class="font-semibold text-secondary-fixed">~2 standard therapy sessions</strong> or 9 community listening credits.
+        </p>
+</div>
+<!-- Auto-Replenish Switch -->
+<div class="relative z-10 mt-space-md pt-space-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-primary font-semibold">Care Continuity Guard</span>
+<span class="font-body-sm text-body-sm text-primary-fixed">Auto-debit active on low balance (&lt;300 ETB)</span>
+</div>
+<button aria-checked="true" class="w-12 h-6 rounded-full bg-secondary-fixed transition-colors duration-200 p-0.5 flex items-center justify-end focus:outline-none shadow-sm" id="autoDebitToggle" role="switch">
+<span class="w-5 h-5 rounded-full bg-on-secondary-fixed transition-transform duration-200 shadow"></span>
+</button>
+</div>
+</div>
+<!-- Escrow Clinical Assurance Banner -->
+<div class="relative w-full rounded-xl bg-surface-container-low p-space-md shadow-sm flex items-start gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[17px]">verified_user</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Protected Care Escrow Guarantee</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-relaxed">
+          Funds are held in neutral escrow and only debited once your session starts. 100% refundable up to 2 hours prior to scheduled therapy.
+        </p>
+</div>
+</div>
+<!-- Replenishment Amount Presets -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Select Replenishment Package</h2>
+</div>
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-secondary font-bold">Instant Top-Up</span>
+</div>
+<!-- Presets Grid -->
+<div class="grid grid-cols-2 gap-space-sm" id="presetContainer">
+<!-- 500 ETB -->
+<button class="preset-card text-left p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex flex-col justify-between min-h-[96px]" data-amount="500" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-on-surface-variant font-bold">Starter</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant check-indicator opacity-0">check_circle</span>
+</div>
+<div class="mt-2">
+<div class="font-numeric-metric text-numeric-metric text-on-surface font-bold">500 <span class="font-label-md text-label-md text-on-surface-variant font-normal">ETB</span></div>
+<div class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Basic listening tier</div>
+</div>
+</button>
+<!-- 1000 ETB -->
+<button class="preset-card text-left p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex flex-col justify-between min-h-[96px]" data-amount="1000" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-on-surface-variant font-bold">Standard</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant check-indicator opacity-0">check_circle</span>
+</div>
+<div class="mt-2">
+<div class="font-numeric-metric text-numeric-metric text-on-surface font-bold">1,000 <span class="font-label-md text-label-md text-on-surface-variant font-normal">ETB</span></div>
+<div class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">1 session + reserve</div>
+</div>
+</button>
+<!-- 2000 ETB (Popular / Selected Default) -->
+<button class="preset-card active-tier text-left p-space-md rounded-xl bg-surface-container-lowest shadow-md transition-all active:scale-[0.98] flex flex-col justify-between min-h-[96px] relative overflow-hidden" data-amount="2000" type="button">
+<div class="absolute top-0 right-0 bg-secondary text-on-secondary px-2 py-0.5 rounded-bl-lg font-label-micro text-label-micro font-bold uppercase tracking-wider">
+            +5% Bonus
+          </div>
+<div class="flex items-center justify-between w-full">
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-secondary font-bold">Most Popular</span>
+<span class="material-symbols-outlined text-[16px] text-secondary check-indicator" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="mt-2">
+<div class="font-numeric-metric text-numeric-metric text-on-surface font-bold text-primary">2,000 <span class="font-label-md text-label-md text-on-surface-variant font-normal">ETB</span></div>
+<div class="font-body-sm text-body-sm text-secondary font-medium line-clamp-1">Save 100 ETB bonus</div>
+</div>
+</button>
+<!-- 5000 ETB -->
+<button class="preset-card text-left p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex flex-col justify-between min-h-[96px]" data-amount="5000" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-on-surface-variant font-bold">Sanctuary</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant check-indicator opacity-0">check_circle</span>
+</div>
+<div class="mt-2">
+<div class="font-numeric-metric text-numeric-metric text-on-surface font-bold">5,000 <span class="font-label-md text-label-md text-on-surface-variant font-normal">ETB</span></div>
+<div class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">4 bundled sessions</div>
+</div>
+</button>
+</div>
+<!-- Custom Amount Input -->
+<div class="mt-space-xs rounded-xl bg-surface-container-lowest p-space-sm shadow-sm flex items-center gap-space-sm">
+<div class="h-10 px-3 rounded-lg bg-surface-container flex items-center justify-center font-label-md text-label-md text-on-surface font-bold shrink-0">
+          ETB
+        </div>
+<input class="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none py-1" id="customAmountInput" placeholder="Enter custom amount (min 200)" type="number"/>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold transition-colors active:scale-95 shrink-0" id="applyCustomBtn">
+          Apply
+        </button>
+</div>
+</div>
+<!-- Payment Rails Selection -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Clinical Payment Gateway</h2>
+</div>
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-outline font-semibold">Zero Fee Tier</span>
+</div>
+<div class="flex flex-col gap-space-sm" id="railsContainer">
+<!-- Telebirr (Selected Default) -->
+<label class="payment-rail flex items-center justify-between p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md cursor-pointer transition-all active:scale-[0.99] ring-2 ring-secondary-container">
+<div class="flex items-center gap-space-md">
+<div class="w-11 h-11 rounded-xl bg-primary-fixed flex items-center justify-center font-bold text-on-primary-fixed shrink-0">
+<span class="material-symbols-outlined text-[24px] text-primary">bolt</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface font-bold">Telebirr SuperApp</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-micro text-label-micro px-1.5 py-0.2 rounded-full font-bold">INSTANT</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Instant push prompt • 0% network fee</span>
+</div>
+</div>
+<input checked="" class="w-4 h-4 text-primary accent-primary shrink-0" name="paymentRail" type="radio" value="Telebirr"/>
+</label>
+<!-- CBE Birr Direct -->
+<label class="payment-rail flex items-center justify-between p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md cursor-pointer transition-all active:scale-[0.99]">
+<div class="flex items-center gap-space-md">
+<div class="w-11 h-11 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px] text-tertiary">account_balance</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface font-bold">CBE Birr / Direct Transfer</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Commercial Bank of Ethiopia • Seamless API</span>
+</div>
+</div>
+<input class="w-4 h-4 text-primary accent-primary shrink-0" name="paymentRail" type="radio" value="CBE Birr"/>
+</label>
+<!-- Dashen Amole -->
+<label class="payment-rail flex items-center justify-between p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md cursor-pointer transition-all active:scale-[0.99]">
+<div class="flex items-center gap-space-md">
+<div class="w-11 h-11 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">account_balance_wallet</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface font-bold">Dashen Bank Amole</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Direct mobile checkout token</span>
+</div>
+</div>
+<input class="w-4 h-4 text-primary accent-primary shrink-0" name="paymentRail" type="radio" value="Dashen Bank"/>
+</label>
+<!-- International Card (Stripe) -->
+<label class="payment-rail flex items-center justify-between p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md cursor-pointer transition-all active:scale-[0.99]">
+<div class="flex items-center gap-space-md">
+<div class="w-11 h-11 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">credit_card</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface font-bold">International Cards</span>
+<span class="bg-surface-container-highest text-on-surface-variant font-label-micro text-label-micro px-1.5 py-0.2 rounded font-bold">STRIPE</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Visa, Mastercard, Amex for diaspora users</span>
+</div>
+</div>
+<input class="w-4 h-4 text-primary accent-primary shrink-0" name="paymentRail" type="radio" value="Card"/>
+</label>
+</div>
+</div>
+<!-- Recent Care Credit Activity (Ledger) -->
+<div class="flex flex-col gap-space-sm mb-20">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Recent Care Credit Ledger</h2>
+<a class="font-label-md text-label-md text-primary font-semibold flex items-center gap-0.5" href="#">
+<span>Full History</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+<div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-lowest p-space-sm shadow-sm">
+<!-- Item 1 -->
+<div class="flex items-center justify-between p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">medical_services</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Dr. Dawit Abebe (Clinical Session)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">E2EE Voice Session • Yesterday</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-md text-label-md font-bold text-on-surface">-650.00 ETB</span>
+<div class="font-label-micro text-label-micro text-secondary font-medium">Completed</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">add_card</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Telebirr Wallet Replenishment</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ref: #AK-892194 • Oct 20</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-md text-label-md font-bold text-primary">+1,000.00 ETB</span>
+<div class="font-label-micro text-label-micro text-secondary font-medium">Settled</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center justify-between p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">forum</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Anonymous Peer Listening Circle</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Community Free Space • Oct 18</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-md text-label-md font-bold text-on-surface-variant">0.00 ETB</span>
+<div class="font-label-micro text-label-micro text-outline font-medium">Granted</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom HUD Action Sheet -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-surface/85 backdrop-blur-xl pb-safe shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
+<div class="px-margin pt-space-sm pb-space-sm max-w-md mx-auto flex flex-col gap-2">
+<!-- Subtle reassurance tag -->
+<div class="flex items-center justify-between text-on-surface-variant px-1">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-secondary">lock</span>
+<span class="font-label-micro text-label-micro font-semibold uppercase tracking-wider text-secondary">Bank-Grade 256-Bit Escrow</span>
+</div>
+<span class="font-label-micro text-label-micro text-on-surface-variant">Instant Clinical Activation</span>
+</div>
+<!-- Vibrant Kinetic Primary Button -->
+<button class="w-full h-12 rounded-full bg-gradient-to-r from-primary via-primary-container to-secondary text-on-primary font-headline-sm text-headline-sm font-semibold flex items-center justify-center gap-2 shadow-lg shadow-primary/25 hover:brightness-105 active:scale-[0.98] transition-all" id="primaryCheckoutBtn">
+<span class="material-symbols-outlined text-[20px]">lock_open</span>
+<span id="btnText">Add 2,000 ETB via Telebirr →</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  (() => {
+    let currentAmount = 2000;
+    let currentRail = 'Telebirr';
+
+    const presetCards = document.querySelectorAll('.preset-card');
+    const customInput = document.getElementById('customAmountInput');
+    const applyCustomBtn = document.getElementById('applyCustomBtn');
+    const railRadios = document.querySelectorAll('input[name="paymentRail"]');
+    const btnText = document.getElementById('btnText');
+    const autoDebitToggle = document.getElementById('autoDebitToggle');
+    const primaryCheckoutBtn = document.getElementById('primaryCheckoutBtn');
+
+    function updateButtonLabel() {
+      const formatted = Number(currentAmount).toLocaleString('en-US');
+      btnText.textContent = `Add ${formatted} ETB via ${currentRail} →`;
+    }
+
+    presetCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        presetCards.forEach(c => {
+          c.classList.remove('active-tier', 'ring-2', 'ring-secondary');
+          const check = c.querySelector('.check-indicator');
+          if (check) {
+            check.classList.add('opacity-0');
+            check.style.fontVariationSettings = "'FILL' 0";
+          }
+        });
+
+        card.classList.add('active-tier', 'ring-2', 'ring-secondary');
+        const check = card.querySelector('.check-indicator');
+        if (check) {
+          check.classList.remove('opacity-0');
+          check.style.fontVariationSettings = "'FILL' 1";
+        }
+
+        currentAmount = parseInt(card.getAttribute('data-amount'), 10);
+        if (customInput) customInput.value = '';
+        updateButtonLabel();
+      });
+    });
+
+    if (applyCustomBtn && customInput) {
+      applyCustomBtn.addEventListener('click', () => {
+        const val = parseInt(customInput.value, 10);
+        if (val && val >= 50) {
+          currentAmount = val;
+          presetCards.forEach(c => {
+            c.classList.remove('active-tier', 'ring-2', 'ring-secondary');
+            const check = c.querySelector('.check-indicator');
+            if (check) check.classList.add('opacity-0');
+          });
+          updateButtonLabel();
+        }
+      });
+    }
+
+    railRadios.forEach((radio) => {
+      radio.addEventListener('change', (e) => {
+        currentRail = e.target.value;
+        document.querySelectorAll('.payment-rail').forEach(p => p.classList.remove('ring-2', 'ring-secondary-container'));
+        const parentLabel = e.target.closest('.payment-rail');
+        if (parentLabel) parentLabel.classList.add('ring-2', 'ring-secondary-container');
+        updateButtonLabel();
+      });
+    });
+
+    if (autoDebitToggle) {
+      autoDebitToggle.addEventListener('click', () => {
+        const isChecked = autoDebitToggle.getAttribute('aria-checked') === 'true';
+        autoDebitToggle.setAttribute('aria-checked', !isChecked);
+        if (isChecked) {
+          autoDebitToggle.classList.remove('bg-secondary-fixed');
+          autoDebitToggle.classList.add('bg-surface-container-highest');
+          autoDebitToggle.firstElementChild.classList.remove('bg-on-secondary-fixed');
+          autoDebitToggle.firstElementChild.classList.add('bg-on-surface-variant');
+          autoDebitToggle.classList.remove('justify-end');
+          autoDebitToggle.classList.add('justify-start');
+        } else {
+          autoDebitToggle.classList.add('bg-secondary-fixed');
+          autoDebitToggle.classList.remove('bg-surface-container-highest');
+          autoDebitToggle.firstElementChild.classList.add('bg-on-secondary-fixed');
+          autoDebitToggle.firstElementChild.classList.remove('bg-on-surface-variant');
+          autoDebitToggle.classList.add('justify-end');
+          autoDebitToggle.classList.remove('justify-start');
+        }
+      });
+    }
+
+    if (primaryCheckoutBtn) {
+      primaryCheckoutBtn.addEventListener('click', () => {
+        primaryCheckoutBtn.classList.add('scale-95');
+        setTimeout(() => {
+          primaryCheckoutBtn.classList.remove('scale-95');
+        }, 150);
+      });
+    }
+
+    updateButtonLabel();
+  })();
+</script></main></body></html>

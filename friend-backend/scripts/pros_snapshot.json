@@ -1,0 +1,241 @@
+{
+    "data": [
+        {
+            "id": 2,
+            "user_id": 26,
+            "display_name": "Waldo Paucek DVM",
+            "avatar_url": null,
+            "bio": "Temporibus et incidunt minima est recusandae quia nemo. Sit reiciendis at perferendis aliquid expedita. Qui sint ratione nam et quam recusandae dignissimos. Quaerat mollitia ut cumque quo provident veniam.",
+            "category": {
+                "id": 2,
+                "slug": "psychiatry",
+                "name": "Psychiatry"
+            },
+            "experience_years": 11,
+            "hourly_rate_cents": 12000,
+            "currency": "USD",
+            "rating_avg": 4.91,
+            "rating_count": 67,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 8,
+            "user_id": 32,
+            "display_name": "Makenzie Wunsch II",
+            "avatar_url": null,
+            "bio": "Eaque ratione quae dignissimos voluptatem. Aut eligendi suscipit facere. Cumque illum pariatur enim molestias vel dicta et. Explicabo et labore suscipit culpa id distinctio sit.",
+            "category": {
+                "id": 1,
+                "slug": "spiritual-psychiatry",
+                "name": "Spiritual Psychiatry"
+            },
+            "experience_years": 4,
+            "hourly_rate_cents": 6000,
+            "currency": "USD",
+            "rating_avg": 4.72,
+            "rating_count": 59,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 3,
+            "user_id": 27,
+            "display_name": "Rosamond Gislason II",
+            "avatar_url": null,
+            "bio": "Ipsa iure reprehenderit non vel ab. Perferendis ut sed nulla vel qui ab. Quidem esse optio possimus voluptates. Odit dolorem atque quibusdam quia quia.",
+            "category": {
+                "id": 1,
+                "slug": "spiritual-psychiatry",
+                "name": "Spiritual Psychiatry"
+            },
+            "experience_years": 1,
+            "hourly_rate_cents": 7500,
+            "currency": "USD",
+            "rating_avg": 4.62,
+            "rating_count": 13,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 9,
+            "user_id": 33,
+            "display_name": "Jose Olson II",
+            "avatar_url": null,
+            "bio": "Dolor quidem minima animi corrupti enim quae soluta. Assumenda consequuntur mollitia soluta. Dolores corrupti consectetur error.",
+            "category": {
+                "id": 3,
+                "slug": "cooking",
+                "name": "Cooking"
+            },
+            "experience_years": 6,
+            "hourly_rate_cents": 9000,
+            "currency": "USD",
+            "rating_avg": 4.31,
+            "rating_count": 69,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 7,
+            "user_id": 31,
+            "display_name": "Emma Lowe",
+            "avatar_url": null,
+            "bio": "Repellendus repellendus fuga error. Et voluptatibus dolorum atque sunt iste quia totam. Doloremque labore adipisci omnis placeat necessitatibus est sit voluptates. Cum minima sit et id tempora officiis omnis placeat.",
+            "category": {
+                "id": 2,
+                "slug": "psychiatry",
+                "name": "Psychiatry"
+            },
+            "experience_years": 16,
+            "hourly_rate_cents": 4500,
+            "currency": "USD",
+            "rating_avg": 4.25,
+            "rating_count": 5,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 1,
+            "user_id": 25,
+            "display_name": "Dr. Maeve Schaden",
+            "avatar_url": null,
+            "bio": "Quia quia similique voluptatem sit delectus libero omnis. Earum sunt occaecati consequatur pariatur sit animi minus. Perferendis expedita fuga quaerat placeat nam. Nesciunt perspiciatis nihil sit voluptatem quisquam tenetur officiis.",
+            "category": {
+                "id": 2,
+                "slug": "psychiatry",
+                "name": "Psychiatry"
+            },
+            "experience_years": 8,
+            "hourly_rate_cents": 12000,
+            "currency": "USD",
+            "rating_avg": 4.06,
+            "rating_count": 66,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 4,
+            "user_id": 28,
+            "display_name": "Dr. Declan Blick",
+            "avatar_url": null,
+            "bio": "Non rem deserunt voluptates eum voluptates. Quaerat mollitia eos a asperiores dolor.",
+            "category": {
+                "id": 3,
+                "slug": "cooking",
+                "name": "Cooking"
+            },
+            "experience_years": 15,
+            "hourly_rate_cents": 3000,
+            "currency": "USD",
+            "rating_avg": 4.05,
+            "rating_count": 69,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 5,
+            "user_id": 29,
+            "display_name": "Carlotta Dicki",
+            "avatar_url": null,
+            "bio": "Enim sapiente sed vero delectus ut quas rerum. Aliquid exercitationem velit perferendis voluptas architecto qui voluptatem. Aut ipsum ipsum aut sed consequuntur.",
+            "category": {
+                "id": 2,
+                "slug": "psychiatry",
+                "name": "Psychiatry"
+            },
+            "experience_years": 14,
+            "hourly_rate_cents": 12000,
+            "currency": "USD",
+            "rating_avg": 4.03,
+            "rating_count": 23,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 10,
+            "user_id": 34,
+            "display_name": "Telly Kilback",
+            "avatar_url": null,
+            "bio": "Qui dicta repellendus totam neque aut nemo animi. Ut odio quos et itaque. Vero earum id fugiat non iusto quo voluptate. Consectetur similique nihil culpa voluptatibus.",
+            "category": {
+                "id": 2,
+                "slug": "psychiatry",
+                "name": "Psychiatry"
+            },
+            "experience_years": 17,
+            "hourly_rate_cents": 9000,
+            "currency": "USD",
+            "rating_avg": 4.01,
+            "rating_count": 33,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 6,
+            "user_id": 30,
+            "display_name": "Icie Nolan",
+            "avatar_url": null,
+            "bio": "Quos aperiam voluptas qui ut optio. Quis optio nesciunt doloremque culpa repellat. Excepturi doloremque animi veniam molestias deserunt quos nemo.",
+            "category": {
+                "id": 3,
+                "slug": "cooking",
+                "name": "Cooking"
+            },
+            "experience_years": 5,
+            "hourly_rate_cents": 9000,
+            "currency": "USD",
+            "rating_avg": 3.74,
+            "rating_count": 65,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        },
+        {
+            "id": 11,
+            "user_id": 35,
+            "display_name": "Demo Pro",
+            "avatar_url": null,
+            "bio": "Seeded demo professional for Akilil.",
+            "category": {
+                "id": 1,
+                "slug": "spiritual-psychiatry",
+                "name": "Spiritual Psychiatry"
+            },
+            "experience_years": 0,
+            "hourly_rate_cents": 5000,
+            "currency": "USD",
+            "rating_avg": 0,
+            "rating_count": 0,
+            "badge_active": true,
+            "verification_status": "approved",
+            "is_accepting_clients": true,
+            "intro_video_url": null
+        }
+    ],
+    "meta": {
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 50,
+        "total": 11
+    }
+}

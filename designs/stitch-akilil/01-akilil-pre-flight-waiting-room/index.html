@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><title>Akilil Stack Shell</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary": "#006194", "primary-fixed-dim": "#6cd3f7", "error-container": "#ffdad6", "surface-container": "#ebedfb", "primary-fixed": "#b7eaff", "on-tertiary-fixed-variant": "#004b73", "background": "#faf9ff", "on-error-container": "#93000a", "inverse-on-surface": "#eef0fe", "on-primary-container": "#fafdff", "surface-container-high": "#e5e8f5", "on-secondary-fixed": "#002020", "on-primary-fixed-variant": "#004e61", "surface": "#faf9ff", "on-background": "#181b25", "primary": "#00647c", "surface-container-lowest": "#ffffff", "surface-variant": "#dfe2ef", "on-secondary-fixed-variant": "#004f50", "on-secondary": "#ffffff", "on-error": "#ffffff", "outline": "#6e797e", "error": "#ba1a1a", "tertiary-fixed-dim": "#93ccff", "outline-variant": "#bdc8ce", "on-surface-variant": "#3e484d", "surface-tint": "#006780", "secondary": "#006a6a", "on-primary-fixed": "#001f28", "on-secondary-container": "#007071", "inverse-surface": "#2c303a", "on-tertiary-fixed": "#001d31", "on-tertiary-container": "#fdfcff", "on-surface": "#181b25", "on-primary": "#ffffff", "tertiary-fixed": "#cce5ff", "surface-container-low": "#f1f3ff", "on-tertiary": "#ffffff", "secondary-fixed-dim": "#26dcdd", "surface-bright": "#faf9ff", "tertiary-container": "#007bb9", "secondary-fixed": "#56f9f9", "surface-container-highest": "#dfe2ef", "primary-container": "#007f9d", "surface-dim": "#d7d9e7", "secondary-container": "#56f9f9", "inverse-primary": "#6cd3f7" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin-sm": "1rem", "space-sm": "0.5rem", "gutter": "1rem", "space-md": "0.75rem", "space-xs": "0.25rem", "margin": "1.25rem", "space-xl": "2rem", "gutter-sm": "0.75rem", "space-lg": "1.25rem" }, "fontFamily": { "label-md": ["Inter"], "display-hero": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "label-micro": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "body-md": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "numeric-metric": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"] }, "fontSize": { "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "display-hero": ["38px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "label-micro": ["10px", { "lineHeight": "12px", "letterSpacing": "0.06em", "fontWeight": "700" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "numeric-metric": ["26px", { "lineHeight": "30px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "display-hero-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;font-feature-settings:"cv02","cv03","cv04","cv11";-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}.pb-safe{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 0.75rem);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}*{-ms-overflow-style:none;scrollbar-width:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="Go back" class="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-low transition-colors active:scale-95" onclick="history.back()"><span class="material-symbols-outlined text-[20px]">arrow_back</span></button><div class="flex flex-col"><h1 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight line-clamp-1">Pre Session Waiting Room</h1><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed-dim"></span><span class="font-label-micro text-label-micro text-secondary uppercase tracking-wider">E2EE Session</span></div></div></div><div class="flex items-center gap-space-sm"><a class="h-8 px-2.5 rounded-full bg-error-container text-on-error-container flex items-center gap-1 font-label-md text-label-md transition-transform active:scale-95" data-path="sos-crisis" href="#"><span class="material-symbols-outlined text-[15px]">emergency</span><span>SOS</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-surface"><div class="flex flex-col w-full pb-safe">
+<div class="px-margin pt-space-md space-y-space-md">
+<!-- Chamber Admission Status Hero Banner -->
+<div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
+<div class="flex items-center justify-between gap-space-sm mb-space-sm">
+<div class="flex items-center gap-space-xs bg-surface-container px-2.5 py-1 rounded-full">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed-dim opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+<span class="font-label-micro text-label-micro text-secondary uppercase tracking-wider font-semibold">Chamber Reserved</span>
+</div>
+<div class="flex items-center gap-1.5 text-primary">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+<span class="font-label-micro text-label-micro uppercase font-bold text-on-surface-variant">E2EE Addis-01</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md">
+<!-- SVG Countdown Radial -->
+<div class="relative w-14 h-14 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 48 48">
+<circle class="stroke-surface-container" cx="24" cy="24" fill="none" r="20" stroke-width="3"></circle>
+<circle class="stroke-secondary transition-all duration-1000" cx="24" cy="24" fill="none" id="countdown-ring" r="20" stroke-dasharray="125.6" stroke-dashoffset="35" stroke-linecap="round" stroke-width="3.5"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-numeric-metric text-[12px] leading-tight font-bold text-on-surface" id="countdown-display">08:42</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate">Dr. Hanna Girma</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-0.5">
+            Reviewing your clinical intake dossier and will admit you momentarily.
+          </p>
+</div>
+</div>
+</div>
+<!-- Self Video & Hardware Diagnostics Sanctuary -->
+<div class="rounded-xl bg-surface-container-lowest overflow-hidden shadow-sm">
+<!-- Simulated Camera Viewport -->
+<div class="relative w-full aspect-[4/3] bg-surface-dim overflow-hidden flex items-end">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Young professional patient sitting relaxed in a softly lit warm sanctuary room with muted neutral tones, ambient natural window light, looking slightly toward camera with a calm serene demeanor, high end aesthetic telehealth portrait photography in cool crisp clarity." id="camera-stream" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDARneo0LpfElBKx_iFugf3WVaT2YRyi_IFRoZeKRcaf7zCCf6v4xaDEQ1AoBqPQxCM8ffX3YneTqxkjgvZTA1INS8K2M24ZIZ4J42G4c4PWVDHBd2vTjQMyz5N7yuH-JY_FTMLjlV1qHJJibSn1SNTXHRaP_NrkVNo9mgHb4n-Q1QxGlRpzVHQx43pFxF7l6yAYThzHjyWexA4oqY0N2zj4T3FE7x6JaW1L6NJVAk"/>
+<!-- Soft Vignette Scrim for Diagnostics Visibility -->
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-black/25 pointer-events-none"></div>
+<!-- Top Mirror Badges -->
+<div class="absolute top-space-sm left-space-sm right-space-sm flex items-center justify-between">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-inverse-surface/70 backdrop-blur-md text-inverse-on-surface font-label-micro text-label-micro font-medium shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+            1080p HD • Active
+          </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-inverse-surface/70 backdrop-blur-md text-inverse-on-surface font-label-micro text-label-micro font-medium shadow-sm">
+<span class="material-symbols-outlined text-[13px] text-secondary-fixed">speed</span>
+            24ms ping
+          </span>
+</div>
+<!-- Bottom Stream Diagnostics Overlay -->
+<div class="relative w-full p-space-md space-y-1.5 z-10">
+<div class="flex items-center justify-between text-inverse-on-surface font-label-micro text-label-micro">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-secondary-fixed">mic</span>
+<span class="font-medium text-inverse-on-surface">Microphone: Crisp (48 kHz)</span>
+</div>
+<!-- Dynamic Equalizer Animation -->
+<div class="flex items-end gap-0.5 h-3">
+<span class="w-0.5 h-1.5 bg-secondary-fixed rounded-full animate-pulse"></span>
+<span class="w-0.5 h-3 bg-secondary-fixed rounded-full animate-bounce"></span>
+<span class="w-0.5 h-2 bg-secondary-fixed rounded-full animate-pulse"></span>
+<span class="w-0.5 h-2.5 bg-secondary-fixed rounded-full animate-bounce"></span>
+</div>
+</div>
+<p class="font-label-micro text-label-micro text-inverse-on-surface/80 flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px] text-secondary-fixed">hub</span>
+            Signal Strong • Jitsi Secure Mesh (Addis Ababa Node)
+          </p>
+</div>
+</div>
+<!-- Quick Media Control Toggles -->
+<div class="p-space-md flex items-center justify-between gap-space-sm bg-surface-container-low">
+<button class="flex-1 py-2 px-3 rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm" id="btn-toggle-mic">
+<span class="material-symbols-outlined text-[18px] text-primary" id="icon-mic">mic</span>
+<span class="font-label-md text-label-md" id="label-mic">Mute Mic</span>
+</button>
+<button class="flex-1 py-2 px-3 rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm" id="btn-toggle-cam">
+<span class="material-symbols-outlined text-[18px] text-primary" id="icon-cam">videocam</span>
+<span class="font-label-md text-label-md" id="label-cam">Camera</span>
+</button>
+<button class="py-2 px-3 rounded-full bg-primary-fixed text-on-primary-fixed-variant flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm" id="btn-blur">
+<span class="material-symbols-outlined text-[18px]">blur_on</span>
+<span class="font-label-md text-label-md font-semibold">Blur On</span>
+</button>
+</div>
+</div>
+<!-- Somatic Calming Prep (Pre-Session Grounding Card) -->
+<div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-label-micro text-label-micro uppercase font-bold text-secondary tracking-wider">Vagal Grounding</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mt-0.5">Centering Moment</h3>
+</div>
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-primary font-label-micro text-label-micro font-medium">
+<span class="material-symbols-outlined text-[14px]">favorite</span>
+<span>72 BPM Baseline</span>
+</div>
+</div>
+<!-- Breathing Cadence Guide -->
+<div class="rounded-lg bg-surface-container-low p-space-md flex items-center gap-space-md">
+<!-- Animated Concentric Pulse Orb -->
+<div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full bg-secondary-fixed opacity-40 transition-all duration-4000 scale-75" id="breath-outer-ring"></div>
+<div class="relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-md transition-all duration-4000 scale-90" id="breath-core-ring">
+<span class="material-symbols-outlined text-[20px]">air</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold" id="breath-phase">Inhale slowly</span>
+<span class="font-numeric-metric text-[14px] text-primary font-bold" id="breath-timer">4s</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            4-7-8 Somatic reset. Soften your shoulders and unclench your jaw.
+          </p>
+</div>
+</div>
+</div>
+<!-- Pre-Session Guidelines & Privacy Protocol -->
+<div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm space-y-space-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Sanctuary Privacy Assurances</h3>
+<div class="space-y-space-sm">
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center shrink-0 mt-0.5 text-primary">
+<span class="material-symbols-outlined text-[18px]">headphones</span>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-body-md text-body-md font-semibold text-on-surface">Private acoustic space recommended</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Use wired or Bluetooth earphones to ensure zero auditory spillover.</p>
+</div>
+</div>
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center shrink-0 mt-0.5 text-primary">
+<span class="material-symbols-outlined text-[18px]">shield</span>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-body-md text-body-md font-semibold text-on-surface">Zero-knowledge session encryption</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Stream is strictly transient. No video, audio, or biometric data is ever logged.</p>
+</div>
+</div>
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center shrink-0 mt-0.5 text-primary">
+<span class="material-symbols-outlined text-[18px]">health_and_safety</span>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-body-md text-body-md font-semibold text-on-surface">Integrated clinical oversight</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Should distress escalate, our senior psychiatric supervisor is on active call.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Navigation Actions Container -->
+<div class="pt-space-xs pb-space-md space-y-space-sm">
+<button class="w-full h-12 rounded-full bg-surface-container-low text-primary flex items-center justify-center gap-2 hover:bg-surface-container active:scale-[0.99] transition-all" id="btn-test-speaker">
+<span class="material-symbols-outlined text-[18px]" id="speaker-icon">volume_up</span>
+<span class="font-label-md text-label-md font-semibold" id="speaker-text">Test Acoustic Speaker Tone</span>
+</button>
+<button class="w-full h-12 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(0,100,124,0.35)] active:scale-[0.98] transition-transform" id="btn-enter-chamber">
+<span class="material-symbols-outlined text-[20px]">meeting_room</span>
+<span class="font-label-md text-label-md font-bold tracking-wide">Enter Telehealth Chamber (Ready)</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  // Countdown Timer Logic
+  let totalSeconds = 522; // 08:42
+  const countdownEl = document.getElementById('countdown-display');
+  const ringEl = document.getElementById('countdown-ring');
+  const circumference = 2 * Math.PI * 20;
+
+  setInterval(() => {
+    if (totalSeconds > 0) {
+      totalSeconds--;
+      const mins = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+      const secs = (totalSeconds % 60).toString().padStart(2, '0');
+      if (countdownEl) countdownEl.textContent = `${mins}:${secs}`;
+      
+      if (ringEl) {
+        const offset = circumference - (totalSeconds / 600) * circumference;
+        ringEl.style.strokeDashoffset = Math.max(0, offset);
+      }
+    }
+  }, 1000);
+
+  // Somatic Breathing Loop (4s Inhale, 7s Hold, 8s Exhale)
+  const breathPhase = document.getElementById('breath-phase');
+  const breathTimer = document.getElementById('breath-timer');
+  const outerRing = document.getElementById('breath-outer-ring');
+  const coreRing = document.getElementById('breath-core-ring');
+
+  const breathingPhases = [
+    { label: 'Inhale slowly', duration: 4, scale: 'scale-125', opacity: 'opacity-80' },
+    { label: 'Gently hold', duration: 7, scale: 'scale-110', opacity: 'opacity-60' },
+    { label: 'Smooth exhale', duration: 8, scale: 'scale-75', opacity: 'opacity-30' }
+  ];
+
+  let currentPhaseIndex = 0;
+  let phaseRemaining = breathingPhases[0].duration;
+
+  function updateBreathingCycle() {
+    if (phaseRemaining <= 0) {
+      currentPhaseIndex = (currentPhaseIndex + 1) % breathingPhases.length;
+      phaseRemaining = breathingPhases[currentPhaseIndex].duration;
+    }
+
+    const current = breathingPhases[currentPhaseIndex];
+    if (breathPhase) breathPhase.textContent = current.label;
+    if (breathTimer) breathTimer.textContent = `${phaseRemaining}s`;
+
+    if (outerRing && coreRing) {
+      outerRing.className = `absolute inset-0 rounded-full bg-secondary-fixed transition-all duration-1000 ${current.scale} ${current.opacity}`;
+    }
+
+    phaseRemaining--;
+  }
+
+  setInterval(updateBreathingCycle, 1000);
+
+  // Micro-interaction Toggles
+  const micBtn = document.getElementById('btn-toggle-mic');
+  const micIcon = document.getElementById('icon-mic');
+  const micLabel = document.getElementById('label-mic');
+  let isMuted = false;
+
+  micBtn?.addEventListener('click', () => {
+    isMuted = !isMuted;
+    if (isMuted) {
+      micIcon.textContent = 'mic_off';
+      micLabel.textContent = 'Unmute';
+      micBtn.classList.add('bg-error-container', 'text-on-error-container');
+      micBtn.classList.remove('bg-surface-container-lowest', 'text-on-surface');
+    } else {
+      micIcon.textContent = 'mic';
+      micLabel.textContent = 'Mute Mic';
+      micBtn.classList.remove('bg-error-container', 'text-on-error-container');
+      micBtn.classList.add('bg-surface-container-lowest', 'text-on-surface');
+    }
+  });
+
+  const camBtn = document.getElementById('btn-toggle-cam');
+  const camIcon = document.getElementById('icon-cam');
+  const camStream = document.getElementById('camera-stream');
+  let isCamOff = false;
+
+  camBtn?.addEventListener('click', () => {
+    isCamOff = !isCamOff;
+    if (isCamOff) {
+      camIcon.textContent = 'videocam_off';
+      if (camStream) camStream.classList.add('opacity-0');
+      camBtn.classList.add('bg-error-container', 'text-on-error-container');
+      camBtn.classList.remove('bg-surface-container-lowest', 'text-on-surface');
+    } else {
+      camIcon.textContent = 'videocam';
+      if (camStream) camStream.classList.remove('opacity-0');
+      camBtn.classList.remove('bg-error-container', 'text-on-error-container');
+      camBtn.classList.add('bg-surface-container-lowest', 'text-on-surface');
+    }
+  });
+
+  const blurBtn = document.getElementById('btn-blur');
+  let isBlurred = true;
+
+  blurBtn?.addEventListener('click', () => {
+    isBlurred = !isBlurred;
+    if (isBlurred) {
+      blurBtn.classList.replace('bg-surface-container', 'bg-primary-fixed');
+      blurBtn.classList.replace('text-on-surface-variant', 'text-on-primary-fixed-variant');
+      if (camStream) camStream.classList.remove('filter-none');
+    } else {
+      blurBtn.classList.replace('bg-primary-fixed', 'bg-surface-container');
+      blurBtn.classList.replace('text-on-primary-fixed-variant', 'text-on-surface-variant');
+      if (camStream) camStream.classList.add('filter-none');
+    }
+  });
+
+  // Acoustic Speaker Test
+  const speakerBtn = document.getElementById('btn-test-speaker');
+  const speakerIcon = document.getElementById('speaker-icon');
+  const speakerText = document.getElementById('speaker-text');
+
+  speakerBtn?.addEventListener('click', () => {
+    speakerText.textContent = 'Playing Chime...';
+    speakerIcon.textContent = 'graphic_eq';
+    speakerBtn.classList.add('bg-primary-fixed', 'text-on-primary-fixed-variant');
+
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(528, audioCtx.currentTime); // Solfeggio Love/Clarity frequency
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.2);
+    } catch(e) {}
+
+    setTimeout(() => {
+      speakerText.textContent = 'Acoustic Sound Verified';
+      speakerIcon.textContent = 'check_circle';
+      setTimeout(() => {
+        speakerText.textContent = 'Test Acoustic Speaker Tone';
+        speakerIcon.textContent = 'volume_up';
+        speakerBtn.classList.remove('bg-primary-fixed', 'text-on-primary-fixed-variant');
+      }, 2000);
+    }, 1200);
+  });
+</script></main></body></html>

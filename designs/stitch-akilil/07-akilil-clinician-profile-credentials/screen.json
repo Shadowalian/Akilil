@@ -1,0 +1,17 @@
+{
+  "name": "projects/7529641220560354026/screens/ab177b39496349029114daaf042569c7",
+  "title": "Akilil - Clinician Profile & Credentials",
+  "screenshot": {
+    "name": "projects/7529641220560354026/screens/ab177b39496349029114daaf042569c7/fileEntries/screenshot",
+    "downloadUrl": "https://stitch.googleapis.com/v1/projects/7529641220560354026/files/screenshot_00065f45c4376e4205fda7c40133670b:download",
+    "mimeType": "image/png"
+  },
+  "htmlCode": {
+    "name": "projects/7529641220560354026/screens/ab177b39496349029114daaf042569c7/fileEntries/html",
+    "downloadUrl": "https://stitch.googleapis.com/v1/projects/7529641220560354026/files/ab177b39496349029114daaf042569c7:download",
+    "mimeType": "text/html"
+  },
+  "width": "780",
+  "height": "3144",
+  "deviceType": "MOBILE"
+}

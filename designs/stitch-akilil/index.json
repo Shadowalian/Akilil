@@ -1,0 +1,56 @@
+[
+  {
+    "title": "Akilil - Pre-Flight Waiting Room",
+    "name": "projects/7529641220560354026/screens/d6e0c4ca8a354252a9fae6abd0aa1928",
+    "folder": "designs\\stitch-akilil\\01-akilil-pre-flight-waiting-room",
+    "deviceType": "MOBILE"
+  },
+  {
+    "title": "Akilil - Live Sanctuary Chamber",
+    "name": "projects/7529641220560354026/screens/7f92d517c67a48b28769c7ceae53ccc4",
+    "folder": "designs\\stitch-akilil\\02-akilil-live-sanctuary-chamber",
+    "deviceType": "MOBILE"
+  },
+  {
+    "title": "Akilil - Cognitive Restructuring Worksheet",
+    "name": "projects/7529641220560354026/screens/30fda1229ef94699b4ad6363a758dd71",
+    "folder": "designs\\stitch-akilil\\03-akilil-cognitive-restructuring-worksheet",
+    "deviceType": "MOBILE"
+  },
+  {
+    "title": "Akilil Pro - Clinician Command Center",
+    "name": "projects/7529641220560354026/screens/07b34cdfa3be42f2815b3d9d81c654ae",
+    "folder": "designs\\stitch-akilil\\04-akilil-pro-clinician-command-center",
+    "deviceType": "MOBILE"
+  },
+  {
+    "title": "Akilil - Somatic Reset Chamber",
+    "name": "projects/7529641220560354026/screens/39d140eed1a046938f678ff219e125c5",
+    "folder": "designs\\stitch-akilil\\05-akilil-somatic-reset-chamber",
+    "deviceType": "MOBILE"
+  },
+  {
+    "title": "Akilil - Wallet & Top-Up Gateway",
+    "name": "projects/7529641220560354026/screens/85a8ceb00c6f4b84862542e11dd80896",
+    "folder": "designs\\stitch-akilil\\06-akilil-wallet-top-up-gateway",
+    "deviceType": "MOBILE"
+  },
+  {
+    "title": "Akilil - Clinician Profile & Credentials",
+    "name": "projects/7529641220560354026/screens/ab177b39496349029114daaf042569c7",
+    "folder": "designs\\stitch-akilil\\07-akilil-clinician-profile-credentials",
+    "deviceType": "MOBILE"
+  },
+  {
+    "title": "Akilil - Clinical Matching Intake",
+    "name": "projects/7529641220560354026/screens/b61070909f284043967d7fcef2a16958",
+    "folder": "designs\\stitch-akilil\\08-akilil-clinical-matching-intake",
+    "deviceType": "MOBILE"
+  },
+  {
+    "title": "Akilil Pro - Patient Clinical Dossier",
+    "name": "projects/7529641220560354026/screens/d7b8ee69161c43deb0aba354f120a002",
+    "folder": "designs\\stitch-akilil\\09-akilil-pro-patient-clinical-dossier",
+    "deviceType": "MOBILE"
+  }
+]

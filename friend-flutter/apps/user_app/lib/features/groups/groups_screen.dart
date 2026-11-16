@@ -1,0 +1,313 @@
+import 'package:core/core.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
+final _clientGroupsProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final dio = ref.read(dioProvider);
+  final res = await dio.get<Map<String, dynamic>>(
+    '/therapy-groups',
+    queryParameters: {'discover': true},
+  );
+  return ((res.data?['data'] as List?) ?? const [])
+      .cast<Map<String, dynamic>>();
+});
+
+class ClientGroupsScreen extends ConsumerWidget {
+  const ClientGroupsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(_clientGroupsProvider);
+    return FriendTabScaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const FriendPageHeader(
+            eyebrow: 'Together',
+            title: 'Group therapy',
+            subtitle: 'Join open groups and meet when the host goes live.',
+          ),
+          Expanded(
+            child: async.when(
+              loading: () =>
+                  const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              error: (_, __) => const FriendEmptyState(
+                icon: Icons.cloud_off_outlined,
+                title: "Couldn't load groups",
+              ),
+              data: (list) {
+                if (list.isEmpty) {
+                  return const FriendEmptyState(
+                    icon: Icons.groups_outlined,
+                    title: 'No open groups yet',
+                    message: 'Listeners can create open groups for you to join.',
+                  );
+                }
+                return RefreshIndicator(
+                  onRefresh: () async => ref.invalidate(_clientGroupsProvider),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(FriendLayout.horizontal),
+                    itemCount: list.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, i) {
+                      final g = list[i];
+                      final isMember = g['is_member'] == true;
+                      return CandyCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              g['title'] as String? ?? 'Group',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            if ((g['description'] as String?)?.isNotEmpty ==
+                                true) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                g['description'] as String,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: FriendColors.textSecondary),
+                              ),
+                            ],
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Text(
+                                  '${g['member_count'] ?? 0} members',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                                const Spacer(),
+                                if (isMember)
+                                  FriendGlowButton(
+                                    label: 'Open',
+                                    onPressed: () =>
+                                        context.go('/groups/${g['id']}'),
+                                  )
+                                else
+                                  FriendGlowButton(
+                                    label: 'Join group',
+                                    onPressed: () async {
+                                      try {
+                                        final dio = ref.read(dioProvider);
+                                        await dio.post(
+                                          '/therapy-groups/${g['id']}/join',
+                                        );
+                                        ref.invalidate(_clientGroupsProvider);
+                                        if (!context.mounted) return;
+                                        context.go('/groups/${g['id']}');
+                                      } on DioException catch (e) {
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              e.response?.data?['message'] ??
+                                                  'Join failed',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ClientGroupDetailScreen extends ConsumerStatefulWidget {
+  const ClientGroupDetailScreen({super.key, required this.groupId});
+  final String groupId;
+
+  @override
+  ConsumerState<ClientGroupDetailScreen> createState() =>
+      _ClientGroupDetailScreenState();
+}
+
+class _ClientGroupDetailScreenState
+    extends ConsumerState<ClientGroupDetailScreen> {
+  Map<String, dynamic>? _group;
+  List<Map<String, dynamic>> _meetings = const [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final dio = ref.read(dioProvider);
+      final g =
+          await dio.get<Map<String, dynamic>>('/therapy-groups/${widget.groupId}');
+      final m = await dio.get<Map<String, dynamic>>(
+        '/therapy-groups/${widget.groupId}/meetings',
+      );
+      if (!mounted) return;
+      setState(() {
+        _group = (g.data?['group'] as Map<String, dynamic>?) ?? g.data;
+        _meetings = ((m.data?['data'] as List?) ?? const [])
+            .cast<Map<String, dynamic>>();
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final title = _group?['title'] as String? ?? 'Group';
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(
+            'When your host starts a meeting, Join opens the shared video room.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: FriendColors.textSecondary,
+                ),
+          ),
+          const SizedBox(height: 16),
+          for (final m in _meetings)
+            Card(
+              child: ListTile(
+                title: Text(m['title'] as String? ?? 'Meeting'),
+                subtitle: Text(
+                  DateFormat('EEE MMM d · h:mm a').format(
+                    DateTime.parse(m['scheduled_at'] as String).toLocal(),
+                  ),
+                ),
+                trailing: m['status'] == 'live'
+                    ? FilledButton(
+                        onPressed: () => context.go(
+                          '/groups/meetings/${m['id']}/join',
+                        ),
+                        child: const Text('Join'),
+                      )
+                    : Text(
+                        m['status'] as String? ?? '',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class ClientGroupMeetingScreen extends ConsumerStatefulWidget {
+  const ClientGroupMeetingScreen({super.key, required this.meetingId});
+  final String meetingId;
+
+  @override
+  ConsumerState<ClientGroupMeetingScreen> createState() =>
+      _ClientGroupMeetingScreenState();
+}
+
+class _ClientGroupMeetingScreenState
+    extends ConsumerState<ClientGroupMeetingScreen> {
+  String? _roomUrl;
+  String? _jwt;
+  String? _displayName;
+  bool _starting = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _join();
+  }
+
+  Future<void> _join() async {
+    setState(() {
+      _starting = true;
+      _error = null;
+    });
+    try {
+      final dio = ref.read(dioProvider);
+      final res = await dio.post<Map<String, dynamic>>(
+        '/therapy-group-meetings/${widget.meetingId}/join',
+      );
+      final session =
+          (res.data?['session'] as Map<String, dynamic>?) ?? const {};
+      setState(() {
+        _roomUrl = session['room_url'] as String?;
+        _jwt = session['token'] as String?;
+        _displayName = res.data?['display_name'] as String? ?? 'Akilil';
+        _starting = false;
+      });
+    } on DioException catch (e) {
+      setState(() {
+        _starting = false;
+        _error = e.response?.data is Map
+            ? (e.response!.data['message'] ?? "Couldn't join").toString()
+            : "Couldn't join";
+      });
+    } catch (_) {
+      setState(() {
+        _starting = false;
+        _error = "Couldn't join";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_error != null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: FriendEmptyState(
+          icon: Icons.videocam_off_outlined,
+          title: "Couldn't join",
+          message: _error,
+          ctaLabel: 'Retry',
+          onCta: _join,
+        ),
+      );
+    }
+    if (_starting || _roomUrl == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: JitsiSessionView(
+        roomUrl: _roomUrl!,
+        jwt: _jwt,
+        displayName: _displayName,
+        onLeave: () {
+          if (mounted) Navigator.of(context).maybePop();
+        },
+      ),
+    );
+  }
+}

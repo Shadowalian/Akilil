@@ -1,0 +1,92 @@
+[
+    {
+        "email": "sara.mekonnen@akilil.app",
+        "password": "AkililCare1!",
+        "token": "35|UqD2OxbUCzOpbFdYVK834eEaKEdPfgk6TVXrWC0T413e8979",
+        "user_id": 37,
+        "name": "Dr. Sara Mekonnen",
+        "profile_hint": {
+            "token": "35|UqD2OxbUCzOpbFdYVK834eEaKEdPfgk6TVXrWC0T413e8979",
+            "user": {
+                "id": 37,
+                "name": "Dr. Sara Mekonnen",
+                "email": "sara.mekonnen@akilil.app",
+                "role": "professional",
+                "locale": "en",
+                "timezone": "Africa\/Addis_Ababa",
+                "avatar_url": null,
+                "gender": null,
+                "date_of_birth": null,
+                "email_verified_at": null,
+                "two_factor_enabled": false,
+                "has_recovery_codes": false,
+                "is_professional": true,
+                "is_admin": false,
+                "created_at": "2026-09-21T08:47:45+00:00"
+            },
+            "requires_2fa": false,
+            "challenge_token": null,
+            "expires_at": "2026-09-28T08:47:45+00:00"
+        }
+    },
+    {
+        "email": "helen.tadesse@akilil.app",
+        "password": "AkililCare1!",
+        "token": "36|4D5m31faUS0FTnMGgBUiwpXK2hfP4Mj7c1sGXtClc1a26be1",
+        "user_id": 38,
+        "name": "Helen Tadesse",
+        "profile_hint": {
+            "token": "36|4D5m31faUS0FTnMGgBUiwpXK2hfP4Mj7c1sGXtClc1a26be1",
+            "user": {
+                "id": 38,
+                "name": "Helen Tadesse",
+                "email": "helen.tadesse@akilil.app",
+                "role": "professional",
+                "locale": "en",
+                "timezone": "Africa\/Addis_Ababa",
+                "avatar_url": null,
+                "gender": null,
+                "date_of_birth": null,
+                "email_verified_at": null,
+                "two_factor_enabled": false,
+                "has_recovery_codes": false,
+                "is_professional": true,
+                "is_admin": false,
+                "created_at": "2026-09-21T08:47:45+00:00"
+            },
+            "requires_2fa": false,
+            "challenge_token": null,
+            "expires_at": "2026-09-28T08:47:45+00:00"
+        }
+    },
+    {
+        "email": "yonas.bekele@akilil.app",
+        "password": "AkililCare1!",
+        "token": "37|sYnHfgHkJcu56orPP8caZCnACOYXQ4kcw5rX67Wa3678e1dc",
+        "user_id": 39,
+        "name": "Chef Yonas Bekele",
+        "profile_hint": {
+            "token": "37|sYnHfgHkJcu56orPP8caZCnACOYXQ4kcw5rX67Wa3678e1dc",
+            "user": {
+                "id": 39,
+                "name": "Chef Yonas Bekele",
+                "email": "yonas.bekele@akilil.app",
+                "role": "professional",
+                "locale": "en",
+                "timezone": "Africa\/Addis_Ababa",
+                "avatar_url": null,
+                "gender": null,
+                "date_of_birth": null,
+                "email_verified_at": null,
+                "two_factor_enabled": false,
+                "has_recovery_codes": false,
+                "is_professional": true,
+                "is_admin": false,
+                "created_at": "2026-09-21T08:47:47+00:00"
+            },
+            "requires_2fa": false,
+            "challenge_token": null,
+            "expires_at": "2026-09-28T08:47:47+00:00"
+        }
+    }
+]

@@ -1,0 +1,39 @@
+name: friend_workspace
+
+# Melos config for the Akilil Flutter monorepo.
+# Bootstraps path-based dependencies and runs pub get across all packages.
+# Docs: https://melos.invertase.dev
+
+packages:
+  - apps/*
+  - packages/*
+
+command:
+  bootstrap:
+    runPubGetInParallel: false  # safer on Windows; serde-style path resolution
+
+scripts:
+  lint:all:
+    description: Run flutter analyze on every package.
+    run: melos exec -c 1 -- "flutter analyze"
+
+  format:
+    description: Format every Dart file.
+    run: melos exec -c 1 -- "dart format ."
+
+  test:
+    description: Run tests across every package.
+    run: melos exec -c 1 -- "flutter test"
+
+  # Cross-platform release builds (Task 11 wires real signing).
+  build:user:android:
+    description: Build the User app Android bundle (debug for now).
+    run: melos exec --scope=friend_user -- "flutter build apk --debug"
+
+  build:user:ios:
+    description: Build the User app iOS archive (debug for now).
+    run: melos exec --scope=friend_user -- "flutter build ios --debug --no-codesign"
+
+  build:pro:android:
+    description: Build the Pro app Android bundle.
+    run: melos exec --scope=friend_professional -- "flutter build apk --debug"

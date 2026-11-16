@@ -1,0 +1,17 @@
+{
+  "name": "projects/7529641220560354026/screens/7f92d517c67a48b28769c7ceae53ccc4",
+  "title": "Akilil - Live Sanctuary Chamber",
+  "screenshot": {
+    "name": "projects/7529641220560354026/screens/7f92d517c67a48b28769c7ceae53ccc4/fileEntries/screenshot",
+    "downloadUrl": "https://stitch.googleapis.com/v1/projects/7529641220560354026/files/screenshot_00065f45dc46573e045ad52d42220770:download",
+    "mimeType": "image/png"
+  },
+  "htmlCode": {
+    "name": "projects/7529641220560354026/screens/7f92d517c67a48b28769c7ceae53ccc4/fileEntries/html",
+    "downloadUrl": "https://stitch.googleapis.com/v1/projects/7529641220560354026/files/7f92d517c67a48b28769c7ceae53ccc4:download",
+    "mimeType": "text/html"
+  },
+  "width": "780",
+  "height": "2142",
+  "deviceType": "MOBILE"
+}

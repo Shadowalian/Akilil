@@ -1,0 +1,13 @@
+# Akilil — local Jitsi Meet
+#
+# Start:   docker compose up -d
+# Stop:    docker compose down
+# Logs:    docker compose logs -f web
+# Meet UI: http://127.0.0.1:8080
+#
+# Laravel must use the same JWT secrets as this stack
+# (see friend-backend/.env and akilil-secrets.env).
+
+.env
+akilil-secrets.env
+.jitsi-meet-cfg/

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 0.75rem);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "error": "#ba1a1a", "on-primary-fixed": "#001f28", "surface-bright": "#faf9ff", "tertiary-container": "#007bb9", "tertiary-fixed": "#cce5ff", "surface-container-high": "#e5e8f5", "surface-container": "#ebedfb", "primary-fixed": "#b7eaff", "outline": "#6e797e", "surface-container-highest": "#dfe2ef", "inverse-on-surface": "#eef0fe", "tertiary-fixed-dim": "#93ccff", "tertiary": "#006194", "inverse-primary": "#6cd3f7", "on-tertiary-fixed-variant": "#004b73", "on-primary-fixed-variant": "#004e61", "on-secondary-fixed-variant": "#004f50", "on-tertiary": "#ffffff", "primary-fixed-dim": "#6cd3f7", "surface-tint": "#006780", "primary-container": "#007f9d", "on-surface-variant": "#3e484d", "on-secondary": "#ffffff", "secondary-container": "#56f9f9", "surface-variant": "#dfe2ef", "secondary-fixed": "#56f9f9", "on-background": "#181b25", "secondary": "#006a6a", "surface": "#faf9ff", "error-container": "#ffdad6", "on-tertiary-container": "#fdfcff", "primary": "#00647c", "outline-variant": "#bdc8ce", "surface-container-lowest": "#ffffff", "on-primary-container": "#fafdff", "on-tertiary-fixed": "#001d31", "on-error": "#ffffff", "surface-container-low": "#f1f3ff", "on-error-container": "#93000a", "on-primary": "#ffffff", "on-secondary-fixed": "#002020", "background": "#faf9ff", "surface-dim": "#d7d9e7", "secondary-fixed-dim": "#26dcdd", "on-surface": "#181b25", "inverse-surface": "#2c303a", "on-secondary-container": "#007071" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "space-md": "0.75rem", "space-sm": "0.5rem", "space-xl": "2rem", "margin-sm": "1rem", "space-xs": "0.25rem", "margin": "1.25rem", "space-lg": "1.25rem", "gutter-sm": "0.75rem" }, fontFamily: { "headline-md": ["Plus Jakarta Sans"], "label-micro": ["Inter"], "display-hero-mobile": ["Plus Jakarta Sans"], "label-md": ["Inter"], "numeric-metric": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "body-md": ["Inter"], "display-hero": ["Plus Jakarta Sans"] }, fontSize: { "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-micro": ["10px", { "lineHeight": "12px", "letterSpacing": "0.06em", "fontWeight": "700" }], "display-hero-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "numeric-metric": ["26px", { "lineHeight": "30px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "display-hero": ["38px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface flex flex-col min-h-screen selection:bg-secondary-container"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_12px_rgba(9,13,22,0.03)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><button aria-label="Go Back" class="w-11 h-11 -ml-1.5 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[22px]">arrow_back_ios_new</span></button><div class="flex flex-col min-w-0"><span class="font-label-micro text-label-micro text-secondary uppercase tracking-widest">Akilil Sanctuary</span><h1 class="font-headline-sm text-headline-sm truncate text-on-surface font-semibold">Somatic Tool Player</h1></div></div><div class="flex items-center gap-space-sm shrink-0"><div class="hidden xs:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-secondary shadow-[0_1px_2px_rgba(9,13,22,0.02)]"><span class="material-symbols-outlined text-[14px]">verified_user</span><span class="font-label-micro text-label-micro tracking-wider uppercase font-semibold">E2EE</span></div><button aria-label="Crisis SOS" class="min-h-[44px] px-3.5 py-1.5 rounded-full bg-error-container text-on-error-container flex items-center gap-1.5 transition-colors hover:bg-error hover:text-on-error" type="button"><span class="material-symbols-outlined text-[16px]">e911_emergency</span><span class="font-label-md text-label-md tracking-wider uppercase font-bold">SOS</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_2px_6px_rgba(0,100,124,0.2)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="px-margin pt-space-md pb-space-lg flex flex-col gap-space-lg">
+<!-- Top Sanctuary Intent & Mode Selector Pill Strip -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/30 text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-micro text-label-micro uppercase tracking-widest font-semibold">Vagal Nerve Neuromodulation</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[15px]">graphic_eq</span>
+<span class="font-label-micro text-label-micro uppercase tracking-wider font-medium">96 kHz Lossless</span>
+</div>
+</div>
+<!-- Mode Selector Scrollable Strip -->
+<div class="overflow-x-auto no-scrollbar -mx-margin px-margin py-1">
+<div class="flex items-center gap-space-sm w-max" id="cadenceModes">
+<button class="px-4 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm flex items-center gap-2 bg-primary text-on-primary" data-mode="box" type="button">
+<span class="material-symbols-outlined text-[16px]">all_inclusive</span>
+<span>4-7-8 Box Cadence (Anxiety Reset)</span>
+</button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md transition-all flex items-center gap-2 bg-surface-container text-on-surface-variant hover:bg-surface-container-high" data-mode="sigh" type="button">
+<span class="material-symbols-outlined text-[16px]">air</span>
+<span>Physiological Sigh (Rapid Calming)</span>
+</button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md transition-all flex items-center gap-2 bg-surface-container text-on-surface-variant hover:bg-surface-container-high" data-mode="coherent" type="button">
+<span class="material-symbols-outlined text-[16px]">monitor_heart</span>
+<span>Coherent Resonance (HRV Peak)</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Central Interactive Visualizer Mandala -->
+<div class="relative w-full rounded-2xl bg-surface-container-lowest shadow-[0_8px_30px_rgba(0,100,124,0.06)] p-space-lg flex flex-col items-center justify-center overflow-hidden">
+<!-- Ambient Radial Backdrops -->
+<div class="absolute -top-16 -left-16 w-56 h-56 rounded-full bg-secondary-fixed/40 blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-primary-fixed/40 blur-3xl pointer-events-none"></div>
+<!-- Status Indicator Pill -->
+<div class="z-10 mb-3 flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-low shadow-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">spatial_audio</span>
+<span class="font-label-micro text-label-micro tracking-wider uppercase text-on-surface-variant">Spatial Binaural Waves • 108 Hz Carrier</span>
+</div>
+<!-- Breathing Visualizer Core with Concentric Glow Rings -->
+<div class="relative w-64 h-64 my-2 flex items-center justify-center">
+<!-- Concentric Halo Layers -->
+<div class="absolute inset-0 rounded-full bg-secondary-fixed-dim/20 scale-100 transition-all duration-1000 ease-in-out" id="ringOuter"></div>
+<div class="absolute inset-4 rounded-full bg-secondary-container/30 scale-95 transition-all duration-1000 ease-in-out" id="ringMid"></div>
+<div class="absolute inset-8 rounded-full bg-primary-fixed/35 scale-90 transition-all duration-1000 ease-in-out shadow-[0_0_40px_rgba(86,249,249,0.35)]" id="ringInner"></div>
+<!-- Mandala Optical Geometry Ring -->
+<div class="absolute inset-10 rounded-full flex items-center justify-center opacity-70">
+<svg class="w-full h-full text-secondary animate-[spin_40s_linear_infinite]" fill="none" viewbox="0 0 100 100">
+<circle cx="50" cy="50" opacity="0.4" r="46" stroke="currentColor" stroke-dasharray="2 3" stroke-width="0.75"></circle>
+<circle cx="50" cy="50" opacity="0.6" r="38" stroke="currentColor" stroke-dasharray="1 4" stroke-width="1"></circle>
+<polygon fill="currentColor" fill-opacity="0.04" points="50,14 62,50 50,86 38,50" stroke="currentColor" stroke-width="0.5"></polygon>
+<polygon fill="currentColor" fill-opacity="0.04" points="14,50 50,62 86,50 50,38" stroke="currentColor" stroke-width="0.5"></polygon>
+</svg>
+</div>
+<!-- Center Glowing Kinetic Pod -->
+<div class="relative z-10 w-36 h-36 rounded-full bg-gradient-to-br from-surface-container-lowest via-surface-container-low to-secondary-container/40 shadow-[0_4px_24px_rgba(0,103,128,0.12)] flex flex-col items-center justify-center p-3 text-center transition-transform duration-700 ease-out" id="coreSphere">
+<span class="font-label-micro text-label-micro font-bold uppercase tracking-widest text-primary" id="promptPhase">Inhale</span>
+<span class="font-display-hero-mobile text-display-hero-mobile font-bold text-on-surface my-0.5" id="countdownTimer">4</span>
+<span class="font-label-micro text-label-micro text-on-surface-variant tracking-wider uppercase">Seconds</span>
+</div>
+</div>
+<!-- Real-time Phase Guidance Legend -->
+<div class="z-10 mt-2 flex items-center justify-center gap-6 text-center">
+<div class="flex flex-col items-center">
+<span class="font-label-micro text-label-micro uppercase text-on-surface-variant">Cadence Goal</span>
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface" id="cadenceSubtitle">4 • 7 • 8</span>
+</div>
+<div class="h-6 w-[1px] bg-outline-variant/40"></div>
+<div class="flex flex-col items-center">
+<span class="font-label-micro text-label-micro uppercase text-on-surface-variant">Audio Phase</span>
+<span class="font-headline-sm text-headline-sm font-semibold text-secondary">Theta Sync</span>
+</div>
+</div>
+</div>
+<!-- Physiological Metrics Card: Heart Rate Telemetry & Autonomic Status -->
+<div class="w-full rounded-2xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(9,13,22,0.03)] p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">ecg_heart</span>
+</div>
+<div>
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase tracking-wider block">Bio-Somatic Sensor</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Real-Time Telemetry</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-container/40 text-on-secondary-container">
+<span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+<span class="font-label-micro text-label-micro uppercase font-bold tracking-widest">Active</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm pt-1">
+<!-- Heart Rate Metric Tile -->
+<div class="rounded-xl bg-surface-container-low p-space-md flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-1">
+<span class="font-label-md text-label-md">Heart Rate</span>
+<span class="material-symbols-outlined text-[16px] text-error">favorite</span>
+</div>
+<div class="flex items-baseline gap-1.5">
+<span class="font-numeric-metric text-numeric-metric text-on-surface font-bold tracking-tight">68</span>
+<span class="font-label-md text-label-md text-on-surface-variant">BPM</span>
+</div>
+<span class="font-label-micro text-label-micro text-secondary font-semibold mt-1">Grounded State (Parasympathetic)</span>
+</div>
+<!-- Autonomic Nervous System Status Tile -->
+<div class="rounded-xl bg-surface-container-low p-space-md flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-1">
+<span class="font-label-md text-label-md">Vagal Tone</span>
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+</div>
+<div class="flex items-baseline gap-1.5">
+<span class="font-numeric-metric text-numeric-metric text-on-surface font-bold tracking-tight">94%</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Index</span>
+</div>
+<span class="font-label-micro text-label-micro text-primary font-semibold mt-1">Optimal ANS Coherence</span>
+</div>
+</div>
+<!-- Real-time Sparkline Bar Waveform -->
+<div class="rounded-xl bg-surface-container-low/60 p-space-sm flex items-center justify-between gap-1 h-9 px-3">
+<span class="font-label-micro text-label-micro uppercase text-on-surface-variant font-medium">HRV Spectrum</span>
+<div class="flex items-end gap-1 h-5">
+<div class="w-1.5 bg-secondary/60 rounded-full h-2 animate-[pulse_1.2s_ease-in-out_infinite]"></div>
+<div class="w-1.5 bg-secondary/80 rounded-full h-4 animate-[pulse_1.5s_ease-in-out_infinite]"></div>
+<div class="w-1.5 bg-primary rounded-full h-5 animate-[pulse_1.1s_ease-in-out_infinite]"></div>
+<div class="w-1.5 bg-secondary rounded-full h-3 animate-[pulse_1.8s_ease-in-out_infinite]"></div>
+<div class="w-1.5 bg-primary/70 rounded-full h-4 animate-[pulse_1.4s_ease-in-out_infinite]"></div>
+<div class="w-1.5 bg-secondary/50 rounded-full h-2 animate-[pulse_1.6s_ease-in-out_infinite]"></div>
+</div>
+</div>
+</div>
+<!-- Audio Environment Selector (Ethiopian Sanctuary Landscapes) -->
+<div class="w-full rounded-2xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(9,13,22,0.03)] p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase tracking-wider block">Soundscape Immersion</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Acoustic Audio Environment</h2>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">volume_up</span>
+</button>
+</div>
+<!-- Audio Track Grid with Cohesive Photographic Placeholders -->
+<div class="grid grid-cols-2 gap-space-sm" id="soundscapeOptions">
+<!-- Option 1: Addis Highland Rain (Selected) -->
+<button class="w-full text-left rounded-xl p-space-sm bg-primary-fixed/20 shadow-sm flex flex-col gap-2 transition-all" data-sound="addis" type="button">
+<div class="w-full h-20 rounded-lg overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Serene rain falling softly over lush eucalyptus trees on Entoto highland Addis Ababa at dawn, mist rising gently in pure morning light, soft emerald greens, cinematic tranquil atmospheric photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_njV7teBrLA9EDpJ1UJCHBHmkUSIz4KwJANIZfV9fYQrvJMwEmEh24NA9vwwqtSIcaj9jOXx6lxVvfQrdZIgPdc9i2dXznMOLT8C8DorsXGetFdU10B3xqQa5sMhNl4R7Eanfo5BrelMidWKKWseDab1Q0V0KRK1IPeaO9M3PCU7LH_wUBVcseMYyKmrosRJjo8KdsSviX2Bb-oov29Cw9-XnOzDg2x5L00BXRL0"/>
+<div class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[14px]">music_note</span>
+</div>
+</div>
+<div>
+<span class="font-label-md text-label-md font-semibold text-on-surface block truncate">Addis Highland Rain</span>
+<span class="font-label-micro text-label-micro text-secondary font-medium block">432 Hz Rain Patter</span>
+</div>
+</button>
+<!-- Option 2: Simien Mountain Breeze -->
+<button class="w-full text-left rounded-xl p-space-sm bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-2" data-sound="simien" type="button">
+<div class="w-full h-20 rounded-lg overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Vast cinematic mountain peaks of Simien Mountains Ethiopia with gentle cool breeze, sweeping golden grassland plateau against pale blue sky, calming breath-taking nature vista." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3ZKMAT_lvuuFW8D9DhT8Df1_Ith_7LzAjxtHOLJQJiZUIB4US6Sespe6X1AopcFWcaAWYI9EpIqEF_1fL9BO2l0l197qqB5A03VVQSm7fe-jfaUHfQug_5G1SBST9vX0W9e5paK3wzoc6xW20wqyoDvlv2WrkZm7NvZBTakOv9bVmhFZBEWUO-HeNoVGAdzi0T9aCklLKH5tPZlH9fSP8N5WbrZjjgtZjwzUoco"/>
+</div>
+<div>
+<span class="font-label-md text-label-md font-semibold text-on-surface block truncate">Simien Mountain Breeze</span>
+<span class="font-label-micro text-label-micro text-on-surface-variant block">Low-Altitude Wind</span>
+</div>
+</button>
+<!-- Option 3: Subtle Krar Resonance -->
+<button class="w-full text-left rounded-xl p-space-sm bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-2" data-sound="krar" type="button">
+<div class="w-full h-20 rounded-lg overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Close up artisan view of an Ethiopian traditional stringed krar instrument made of polished cedar wood bathed in warm meditation studio sunlight, soothing aesthetic, peaceful atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-AmQTRBgjX3YnGe7g885tvaPTdIOjhWNHZfDRSAYxDbHJchIMYVl3uo-ViGt-Kbho7Zi-yE2S82H7IdkUgx6LKfjrs2MAibNc5JT3_G8DOWpVARzV5UXVEPwPeP3icaTByehA8X4mczpwZyA897WT9VM0uhB4PYM46DTF6IwKJuCXoGYHbqin-2SyLx28rRHwoTTwnPj0tJDc4gEx4_6UXSosgc6sE-_hNMCGbiQ"/>
+</div>
+<div>
+<span class="font-label-md text-label-md font-semibold text-on-surface block truncate">Subtle Krar Resonance</span>
+<span class="font-label-micro text-label-micro text-on-surface-variant block">528 Hz Pentatonic</span>
+</div>
+</button>
+<!-- Option 4: Pure Pink Noise -->
+<button class="w-full text-left rounded-xl p-space-sm bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-2" data-sound="pink" type="button">
+<div class="w-full h-20 rounded-lg overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Abstract tranquil sound waves floating like soft translucent ocean foam and pure turquoise ambient light particles, meditative clean minimalist aesthetic, high-key lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBmvMl0v-nV6kUBnTIVbC6BkvQATXkRF2uL7tY7h6XpAsjdqYhxmmWASFibsD1pca0JOjupMSR0-ceGTdGHqc4kk1r_0xaltlIgQ-tJot5SmN5kbZf7SbGXl-ii0sWCHTu2g4mKyK6wysuRV5jDMlaWwns-1XVOwFBt4WC39Wf59K69PwmvznyER97O04GscPbEZHDbqNu-5KulujliVUZhV2Bk4Z0PZr9fMtL5SE"/>
+</div>
+<div>
+<span class="font-label-md text-label-md font-semibold text-on-surface block truncate">Pure Pink Noise</span>
+<span class="font-label-micro text-label-micro text-on-surface-variant block">Neurological Masking</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Session Duration & Gentle Haptic Settings Card -->
+<div class="w-full rounded-2xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(9,13,22,0.03)] p-space-lg flex flex-col gap-space-md">
+<!-- Duration Selection -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase tracking-wider font-semibold">Chamber Immersion Duration</span>
+<div class="grid grid-cols-3 gap-space-sm pt-1" id="durationChips">
+<button class="py-2.5 rounded-xl font-label-md text-label-md font-semibold text-center transition-all bg-primary text-on-primary shadow-sm" type="button">
+            5 min
+          </button>
+<button class="py-2.5 rounded-xl font-label-md text-label-md font-medium text-center transition-all bg-surface-container text-on-surface hover:bg-surface-container-high" type="button">
+            10 min
+          </button>
+<button class="py-2.5 rounded-xl font-label-md text-label-md font-medium text-center transition-all bg-surface-container text-on-surface hover:bg-surface-container-high" type="button">
+            15 min
+          </button>
+</div>
+</div>
+<!-- Haptic Toggle Switch -->
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-full bg-secondary-container/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">vibration</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Gentle Haptic Pacer</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Synchronized diaphragmatic pulses</span>
+</div>
+</div>
+<!-- Accessible Native-Styled Toggle Button -->
+<button aria-pressed="true" class="w-12 h-7 rounded-full bg-primary transition-colors p-1 flex items-center justify-end" id="hapticToggle" type="button">
+<div class="w-5 h-5 rounded-full bg-on-primary shadow-sm transform transition-transform"></div>
+</button>
+</div>
+</div>
+<!-- Primary Control Action CTAs -->
+<div class="flex flex-col gap-space-sm pt-2 pb-space-lg">
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Pause Cadence Button -->
+<button class="min-h-[48px] px-4 rounded-full bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform" id="togglePauseBtn" type="button">
+<span class="material-symbols-outlined text-[18px]">pause_circle</span>
+<span id="pauseBtnText">Pause Cadence</span>
+</button>
+<!-- Complete Somatic Reset Button -->
+<button class="min-h-[48px] px-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-label-md text-label-md font-semibold shadow-[0_4px_16px_rgba(0,100,124,0.3)] flex items-center justify-center gap-2 active:scale-[0.98] transition-all" id="completeResetBtn" type="button">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span>Complete Reset</span>
+</button>
+</div>
+<div class="flex items-center justify-center gap-1.5 py-1 text-center">
+<span class="material-symbols-outlined text-[14px] text-secondary">lock</span>
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase tracking-widest">End-to-End Encrypted Biometric Sanctuary Session</span>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    // Cadence Modes configuration: [Phase Name, duration in sec, ring scale]
+    const CADENCES = {
+      box: [
+        { name: 'INHALE SLOWLY', duration: 4, scale: 1.18, color: 'text-primary' },
+        { name: 'HOLD GENTLY', duration: 7, scale: 1.18, color: 'text-secondary' },
+        { name: 'EXHALE FULLY', duration: 8, scale: 0.92, color: 'text-tertiary' }
+      ],
+      sigh: [
+        { name: 'FIRST INHALE', duration: 3, scale: 1.12, color: 'text-primary' },
+        { name: 'TOP-OFF INHALE', duration: 1, scale: 1.25, color: 'text-primary' },
+        { name: 'LONG SIGH EXHALE', duration: 6, scale: 0.88, color: 'text-secondary' }
+      ],
+      coherent: [
+        { name: 'INHALE COHERENCE', duration: 5, scale: 1.15, color: 'text-secondary' },
+        { name: 'EXHALE RELEASE', duration: 5, scale: 0.90, color: 'text-primary' }
+      ]
+    };
+
+    let currentMode = 'box';
+    let phaseIndex = 0;
+    let timerValue = CADENCES[currentMode][0].duration;
+    let isPaused = false;
+    let intervalId = null;
+
+    const timerEl = document.getElementById('countdownTimer');
+    const promptEl = document.getElementById('promptPhase');
+    const coreSphereEl = document.getElementById('coreSphere');
+    const ringOuterEl = document.getElementById('ringOuter');
+    const ringMidEl = document.getElementById('ringMid');
+    const ringInnerEl = document.getElementById('ringInner');
+    const pauseBtn = document.getElementById('togglePauseBtn');
+    const pauseText = document.getElementById('pauseBtnText');
+
+    function applyPhaseVisuals(phase) {
+      if (!timerEl || !promptEl) return;
+      promptEl.textContent = phase.name;
+      promptEl.className = 'font-label-micro text-label-micro font-bold uppercase tracking-widest ' + phase.color;
+      
+      const s = phase.scale;
+      coreSphereEl.style.transform = `scale(${s})`;
+      ringInnerEl.style.transform = `scale(${s * 0.95})`;
+      ringMidEl.style.transform = `scale(${s * 1.05})`;
+      ringOuterEl.style.transform = `scale(${s * 1.15})`;
+    }
+
+    function runBreathingTick() {
+      if (isPaused) return;
+
+      const phases = CADENCES[currentMode];
+      const currentPhase = phases[phaseIndex];
+
+      timerEl.textContent = timerValue;
+
+      if (timerValue <= 1) {
+        // Advance to next cadence phase
+        phaseIndex = (phaseIndex + 1) % phases.length;
+        const nextPhase = phases[phaseIndex];
+        timerValue = nextPhase.duration;
+        applyPhaseVisuals(nextPhase);
+      } else {
+        timerValue--;
+      }
+    }
+
+    function startBreathingLoop() {
+      if (intervalId) clearInterval(intervalId);
+      const initialPhase = CADENCES[currentMode][phaseIndex];
+      timerValue = initialPhase.duration;
+      timerEl.textContent = timerValue;
+      applyPhaseVisuals(initialPhase);
+      intervalId = setInterval(runBreathingTick, 1000);
+    }
+
+    // Initialize loop
+    startBreathingLoop();
+
+    // Mode Selector Handler
+    const modeButtons = document.querySelectorAll('#cadenceModes button');
+    const cadenceSubtitle = document.getElementById('cadenceSubtitle');
+
+    modeButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        modeButtons.forEach(b => {
+          b.className = 'px-4 py-2 rounded-full font-label-md text-label-md transition-all flex items-center gap-2 bg-surface-container text-on-surface-variant hover:bg-surface-container-high';
+        });
+        this.className = 'px-4 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm flex items-center gap-2 bg-primary text-on-primary';
+        
+        currentMode = this.getAttribute('data-mode') || 'box';
+        phaseIndex = 0;
+        
+        if (currentMode === 'box') {
+          cadenceSubtitle.textContent = '4 • 7 • 8';
+        } else if (currentMode === 'sigh') {
+          cadenceSubtitle.textContent = 'Double Inhale • Sigh';
+        } else {
+          cadenceSubtitle.textContent = '5.5s In • 5.5s Out';
+        }
+
+        startBreathingLoop();
+      });
+    });
+
+    // Pause / Resume Toggle
+    if (pauseBtn) {
+      pauseBtn.addEventListener('click', function() {
+        isPaused = !isPaused;
+        if (isPaused) {
+          pauseText.textContent = 'Resume Cadence';
+          pauseBtn.querySelector('.material-symbols-outlined').textContent = 'play_circle';
+          coreSphereEl.style.opacity = '0.7';
+        } else {
+          pauseText.textContent = 'Pause Cadence';
+          pauseBtn.querySelector('.material-symbols-outlined').textContent = 'pause_circle';
+          coreSphereEl.style.opacity = '1.0';
+        }
+      });
+    }
+
+    // Soundscape Option Selector
+    const soundOptions = document.querySelectorAll('#soundscapeOptions button');
+    soundOptions.forEach(opt => {
+      opt.addEventListener('click', function() {
+        soundOptions.forEach(o => {
+          o.className = 'w-full text-left rounded-xl p-space-sm bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-2';
+          const badge = o.querySelector('.absolute');
+          if (badge) badge.remove();
+        });
+        this.className = 'w-full text-left rounded-xl p-space-sm bg-primary-fixed/20 shadow-sm flex flex-col gap-2 transition-all';
+        const imgWrap = this.querySelector('.relative');
+        if (imgWrap && !imgWrap.querySelector('.absolute')) {
+          const badge = document.createElement('div');
+          badge.className = 'absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md';
+          badge.innerHTML = '<span class="material-symbols-outlined text-[14px]">music_note</span>';
+          imgWrap.appendChild(badge);
+        }
+      });
+    });
+
+    // Duration Selector Chips
+    const durationBtns = document.querySelectorAll('#durationChips button');
+    durationBtns.forEach(dBtn => {
+      dBtn.addEventListener('click', function() {
+        durationBtns.forEach(b => {
+          b.className = 'py-2.5 rounded-xl font-label-md text-label-md font-medium text-center transition-all bg-surface-container text-on-surface hover:bg-surface-container-high';
+        });
+        this.className = 'py-2.5 rounded-xl font-label-md text-label-md font-semibold text-center transition-all bg-primary text-on-primary shadow-sm';
+      });
+    });
+
+    // Haptic Toggle Switch
+    const hapticToggle = document.getElementById('hapticToggle');
+    if (hapticToggle) {
+      let isHapticActive = true;
+      hapticToggle.addEventListener('click', function() {
+        isHapticActive = !isHapticActive;
+        if (isHapticActive) {
+          this.className = 'w-12 h-7 rounded-full bg-primary transition-colors p-1 flex items-center justify-end';
+          this.setAttribute('aria-pressed', 'true');
+        } else {
+          this.className = 'w-12 h-7 rounded-full bg-surface-container-highest transition-colors p-1 flex items-center justify-start';
+          this.setAttribute('aria-pressed', 'false');
+        }
+      });
+    }
+
+    // Complete Reset Button Micro-Interaction
+    const completeBtn = document.getElementById('completeResetBtn');
+    if (completeBtn) {
+      completeBtn.addEventListener('click', function() {
+        const originalText = this.innerHTML;
+        this.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Somatic State Calibrated</span>';
+        setTimeout(() => {
+          this.innerHTML = originalText;
+        }, 1800);
+      });
+    }
+  })();
+</script></main></body></html>

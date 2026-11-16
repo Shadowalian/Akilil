@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><title>Akilil Stack Shell</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary": "#006194", "primary-fixed-dim": "#6cd3f7", "error-container": "#ffdad6", "surface-container": "#ebedfb", "primary-fixed": "#b7eaff", "on-tertiary-fixed-variant": "#004b73", "background": "#faf9ff", "on-error-container": "#93000a", "inverse-on-surface": "#eef0fe", "on-primary-container": "#fafdff", "surface-container-high": "#e5e8f5", "on-secondary-fixed": "#002020", "on-primary-fixed-variant": "#004e61", "surface": "#faf9ff", "on-background": "#181b25", "primary": "#00647c", "surface-container-lowest": "#ffffff", "surface-variant": "#dfe2ef", "on-secondary-fixed-variant": "#004f50", "on-secondary": "#ffffff", "on-error": "#ffffff", "outline": "#6e797e", "error": "#ba1a1a", "tertiary-fixed-dim": "#93ccff", "outline-variant": "#bdc8ce", "on-surface-variant": "#3e484d", "surface-tint": "#006780", "secondary": "#006a6a", "on-primary-fixed": "#001f28", "on-secondary-container": "#007071", "inverse-surface": "#2c303a", "on-tertiary-fixed": "#001d31", "on-tertiary-container": "#fdfcff", "on-surface": "#181b25", "on-primary": "#ffffff", "tertiary-fixed": "#cce5ff", "surface-container-low": "#f1f3ff", "on-tertiary": "#ffffff", "secondary-fixed-dim": "#26dcdd", "surface-bright": "#faf9ff", "tertiary-container": "#007bb9", "secondary-fixed": "#56f9f9", "surface-container-highest": "#dfe2ef", "primary-container": "#007f9d", "surface-dim": "#d7d9e7", "secondary-container": "#56f9f9", "inverse-primary": "#6cd3f7" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin-sm": "1rem", "space-sm": "0.5rem", "gutter": "1rem", "space-md": "0.75rem", "space-xs": "0.25rem", "margin": "1.25rem", "space-xl": "2rem", "gutter-sm": "0.75rem", "space-lg": "1.25rem" }, "fontFamily": { "label-md": ["Inter"], "display-hero": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "label-micro": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "body-md": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "numeric-metric": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"] }, "fontSize": { "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "display-hero": ["38px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "label-micro": ["10px", { "lineHeight": "12px", "letterSpacing": "0.06em", "fontWeight": "700" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "numeric-metric": ["26px", { "lineHeight": "30px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "display-hero-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;font-feature-settings:"cv02","cv03","cv04","cv11";-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}.pb-safe{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 0.75rem);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}*{-ms-overflow-style:none;scrollbar-width:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="Go back" class="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-low transition-colors active:scale-95" onclick="history.back()"><span class="material-symbols-outlined text-[20px]">arrow_back</span></button><div class="flex flex-col"><h1 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight line-clamp-1">Clinician Booking</h1><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed-dim"></span><span class="font-label-micro text-label-micro text-secondary uppercase tracking-wider">E2EE Session</span></div></div></div><div class="flex items-center gap-space-sm"><a class="h-8 px-2.5 rounded-full bg-error-container text-on-error-container flex items-center gap-1 font-label-md text-label-md transition-transform active:scale-95" data-path="sos-crisis" href="#"><span class="material-symbols-outlined text-[15px]">emergency</span><span>SOS</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-surface"><div class="flex flex-col w-full px-margin pb-safe">
+<!-- Availability Instant Status Chip -->
+<div class="mt-space-md mb-space-md flex items-center justify-between p-space-md rounded-xl bg-surface-container-low shadow-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="relative flex h-2.5 w-2.5 shrink-0">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-micro text-label-micro text-secondary uppercase tracking-wider">Instant Slot Open</span>
+<span class="font-label-md text-label-md text-on-surface truncate">Today, 6:00 PM (In 1 hr 45 min)</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary shrink-0 text-[18px]">bolt</span>
+</div>
+<!-- Video Introduction Showcase Card -->
+<div class="relative w-full rounded-xl overflow-hidden bg-inverse-surface shadow-md aspect-[16/10] mb-space-lg group cursor-pointer" id="videoTriggerCard">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105" data-alt="Editorial portrait of Dr. Hanna Girma, an articulate and warm East African female clinical psychologist with tailored charcoal blazer and gentle smile in a serene sunlit therapy studio with modern acoustic wood paneling and gentle indoor greenery, captured in soft cinema 35mm lighting with sharp optical depth." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBefA8040M1hLCvFix0elQ3M8tW8m81kUkCMjGpiG2tVzwoQK3j_tnHDm7J9wG3QQ4frhArFTUN3Llf8zY20Pk6n5elDXNS0R2KPa5bJEjliQpfFyx2tso2F5T25Sz5qUsmbi3827zpMT4vH-9jQF0q7ehHn9yYUAQlsG89h5_0XfAuISi1WB65YGIPNi7yssOy9H9tINRqbJr93rdBnZNSA0v4_UO40Y3opl29sX8')">
+</div>
+<!-- Translucent Ambient Scrim -->
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-inverse-surface/30 to-transparent"></div>
+<!-- Live HD Badge -->
+<div class="absolute top-space-md left-space-md flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-inverse-surface/70 backdrop-blur-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+<span class="font-label-micro text-label-micro text-on-primary font-semibold tracking-wide">1080P HD PHILOSOPHY</span>
+</div>
+<!-- Duration Pill -->
+<div class="absolute top-space-md right-space-md px-2 py-1 rounded-full bg-inverse-surface/60 backdrop-blur-md">
+<span class="font-label-micro text-label-micro text-on-primary">1:32 MIN</span>
+</div>
+<!-- Frosted Play Button -->
+<div class="absolute inset-0 flex flex-col items-center justify-center p-space-md">
+<div class="w-14 h-14 rounded-full bg-surface-container-lowest/80 backdrop-blur-lg flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 active:scale-95">
+<span class="material-symbols-outlined text-primary text-[30px] ml-0.5" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="mt-space-sm px-3 py-1 rounded-full bg-inverse-surface/80 backdrop-blur-md">
+<span class="font-label-md text-label-md text-on-primary">Watch 90-sec Welcome &amp; Methodology</span>
+</div>
+</div>
+</div>
+<!-- Clinician Identity & Badges -->
+<div class="flex flex-col mb-space-md">
+<div class="flex items-center gap-space-sm flex-wrap">
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">Dr. Hanna Girma, Ph.D.</h2>
+<div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-micro text-label-micro font-bold uppercase tracking-wider">Verified Clinical</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+      Licensed Clinical Psychologist • Addis Ababa University Fellow
+    </p>
+</div>
+<!-- Micro-Stats Pill Ribbon (Horizontal Scroller) -->
+<div class="flex items-center gap-space-sm overflow-x-auto pb-space-sm mb-space-lg no-scrollbar">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low shrink-0">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.98</span>
+<span class="font-label-micro text-label-micro text-outline">(184 reviews)</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low shrink-0">
+<span class="material-symbols-outlined text-[16px] text-primary">psychology</span>
+<span class="font-label-md text-label-md text-on-surface">14 Yrs Exp</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low shrink-0">
+<span class="material-symbols-outlined text-[16px] text-secondary">lock</span>
+<span class="font-label-md text-label-md text-on-surface">E2EE Stream</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low shrink-0">
+<span class="material-symbols-outlined text-[16px] text-primary">payments</span>
+<span class="font-label-md text-label-md text-on-surface">650 ETB / 50m</span>
+</div>
+</div>
+<!-- Clinician Philosophy Quote Box -->
+<div class="relative overflow-hidden rounded-xl bg-primary-fixed/20 p-space-lg mb-space-lg">
+<div class="absolute -right-4 -bottom-4 opacity-10 text-primary pointer-events-none">
+<span class="material-symbols-outlined text-[96px]">format_quote</span>
+</div>
+<span class="font-label-micro text-label-micro text-primary font-bold uppercase tracking-wider block mb-1">Therapeutic Manifesto</span>
+<p class="font-body-md text-body-md text-on-surface italic leading-relaxed relative z-10">
+      “My practice creates a non-judgmental space bridging somatic groundedness with actionable cognitive reframing techniques, calibrating emotional safety with measurable neurological growth.”
+    </p>
+</div>
+<!-- Therapeutic Focus Areas -->
+<div class="flex flex-col mb-space-lg">
+<div class="flex items-center justify-between mb-space-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Specializations</h3>
+<span class="font-label-micro text-label-micro text-secondary font-bold uppercase">Evidence-Based</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface">
+        Cognitive Behavioral (CBT)
+      </span>
+<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface">
+        Burnout &amp; Executive Stress
+      </span>
+<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface">
+        Grief &amp; Somatic Trauma
+      </span>
+<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface">
+        Diaspora Re-adaptation
+      </span>
+<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface">
+        Anxiety Regulation
+      </span>
+</div>
+</div>
+<!-- Credentials & Clinical Accreditations -->
+<div class="flex flex-col mb-space-lg">
+<div class="flex items-center justify-between mb-space-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Verified Credentials</h3>
+<span class="material-symbols-outlined text-outline text-[18px]">verified_user</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Item 1 -->
+<div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm">
+<div class="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between gap-2">
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Ministry of Health License</span>
+<span class="font-label-micro text-label-micro text-secondary bg-surface-container px-2 py-0.5 rounded-full font-bold shrink-0">ACTIVE</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">License #ET-MED-4910 • Standing: Exemplary</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm">
+<div class="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">school</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Ph.D. in Clinical Neuropsychology</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Addis Ababa University • Dept of Behavioral Medicine</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm">
+<div class="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">workspace_premium</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Accredited Clinical Fellow</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">International Cognitive Behavioral Association (ICBA)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Client Testimonial Card -->
+<div class="flex flex-col mb-space-xl">
+<div class="flex items-center justify-between mb-space-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Patient Experience</h3>
+<span class="font-label-md text-label-md text-secondary font-semibold">184 Verified Stories</span>
+</div>
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-0.5 text-secondary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-label-micro text-label-micro text-outline">2 WEEKS AGO</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+        “Dr. Hanna has completely transformed how I process executive anxiety during high-stress project cycles. Truly life-changing, deeply compassionate care.”
+      </p>
+<div class="flex items-center gap-space-sm mt-1">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-[14px]">lock</span>
+</div>
+<span class="font-label-micro text-label-micro text-on-surface-variant">Verified Client • 42 Completed Sessions</span>
+</div>
+</div>
+</div>
+<!-- Bottom Floating Spacer to ensure content isn't clipped by sticky bar -->
+<div class="h-20 w-full"></div>
+<!-- Sticky Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-xl px-margin py-3 pb-safe shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+<div class="flex items-center justify-between max-w-lg mx-auto w-full gap-space-md">
+<!-- Session Fee Column -->
+<div class="flex flex-col">
+<div class="flex items-baseline gap-1">
+<span class="font-numeric-metric text-numeric-metric text-on-surface font-bold tracking-tight">650</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold">ETB</span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-tight">50 min clinical session</span>
+</div>
+<!-- Booking Button -->
+<button class="flex-1 h-12 rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 hover:bg-primary-container" id="bookConsultationBtn">
+<span>Book Slot</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  // Simple micro-interaction for video trigger card & booking CTA
+  const videoCard = document.getElementById('videoTriggerCard');
+  if (videoCard) {
+    videoCard.addEventListener('click', () => {
+      const playIcon = videoCard.querySelector('.material-symbols-outlined');
+      if (playIcon) {
+        playIcon.classList.add('scale-125');
+        setTimeout(() => playIcon.classList.remove('scale-125'), 200);
+      }
+    });
+  }
+
+  const bookBtn = document.getElementById('bookConsultationBtn');
+  if (bookBtn) {
+    bookBtn.addEventListener('click', () => {
+      bookBtn.classList.add('opacity-90');
+      setTimeout(() => bookBtn.classList.remove('opacity-90'), 150);
+    });
+  }
+</script></main></body></html>
