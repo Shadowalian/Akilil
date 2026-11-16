@@ -8,6 +8,7 @@ import 'package:core/core.dart';
 
 import '../../l10n/app_locale.dart';
 import '../../router.dart';
+import 'booking_care_section.dart';
 
 const _ethiopicFallback = ['NotoSansEthiopic'];
 const _eatTz = 'Africa/Addis_Ababa';
@@ -74,29 +75,9 @@ class _ProSummary {
   final int? voiceRateCents;
   final int? videoRateCents;
 
-  int modeRateCents(_SessionMode mode) {
-    final base = _sessionPriceCents(hourlyRateCents, sessionMinutes);
-    int? explicit;
-    switch (mode) {
-      case _SessionMode.chat:
-        explicit = chatRateCents;
-        break;
-      case _SessionMode.voice:
-        explicit = voiceRateCents;
-        break;
-      case _SessionMode.video:
-        explicit = videoRateCents;
-        break;
-    }
-    if (explicit != null && explicit > 0) return explicit;
-  const multipliers = {_SessionMode.chat: 0.65, _SessionMode.voice: 0.85, _SessionMode.video: 1.0};
-    return (base * multipliers[mode]!).round();
-  }
-}
-
-int _sessionPriceCents(int hourlyCents, int minutes) {
-  if (hourlyCents <= 0) return 0;
-  return ((hourlyCents * minutes) / 60).round();
+  /// What the server charges for a session. It is one flat price per
+  /// session (per care format), whatever the mode — show exactly that.
+  int modeRateCents(_SessionMode mode) => hourlyRateCents;
 }
 
 class _BookingScreenState extends ConsumerState<BookingScreen> {
@@ -112,6 +93,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   bool _busy = false;
 
   _ProSummary? _pro;
+  Map<String, dynamic>? _proDetail;
+  BookingCareSelection _care = const BookingCareSelection();
   String? _proLoadError;
   bool _proLoading = true;
 
@@ -145,6 +128,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       final hourly = (pro['hourly_rate_cents'] as num?)?.toInt() ?? 0;
       setState(() {
         _proLoading = false;
+        _proDetail = pro;
         _pro = _ProSummary(
           userId: userId,
           displayName: pro['display_name'] as String? ?? 'Listener',
@@ -265,17 +249,19 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   Future<void> _book() async {
     final pro = _pro;
-    if (pro == null || !_timesValid) return;
+    // Only a slot the server offered can be booked: send its exact instant.
+    final scheduledAt = _selectedSlotUtc;
+    if (pro == null || !_timesValid || scheduledAt == null || !_care.isValid) return;
     setState(() => _busy = true);
     try {
       final dio = ref.read(dioProvider);
-      final scheduledAt = _localStart.toUtc().toIso8601String();
       await dio.post('/appointments', data: {
         'professional_user_id': pro.userId,
         'scheduled_at': scheduledAt,
         'duration_minutes': _durationMinutes,
         'session_type': _sessionType,
         'user_timezone': _eatTz,
+        ..._care.toPayload(),
       });
       if (!mounted) return;
       await _showConfirmation(pro: pro);
@@ -291,18 +277,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         return;
       }
       final data = e.response?.data;
-      String msg = 'Booking failed.';
-      if (data is Map) {
-        if (data['message'] != null) {
-          msg = data['message'].toString();
-        } else if (data['errors'] is Map && (data['errors'] as Map).isNotEmpty) {
-          final first = (data['errors'] as Map).values.first;
-          msg = first is List && first.isNotEmpty
-              ? first.first.toString()
-              : first.toString();
-        }
+      if (data is Map && data['code'] == 'date_of_birth_required') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Add your date of birth to book a session')),
+        );
+        context.push(AppRoutes.family);
+        return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(apiErrorMessage(data, 'Booking failed.'))),
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -375,8 +359,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final s = ref.watch(stringsProvider);
     final walletAsync = ref.watch(_bookingWalletProvider);
     final pro = _pro;
-    final canConfirm = pro != null && _timesValid && !_busy;
-    final sessionCents = pro?.modeRateCents(_mode) ?? 0;
+    final canConfirm = pro != null &&
+        _timesValid &&
+        !_busy &&
+        _selectedSlotUtc != null &&
+        _care.isValid;
+    final sessionCents = _care.priceCents ?? pro?.modeRateCents(_mode) ?? 0;
     final serviceFeeCents = 0;
     final totalCents = sessionCents + serviceFeeCents;
     final totalMajor = (totalCents / 100).round();
@@ -431,6 +419,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 else if (pro != null)
                   _ProHeader(pro: pro, minutes: pro.sessionMinutes),
                 const SizedBox(height: 24),
+                if (_proDetail != null)
+                  BookingCareSection(
+                    professional: _proDetail!,
+                    onChanged: (c) => setState(() => _care = c),
+                  ),
                 Text(
                   s.sessionSummary,
                   style: _geist(
@@ -478,17 +471,20 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                   )
-                else
+                else if (_daySlots.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      'No open times on this day. Try another date.',
+                      style: _geist(context, color: FriendColors.textSecondary),
+                    ),
+                  ),
+                if (!_slotsLoading)
                   _TimeChips(
                     slots: _daySlots,
                     selectedUtc: _selectedSlotUtc,
                     selectedStart: _start,
-                    placeholderTimes: const [
-                      TimeOfDay(hour: 10, minute: 0),
-                      TimeOfDay(hour: 14, minute: 0),
-                      TimeOfDay(hour: 16, minute: 30),
-                      TimeOfDay(hour: 18, minute: 0),
-                    ],
+                    placeholderTimes: const [],
                     onSelectSlot: _applySlot,
                     onSelectPlaceholder: (t) {
                       setState(() {

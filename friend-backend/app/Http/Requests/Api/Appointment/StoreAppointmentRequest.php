@@ -14,7 +14,7 @@ class StoreAppointmentRequest extends FormRequest
             'professional_user_id' => ['required', 'integer', 'exists:users,id'],
             'scheduled_at'         => ['required', 'date'],
             'duration_minutes'     => ['nullable', 'integer', 'min:15', 'max:240'],
-            'session_type'         => ['nullable', 'in:video,voice'],
+            'session_type'         => ['nullable', 'in:video,voice,chat'],
             'user_timezone'        => ['nullable', 'string', 'max:64', 'timezone:all'],
 
             // Who the session is for and how it is delivered.

@@ -9,6 +9,37 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/design_tokens.dart';
 import '../ui/akilil_stitch_widgets.dart';
 
+/// How a room behaves. The server already bakes the matching Jitsi config
+/// into the room URL (see `config/jitsi.php` → `modes`); the client adds
+/// what only it can enforce: device permissions and its own chrome.
+enum JitsiRoomMode {
+  /// 1:1, couples or family session — everyone on camera.
+  consult,
+
+  /// Group therapy or a cooking class — tile view, members join muted.
+  group,
+
+  /// The person going live.
+  broadcastHost,
+
+  /// The audience of a live broadcast: watches and listens, never publishes.
+  broadcastView;
+
+  static JitsiRoomMode fromApi(String? value) => switch (value) {
+        'group' => JitsiRoomMode.group,
+        'broadcast_host' => JitsiRoomMode.broadcastHost,
+        'broadcast_view' => JitsiRoomMode.broadcastView,
+        _ => JitsiRoomMode.consult,
+      };
+
+  bool get canPublish => this != JitsiRoomMode.broadcastView;
+  bool get isBroadcast => this == JitsiRoomMode.broadcastHost || this == JitsiRoomMode.broadcastView;
+}
+
+/// Akilil Meet host. Override per build:
+/// `--dart-define=AKILIL_MEET_HOST=meet.akilil.app`.
+const akililMeetHost = String.fromEnvironment('AKILIL_MEET_HOST', defaultValue: '13.140.131.249');
+
 /// In-app Akilil Meet room (self-hosted).
 ///
 /// Opens the session WebRTC UI inside the app with Akilil chrome —
@@ -21,6 +52,10 @@ class JitsiSessionView extends StatefulWidget {
     this.displayName,
     this.onLeave,
     this.onSos,
+    this.mode = JitsiRoomMode.consult,
+    this.showChrome = true,
+    this.title,
+    this.overlay,
   });
 
   final String roomUrl;
@@ -28,6 +63,20 @@ class JitsiSessionView extends StatefulWidget {
   final String? displayName;
   final VoidCallback? onLeave;
   final VoidCallback? onSos;
+
+  /// Room behaviour — see [JitsiRoomMode].
+  final JitsiRoomMode mode;
+
+  /// The default top bar (title, SOS, Leave). Turn off when [overlay]
+  /// supplies its own chrome, as the live room does.
+  final bool showChrome;
+
+  /// Replaces the default "Live Sanctuary Chamber" title.
+  final String? title;
+
+  /// Drawn above the video and below the loading / error states: comments,
+  /// gift effects, a recipe panel.
+  final Widget? overlay;
 
   @override
   State<JitsiSessionView> createState() => _JitsiSessionViewState();
@@ -43,6 +92,9 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
     '13.140.131.249',
     'meet.akilil.app',
   };
+
+  bool _isAkililHost(String host) =>
+      host == akililMeetHost || _akililHosts.contains(host) || host.contains('13.140.131.249');
 
   Uri _buildUri() {
     var rawUrl = widget.roomUrl.trim();
@@ -146,6 +198,56 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
     } catch (_) {}
   }
 
+  /// Mode-specific tweaks applied inside the page once it has loaded.
+  Future<void> _applyMode() async {
+    final c = _controller;
+    if (c == null) return;
+    try {
+      if (widget.mode == JitsiRoomMode.broadcastView) {
+        // Hide every control and thumbnail: the audience sees only the host.
+        await c.evaluateJavascript(source: r'''
+          (function () {
+            var style = document.getElementById("akilil-viewer");
+            if (!style) {
+              style = document.createElement("style");
+              style.id = "akilil-viewer";
+              style.textContent = `
+                .new-toolbox, .toolbox-content, #new-toolbox,
+                .filmstrip, .vertical-filmstrip, .horizontal-filmstrip,
+                .subject, .details-container, #notifications-container,
+                .tile-view-toggle, .atlaskit-portal-container { display: none !important; }
+                #largeVideoContainer, #videospace { background: #000 !important; }
+              `;
+              document.documentElement.appendChild(style);
+            }
+          })();
+        ''');
+      } else if (widget.mode == JitsiRoomMode.broadcastHost) {
+        // Best effort: switch on audio/video moderation so nobody in the
+        // audience can unmute. Server-side enforcement is Jitsi visitors
+        // mode — see jitsi/AKILIL.md.
+        await c.evaluateJavascript(source: r'''
+          (function () {
+            if (window.__akililModeration) return;
+            window.__akililModeration = true;
+            var tries = 0;
+            var timer = setInterval(function () {
+              tries++;
+              try {
+                if (window.APP && APP.conference && APP.conference.isJoined && APP.conference.isJoined()) {
+                  APP.store.dispatch({ type: "REQUEST_ENABLE_AUDIO_MODERATION" });
+                  APP.store.dispatch({ type: "REQUEST_ENABLE_VIDEO_MODERATION" });
+                  clearInterval(timer);
+                }
+              } catch (e) {}
+              if (tries > 90) clearInterval(timer);
+            }, 1000);
+          })();
+        ''');
+      }
+    } catch (_) {}
+  }
+
   Future<void> _openExternalFallback() async {
     final uri = _buildUri();
     try {
@@ -200,6 +302,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
               },
               onLoadStop: (_, __) async {
                 await _injectBrand();
+                await _applyMode();
                 if (!mounted) return;
                 setState(() => _loading = false);
               },
@@ -213,16 +316,18 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                 });
               },
               onPermissionRequest: (controller, request) async {
+                // The audience of a broadcast never gets camera or microphone.
                 return PermissionResponse(
-                  resources: request.resources,
-                  action: PermissionResponseAction.GRANT,
+                  resources: widget.mode.canPublish ? request.resources : const [],
+                  action: widget.mode.canPublish
+                      ? PermissionResponseAction.GRANT
+                      : PermissionResponseAction.DENY,
                 );
               },
               onReceivedServerTrustAuthRequest:
                   (controller, challenge) async {
                 final host = challenge.protectionSpace.host;
-                if (_akililHosts.contains(host) ||
-                    host.contains('13.140.131.249')) {
+                if (_isAkililHost(host)) {
                   return ServerTrustAuthResponse(
                     action: ServerTrustAuthResponseAction.PROCEED,
                   );
@@ -235,9 +340,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                 final req = action.request.url;
                 if (req == null) return NavigationActionPolicy.ALLOW;
                 final host = req.host;
-                if (_akililHosts.contains(host) ||
-                    host.contains('13.140.131.249') ||
-                    host.isEmpty) {
+                if (_isAkililHost(host) || host.isEmpty) {
                   return NavigationActionPolicy.ALLOW;
                 }
                 // Block deep-links out to public meet / app stores.
@@ -247,7 +350,10 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
           else
             const ColoredBox(color: Colors.black),
 
+          if (widget.overlay != null) Positioned.fill(child: widget.overlay!),
+
           // Top Akilil Meet chrome — live sanctuary chamber
+          if (widget.showChrome)
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
@@ -276,7 +382,9 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Live Sanctuary Chamber',
+                          widget.title ?? 'Live Sanctuary Chamber',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.plusJakartaSans(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
@@ -296,7 +404,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'E2EE SESSION',
+                              widget.mode == JitsiRoomMode.group ? 'PRIVATE GROUP' : 'PRIVATE SESSION',
                               style: GoogleFonts.inter(
                                 color: Colors.white.withValues(alpha: 0.85),
                                 fontWeight: FontWeight.w700,

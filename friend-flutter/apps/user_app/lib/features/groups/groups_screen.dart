@@ -175,6 +175,59 @@ class _ClientGroupDetailScreenState
     }
   }
 
+  Future<void> _post(String path, String ok) async {
+    try {
+      await ref.read(dioProvider).post(path);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok)));
+      _load();
+    } on DioException catch (e) {
+      if (!mounted) return;
+      if (e.response?.statusCode == 402) {
+        context.push('/wallet');
+        return;
+      }
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(apiErrorMessage(e.response?.data))));
+    }
+  }
+
+  /// Reserve → (cooking: confirm ingredients) → join when the host is live.
+  Widget _meetingAction(Map<String, dynamic> m) {
+    final seat = m['my_seat'] as Map?;
+    final hasSeat = seat?['status'] == 'reserved';
+    final price = (m['price_cents'] as num?)?.toInt() ?? 0;
+    final recipe = m['recipe'] as Map?;
+    final status = m['status'] as String? ?? '';
+    if (status != 'scheduled' && status != 'live') {
+      return Text(status, style: Theme.of(context).textTheme.bodySmall);
+    }
+    if (!hasSeat && price > 0) {
+      return FilledButton(
+        onPressed: () => _post('/therapy-group-meetings/${m['id']}/reserve', 'Seat reserved'),
+        child: Text('Reserve · ${formatMoney(price, m['currency'] as String?)}'),
+      );
+    }
+    if (recipe != null && seat?['ingredients_confirmed'] != true) {
+      return FilledButton.tonal(
+        onPressed: () async {
+          if (!hasSeat) await _post('/therapy-group-meetings/${m['id']}/reserve', 'Seat reserved');
+          if (!mounted) return;
+          await context.push('/recipes/${recipe['id']}?meeting=${m['id']}');
+          _load();
+        },
+        child: const Text('Ingredients'),
+      );
+    }
+    if (status == 'live') {
+      return FilledButton(
+        onPressed: () => context.go('/groups/meetings/${m['id']}/join'),
+        child: const Text('Join'),
+      );
+    }
+    return Text(hasSeat ? 'Seat reserved' : 'Scheduled', style: Theme.of(context).textTheme.bodySmall);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -204,17 +257,7 @@ class _ClientGroupDetailScreenState
                     DateTime.parse(m['scheduled_at'] as String).toLocal(),
                   ),
                 ),
-                trailing: m['status'] == 'live'
-                    ? FilledButton(
-                        onPressed: () => context.go(
-                          '/groups/meetings/${m['id']}/join',
-                        ),
-                        child: const Text('Join'),
-                      )
-                    : Text(
-                        m['status'] as String? ?? '',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
+                trailing: _meetingAction(m),
               ),
             ),
         ],
@@ -304,6 +347,8 @@ class _ClientGroupMeetingScreenState
         roomUrl: _roomUrl!,
         jwt: _jwt,
         displayName: _displayName,
+        mode: JitsiRoomMode.group,
+        title: 'Group session',
         onLeave: () {
           if (mounted) Navigator.of(context).maybePop();
         },
