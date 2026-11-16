@@ -109,10 +109,6 @@ bool _isLicenseVerified(Map<String, dynamic> data) {
   return docs != null && docs.isNotEmpty;
 }
 
-int _sessionPriceCents(int hourlyCents, int minutes) {
-  if (hourlyCents <= 0) return 0;
-  return ((hourlyCents * minutes) / 60).round();
-}
 
 String _moneyLabel(int cents, String currency) {
   final major = (cents / 100).round();
@@ -172,7 +168,8 @@ class _ProfessionalDetailScreenState
           final specialties = _labels(data['specialties']);
           final accepting = data['is_accepting_clients'] != false;
           final verified = _isLicenseVerified(data);
-          final sessionCents = _sessionPriceCents(rateCents, duration);
+          // The server charges this flat price per session.
+          final sessionCents = rateCents;
           final priceMajor = _moneyLabel(sessionCents, currency);
           final langLine = languages.isEmpty
               ? 'English'
@@ -191,7 +188,7 @@ class _ProfessionalDetailScreenState
                         name: name,
                         avatarUrl: avatar,
                         verified: verified,
-                        licenseLabel: s.licenseVerified,
+                        licenseLabel: category?['slug'] == 'cooking' ? 'Verified chef' : s.licenseVerified,
                         onBack: () => context.pop(),
                         onShare: () {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -213,7 +210,7 @@ class _ProfessionalDetailScreenState
                               top: Radius.circular(24),
                             ),
                           ),
-                          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                          padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

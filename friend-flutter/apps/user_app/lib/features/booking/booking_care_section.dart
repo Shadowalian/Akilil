@@ -222,6 +222,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
               for (final o in options)
                 ChoiceChip(
                   avatar: Icon(o.icon, size: 16),
+                  showCheckmark: false,
                   label: Text(o.label),
                   selected: _format == o.key,
                   onSelected: (_) => _pick(o.key),

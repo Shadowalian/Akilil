@@ -195,9 +195,12 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
       title: 'People you care for',
       subtitle: 'Book and pay for your children, and join sessions you are invited to.',
       body: _loading
-          ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
-          : ListView(
-              padding: const EdgeInsets.all(FriendLayout.horizontal),
+          ? const Padding(
+              padding: EdgeInsets.all(40),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (_needsDob)
                   CandyCard(

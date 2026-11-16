@@ -51,7 +51,7 @@ class ClientsScreen extends ConsumerWidget {
               final last = DateTime.tryParse(c['last_session_at'] as String? ?? '');
               return ListTile(
                 leading: CircleAvatar(
-                  child: Text(((user['name'] as String?) ?? '?').substring(0, 1)),
+                  child: Text(personInitial(user['name'] as String?)),
                 ),
                 title: Text(user['name'] as String? ?? 'Anonymous'),
                 subtitle: Text(

@@ -566,7 +566,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         ? '…'
                         : canConfirm
                             ? s.confirmAndPay(totalMajor)
-                            : s.unavailable,
+                            : _care.problem ?? (_selectedSlotUtc == null ? 'Pick a time' : s.unavailable),
                     style: _geist(
                       context,
                       fontSize: 16,
@@ -593,7 +593,7 @@ class _ProHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initial =
-        pro.displayName.isNotEmpty ? pro.displayName[0].toUpperCase() : '?';
+        personInitial(pro.displayName);
 
     return Row(
       children: [

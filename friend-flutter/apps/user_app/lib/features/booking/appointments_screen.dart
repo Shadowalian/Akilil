@@ -26,8 +26,8 @@ class AppointmentsScreen extends ConsumerWidget {
         children: [
           const FriendPageHeader(
             eyebrow: 'Sessions',
-            title: 'Your video rooms',
-            subtitle: 'Private Jitsi calls with the listeners you booked.',
+            title: 'Your sessions',
+            subtitle: 'Everything you have booked, in one place.',
           ),
           Expanded(
             child: apptsAsync.when(
@@ -170,7 +170,7 @@ class _NextUpHero extends StatelessWidget {
                 children: [
                   Expanded(
                     child: FriendGlowButton(
-                      label: canJoin ? 'Join video' : 'Enter 4K session',
+                      label: canJoin ? 'Join session' : 'Open waiting room',
                       icon: Icons.videocam_rounded,
                       expanded: true,
                       onPressed: () =>
@@ -277,12 +277,21 @@ class _AppointmentCard extends ConsumerWidget {
                   color: FriendColors.textSecondary,
                 ),
           ),
+          if (_careLine(appt) case final line?) ...[
+            const SizedBox(height: 4),
+            Text(line, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textMuted)),
+          ],
+          if (appt['recipe'] is Map && (status == 'pending' || status == 'confirmed')) ...[
+            const SizedBox(height: 10),
+            _RecipeNudge(appt: appt),
+          ],
+          if (status == 'pending' || status == 'confirmed' || canJoin || waitingAccept) ...[
           const SizedBox(height: 14),
           Row(
             children: [
               if (canJoin)
                 FriendGlowButton(
-                  label: 'Join video',
+                  label: 'Join session',
                   icon: Icons.videocam_rounded,
                   onPressed: () =>
                       context.go('/appointments/${appt['id']}/room'),
@@ -311,7 +320,63 @@ class _AppointmentCard extends ConsumerWidget {
                 ),
             ],
           ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+/// "Couples session · with Dawit" / "For Abel" — who a session is for.
+String? _careLine(Map<String, dynamic> appt) {
+  final format = appt['care_format'] as String? ?? 'individual';
+  final dependent = appt['dependent'] as Map?;
+  final others = ((appt['participants'] as List?) ?? const []).map((p) => (p as Map)['name']).join(', ');
+  final label = switch (format) {
+    'couples' => 'Couples session',
+    'family' => 'Family session',
+    'child' || 'teen' => 'For ${dependent?['name'] ?? 'your child'}',
+    _ => null,
+  };
+  if (label == null) return null;
+  return others.isEmpty ? label : '$label · with $others';
+}
+
+/// Cooking sessions: get the ingredients, then confirm.
+class _RecipeNudge extends StatelessWidget {
+  const _RecipeNudge({required this.appt});
+  final Map<String, dynamic> appt;
+
+  @override
+  Widget build(BuildContext context) {
+    final recipe = appt['recipe'] as Map;
+    final ready = appt['ingredients_confirmed_at'] != null;
+    return Material(
+      color: ready ? FriendColors.primaryLight : FriendColors.woodLight,
+      borderRadius: BorderRadius.circular(FriendRadii.medium),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(FriendRadii.medium),
+        onTap: () => context.push('/recipes/${recipe['id']}?appointment=${appt['id']}'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              Icon(
+                ready ? Icons.check_circle_rounded : Icons.shopping_basket_outlined,
+                size: 18,
+                color: ready ? FriendColors.primary : FriendColors.woodDeep,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  ready ? 'Ingredients ready · ${recipe['title']}' : 'Get your ingredients · ${recipe['title']}',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, size: 18),
+            ],
+          ),
+        ),
       ),
     );
   }

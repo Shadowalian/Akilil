@@ -31,10 +31,13 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
     final index = _indexFor(location);
-    final hideNav = location.contains('/host') ||
+    final hideNav = location.startsWith('/recipes') ||
+        location.startsWith('/live') ||
+        location.startsWith('/care-settings') ||
+        location.contains('/host') ||
         location.contains('/notes') ||
         location.contains('/room');
-    return ColoredBox(
+    return Material(
       color: FriendColors.background,
       child: Stack(
         fit: StackFit.expand,

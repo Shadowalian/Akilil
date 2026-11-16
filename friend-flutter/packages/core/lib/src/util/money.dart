@@ -22,3 +22,12 @@ String apiErrorMessage(Object? data, [String fallback = 'Something went wrong'])
   }
   return fallback;
 }
+
+/// The letter for an avatar: skips honorifics, so "Dr. Hanna Tesfaye" → "H".
+String personInitial(String? name, [String fallback = '?']) {
+  const titles = {'dr', 'dr.', 'chef', 'abba', 'prof', 'prof.', 'mr', 'mr.', 'mrs', 'mrs.', 'ms', 'ms.', 'sister', 'pastor', 'sheikh'};
+  final parts = (name ?? '').trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+  if (parts.isEmpty) return fallback;
+  final word = parts.firstWhere((p) => !titles.contains(p.toLowerCase()), orElse: () => parts.first);
+  return word.substring(0, 1).toUpperCase();
+}

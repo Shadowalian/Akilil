@@ -484,9 +484,9 @@ class _FaithChipsRow extends ConsumerWidget {
     if (chips.length <= 1) return const SizedBox.shrink();
 
     return SizedBox(
-      height: 44,
+      height: 60,
       child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
         scrollDirection: Axis.horizontal,
         itemCount: chips.length,
         separatorBuilder: (context, index) => const SizedBox(width: 8),
@@ -702,7 +702,7 @@ class _ProListRow extends ConsumerWidget {
               FriendAvatar(
                 size: 52,
                 imageUrl: avatar,
-                initials: name.isNotEmpty ? name[0].toUpperCase() : '?',
+                initials: personInitial(name),
                 verified: badge,
               ),
               const SizedBox(width: 12),

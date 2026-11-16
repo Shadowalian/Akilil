@@ -253,7 +253,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           ),
           const SizedBox(height: 16),
           FriendGlowButton(
-            label: 'Schedule meeting now',
+            label: _group?['is_cooking_class'] == true ? 'Schedule a class' : 'Start a meeting',
             icon: Icons.event,
             expanded: true,
             onPressed: _scheduleMeeting,

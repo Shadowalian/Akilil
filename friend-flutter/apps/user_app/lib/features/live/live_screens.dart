@@ -33,7 +33,9 @@ class LiveListScreen extends ConsumerWidget {
                 message: 'Upcoming broadcasts will appear here.',
               )
             : ListView.separated(
-                padding: const EdgeInsets.all(FriendLayout.horizontal),
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: list.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, i) {

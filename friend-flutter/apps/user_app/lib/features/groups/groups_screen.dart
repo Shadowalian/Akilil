@@ -237,7 +237,8 @@ class _ClientGroupDetailScreenState
     }
     final title = _group?['title'] as String? ?? 'Group';
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      backgroundColor: FriendColors.background,
+      appBar: AppBar(title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -249,15 +250,31 @@ class _ClientGroupDetailScreenState
           ),
           const SizedBox(height: 16),
           for (final m in _meetings)
-            Card(
-              child: ListTile(
-                title: Text(m['title'] as String? ?? 'Meeting'),
-                subtitle: Text(
-                  DateFormat('EEE MMM d · h:mm a').format(
-                    DateTime.parse(m['scheduled_at'] as String).toLocal(),
-                  ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: CandyCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(m['title'] as String? ?? 'Meeting', style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 4),
+                    Text(
+                      DateFormat('EEE MMM d · h:mm a').format(
+                        DateTime.parse(m['scheduled_at'] as String).toLocal(),
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
+                    ),
+                    if (m['recipe'] is Map) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'Cooking: ${(m['recipe'] as Map)['title']}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.woodDeep),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    Align(alignment: Alignment.centerRight, child: _meetingAction(m)),
+                  ],
                 ),
-                trailing: _meetingAction(m),
               ),
             ),
         ],

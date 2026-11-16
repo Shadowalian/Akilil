@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:core/core.dart';
 
+import '../studio/studio_screens.dart';
+
 import '../auth/auth_controller.dart';
 import '../auth/brand_stub.dart';
 
@@ -12,6 +14,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(myProfileProvider).valueOrNull ?? const <String, dynamic>{};
     final user = ref.watch(currentUserProvider);
     final theme = Theme.of(context);
     return Scaffold(
@@ -37,6 +40,7 @@ class ProfileScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.go('/clients'),
           ),
+          if (profile['can_go_live'] == true)
           ListTile(
             leading: const Icon(Icons.sensors_rounded),
             title: const Text('Go live'),
@@ -44,27 +48,20 @@ class ProfileScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/live'),
           ),
+          if (profile['is_chef'] == true)
           ListTile(
             leading: const Icon(Icons.restaurant_menu_rounded),
             title: const Text('My recipes'),
-            subtitle: const Text('Chefs: required for every cooking session'),
+            subtitle: const Text('Required for every cooking session'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/recipes'),
           ),
           ListTile(
-            leading: const Icon(Icons.family_restroom_rounded),
-            title: const Text('Who I work with'),
-            subtitle: const Text('Couples, families, children, teens'),
+            leading: const Icon(Icons.edit_outlined),
+            title: const Text('Practice profile'),
+            subtitle: const Text('Bio, price, accepting clients'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/care-settings'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.edit_outlined),
-            title: const Text('Edit profile'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Profile editor — coming soon.')),
-            ),
           ),
           ListTile(
             leading: const Icon(Icons.lock_outline),
@@ -75,11 +72,10 @@ class ProfileScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.account_balance_outlined),
-            title: const Text('Payout method'),
+            title: const Text('Earnings & payouts'),
+            subtitle: const Text('What you earned and withdrawals'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Add bank account — coming soon.')),
-            ),
+            onTap: () => context.go('/earnings'),
           ),
           ListTile(
             leading: const Icon(Icons.support_outlined),

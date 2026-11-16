@@ -84,7 +84,8 @@ class JitsiSessionView extends StatefulWidget {
 
 class _JitsiSessionViewState extends State<JitsiSessionView> {
   InAppWebViewController? _controller;
-  var _loading = true;
+  // There is no in-app webview on web, so nothing will ever finish loading.
+  var _loading = !kIsWeb;
   String? _error;
   var _left = false;
 

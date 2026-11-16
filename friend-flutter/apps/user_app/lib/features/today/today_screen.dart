@@ -374,6 +374,30 @@ class _ExploreSupportSection extends ConsumerWidget {
         Row(
           children: [
             Expanded(
+              child: _QuickCard(
+                icon: Icons.sensors_rounded,
+                color: FriendColors.coral,
+                title: 'Live',
+                subtitle: 'Reflections & cook-alongs',
+                onTap: () => context.go(AppRoutes.live),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _QuickCard(
+                icon: Icons.family_restroom_rounded,
+                color: FriendColors.primary,
+                title: 'Family',
+                subtitle: 'Book for your child',
+                onTap: () => context.go(AppRoutes.family),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Row(
+          children: [
+            Expanded(
               child: Text(
                 s.exploreSupport,
                 style: sectionTitle(context),
@@ -593,7 +617,7 @@ class _NextSessionHero extends ConsumerWidget {
                   FriendAvatar(
                     size: 48,
                     initials:
-                        proName.isNotEmpty ? proName[0].toUpperCase() : 'A',
+                        personInitial(proName, 'A'),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -826,6 +850,55 @@ class _QuietNote extends StatelessWidget {
               fontFamily: 'Geist',
               fontFamilyFallback: TodayScreen._ethiopicFallback,
             ),
+      ),
+    );
+  }
+}
+
+/// Compact shortcut tile on the home screen.
+class _QuickCard extends StatelessWidget {
+  const _QuickCard({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return CandyCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(height: 12),
+          Text(title, style: theme.textTheme.titleSmall),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
+          ),
+        ],
       ),
     );
   }

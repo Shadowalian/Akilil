@@ -86,6 +86,18 @@ class ProfileScreen extends ConsumerWidget {
                   onTap: () => context.go(AppRoutes.goals),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(18, 12, 12, 12),
+                  child: Row(
+                    children: [
+                      Icon(Icons.translate_rounded, size: 20, color: FriendColors.primary),
+                      SizedBox(width: 14),
+                      Expanded(child: Text('Language')),
+                      LanguageToggle(compact: true),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.family_restroom_rounded,
                   title: 'Family',
