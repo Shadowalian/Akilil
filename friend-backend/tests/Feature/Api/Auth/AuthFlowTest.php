@@ -29,6 +29,8 @@ class AuthFlowTest extends TestCase
             'email'                 => 'test@example.com',
             'password'              => 'Pass-word-9',
             'password_confirmation' => 'Pass-word-9',
+            'date_of_birth'         => '1994-05-17',
+            'accept_terms'          => true,
         ]);
 
         $response->assertCreated();

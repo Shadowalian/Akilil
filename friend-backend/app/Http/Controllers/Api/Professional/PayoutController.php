@@ -45,6 +45,18 @@ class PayoutController extends Controller
         $user = $request->user();
         abort_unless($user->role === 'professional', 403, 'Only professionals can request payouts.');
 
+        // You can only withdraw what you have actually earned (net of the
+        // platform fee) and not already requested.
+        $amount    = (int) $request->input('amount_cents');
+        $available = app(\App\Services\EarningsService::class)->availableCents($user);
+        if ($amount > $available) {
+            return response()->json([
+                'message'         => 'That is more than your available balance.',
+                'code'            => 'insufficient_earnings',
+                'available_cents' => $available,
+            ], 422);
+        }
+
         $payout = Payout::create([
             'professional_user_id' => $user->id,
             'amount_cents'         => (int) $request->input('amount_cents'),

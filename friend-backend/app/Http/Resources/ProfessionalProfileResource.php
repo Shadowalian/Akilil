@@ -27,6 +27,13 @@ class ProfessionalProfileResource extends JsonResource
             'sessions_completed'       => $this->sessions_completed,
             'is_accepting_clients'     => (bool) $this->is_accepting_clients,
             'offers_free_listening'    => (bool) ($this->offers_free_listening ?? false),
+            'care_formats'             => $this->offeredCareFormats(),
+            'age_groups'               => $this->servedAgeGroups(),
+            'couples_rate_cents'       => $this->couples_rate_cents,
+            'family_rate_cents'        => $this->family_rate_cents,
+            // What this professional's pillar unlocks in the Pro app.
+            'is_chef'                  => $this->isCookingPillar(),
+            'can_go_live'              => in_array($this->category?->slug, config('akilil.live.pillars'), true),
             'specialties'              => $this->whenLoaded('specialties', fn () => $this->specialties->map(fn ($s) => ['id'=>$s->id,'slug'=>$s->slug,'name'=>$s->name])),
             'languages'                => $this->whenLoaded('languages',  fn () => $this->languages->map(fn ($l) => ['id'=>$l->id,'code'=>$l->code,'name'=>$l->name,'proficiency'=>$l->pivot->proficiency])),
         ];

@@ -21,6 +21,10 @@ class DiscoveryFiltersRequest extends FormRequest
             'max_price_cents'    => ['nullable', 'integer', 'min:0'],
             'available_from'     => ['nullable', 'date'],
             'available_to'       => ['nullable', 'date', 'after_or_equal:available_from'],
+            'care_format'        => ['nullable', 'in:'.implode(',', config('akilil.care_formats'))],
+            'age_group'          => ['nullable', 'in:'.implode(',', array_keys(config('akilil.age_groups')))],
+            // Shortcut: filter to people who work with this child's age group.
+            'dependent_id'       => ['nullable', 'integer'],
             'sort'               => ['nullable', 'in:rating,price,newest,experience,match'],
             'page'               => ['nullable', 'integer', 'min:1'],
             'per_page'           => ['nullable', 'integer', 'min:1', 'max:50'],

@@ -29,7 +29,15 @@ class MeController extends Controller
     public function update(UpdateMeRequest $request): JsonResponse
     {
         $user = $request->user();
-        $user->fill($request->validated());
+        $data = $request->validated();
+
+        // A date of birth is an age-gate input: once given it can only be
+        // corrected by support, and a guardian-managed teen can't set it.
+        if (array_key_exists('date_of_birth', $data) && ($user->date_of_birth || $user->guardian_user_id)) {
+            unset($data['date_of_birth']);
+        }
+
+        $user->fill($data);
         $user->save();
 
         return (new UserResource($user->fresh('professionalProfile')))->response();

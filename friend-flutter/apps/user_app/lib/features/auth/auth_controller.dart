@@ -131,6 +131,8 @@ class AuthController extends ChangeNotifier {
     required String email,
     required String password,
     required String passwordConfirmation,
+    required DateTime dateOfBirth,
+    String seekingCareFor = 'self',
   }) async {
     final res = await _dio.post<Map<String, dynamic>>(
       '/auth/register',
@@ -139,6 +141,9 @@ class AuthController extends ChangeNotifier {
         'email': email,
         'password': password,
         'password_confirmation': passwordConfirmation,
+        'date_of_birth': dateOfBirth.toIso8601String().substring(0, 10),
+        'seeking_care_for': seekingCareFor,
+        'accept_terms': true,
       },
     );
     final data = res.data ?? const {};

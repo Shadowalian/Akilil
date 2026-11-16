@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Broadcast;
  *   - private-channel.{id}       →  community channel members
  *   - presence-channel.{id}      →  same as private-channel.* but with presence
  *   - presence-notifications.*   →  opt-in global presence
+ *   - live-stream.{id}           →  PUBLIC (no closure): the live feed any
+ *                                   signed-in viewer can already read
  */
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {

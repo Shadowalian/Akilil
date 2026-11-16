@@ -28,6 +28,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _pass2 = TextEditingController();
   bool _busy = false;
   bool _obscure = true;
+  DateTime? _dob;
+  String _careFor = 'self';
+  bool _terms = false;
   String? _error;
 
   @override
@@ -41,6 +44,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final dob = _dob;
+    if (dob == null) {
+      setState(() => _error = 'Please tell us your date of birth.');
+      return;
+    }
+    final now = DateTime.now();
+    final age = now.year - dob.year - ((now.month < dob.month || (now.month == dob.month && now.day < dob.day)) ? 1 : 0);
+    if (age < 18) {
+      setState(() => _error =
+          'Akilil accounts are for adults. Ask a parent or guardian to sign up and add you — they can book and pay for your sessions.');
+      return;
+    }
+    if (!_terms) {
+      setState(() => _error = 'Please accept the terms and privacy policy.');
+      return;
+    }
     setState(() {
       _busy = true;
       _error = null;
@@ -51,6 +70,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             email: _email.text.trim(),
             password: _pass.text,
             passwordConfirmation: _pass2.text,
+            dateOfBirth: dob,
+            seekingCareFor: _careFor,
           );
     } on DioException catch (e) {
       setState(() {
@@ -201,6 +222,55 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               validator: (v) => v == _pass.text
                                   ? null
                                   : "Passwords don't match",
+                            ),
+                            const SizedBox(height: 22),
+                            OutlinedButton.icon(
+                              icon: const Icon(Icons.cake_outlined, size: 18),
+                              label: Text(_dob == null
+                                  ? 'Date of birth'
+                                  : 'Born ${_dob!.day}/${_dob!.month}/${_dob!.year}'),
+                              onPressed: () async {
+                                final now = DateTime.now();
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: _dob ?? DateTime(now.year - 25),
+                                  firstDate: DateTime(1900),
+                                  lastDate: now,
+                                  helpText: 'Your date of birth',
+                                );
+                                if (picked != null) setState(() => _dob = picked);
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            Text('Who are you looking for support for?',
+                                style: Theme.of(context).textTheme.labelLarge),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: [
+                                for (final o in const [
+                                  ('self', 'Myself'),
+                                  ('couple', 'Me & my partner'),
+                                  ('child', 'My child'),
+                                  ('family', 'My family'),
+                                ])
+                                  ChoiceChip(
+                                    label: Text(o.$2),
+                                    selected: _careFor == o.$1,
+                                    onSelected: (_) => setState(() => _careFor = o.$1),
+                                  ),
+                              ],
+                            ),
+                            CheckboxListTile(
+                              contentPadding: EdgeInsets.zero,
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _terms,
+                              onChanged: (v) => setState(() => _terms = v ?? false),
+                              title: Text(
+                                'I am 18 or older and accept the Terms and Privacy Policy.',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
                             ),
                             if (_error != null) ...[
                               const SizedBox(height: 20),

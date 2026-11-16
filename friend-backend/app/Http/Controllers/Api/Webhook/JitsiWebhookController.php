@@ -31,6 +31,8 @@ class JitsiWebhookController extends Controller
     public function handle(Request $request): JsonResponse
     {
         $expected = config('jitsi.webhook_secret');
+        // No secret configured: only tolerated on a developer machine.
+        abort_if(! $expected && ! app()->environment(['local', 'testing']), 503, 'Webhook secret is not configured.');
         if ($expected) {
             $provided = $request->header('X-Webhook-Secret');
             abort_unless($provided && hash_equals($expected, (string) $provided), 401, 'Invalid webhook secret.');

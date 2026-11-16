@@ -19,8 +19,9 @@ class RegisterProfessionalController extends Controller
      * POST /api/auth/register-professional
      *
      * Creates a user with role='professional' AND a professional_profiles row.
-     * During QA signup (name/email/password only), defaults category + auto-approves
-     * so the new pro is discoverable for free test video calls.
+     * New professionals start `pending` and hidden from clients until an
+     * admin reviews their credentials. `akilil.demo_mode` skips review for
+     * demos only.
      */
     public function __invoke(RegisterProfessionalRequest $request): JsonResponse
     {
@@ -34,6 +35,8 @@ class RegisterProfessionalController extends Controller
                 'timezone' => $request->input('timezone') ?? 'UTC',
             ]);
 
+            $demo = (bool) config('akilil.demo_mode');
+
             $categoryId = $request->filled('category_id')
                 ? $request->integer('category_id')
                 : (int) (Category::query()->orderBy('id')->value('id') ?? 1);
@@ -44,15 +47,14 @@ class RegisterProfessionalController extends Controller
                 'experience_years'     => $request->filled('experience_years')
                     ? $request->integer('experience_years')
                     : 1,
-                'bio'                  => $request->input('bio') ?: 'Testing account — free video calls enabled.',
-                // QA: approved + accepting so phone-created pros show up for test calls.
-                'verification_status'  => 'approved',
-                'badge_active'         => true,
-                'currency'             => 'USD',
-                'is_accepting_clients' => true,
+                'bio'                  => $request->input('bio'),
+                'verification_status'  => $demo ? 'approved' : 'pending',
+                'badge_active'         => $demo,
+                'currency'             => config('akilil.currency'),
+                'is_accepting_clients' => $demo,
             ]);
 
-            Wallet::create(['user_id' => $user->id, 'currency' => 'USD']);
+            Wallet::create(['user_id' => $user->id, 'currency' => config('akilil.currency')]);
 
             event(new Registered($user));
 

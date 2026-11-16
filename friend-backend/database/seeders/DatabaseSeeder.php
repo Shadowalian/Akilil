@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndAdminSeeder::class,
             DemoDataSeeder::class,
+            // After the demo seeder, which resets the pillar list.
+            CatalogSeeder::class,
         ]);
     }
 }

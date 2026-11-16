@@ -23,9 +23,10 @@ class MainShell extends ConsumerWidget {
     return 1;
   }
 
-  bool _hideDock(String location) => location.contains('/room');
+  bool _hideDock(String location) =>
+      location.contains('/room') || RegExp(r'^/live/\d+').hasMatch(location) || location.contains('/meetings/');
 
-  bool _hideLanguage(String location) => location.contains('/room');
+  bool _hideLanguage(String location) => _hideDock(location);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

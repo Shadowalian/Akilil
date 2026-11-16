@@ -12,7 +12,7 @@ class TherapyGroup extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'professional_user_id', 'title', 'description', 'max_members',
+        'professional_user_id', 'category_id', 'title', 'description', 'max_members', 'min_age',
         'is_open', 'price_cents', 'currency', 'status',
     ];
 
@@ -20,6 +20,7 @@ class TherapyGroup extends Model
     {
         return [
             'max_members' => 'integer',
+            'min_age' => 'integer',
             'is_open' => 'boolean',
             'price_cents' => 'integer',
         ];
@@ -28,6 +29,16 @@ class TherapyGroup extends Model
     public function professional(): BelongsTo
     {
         return $this->belongsTo(User::class, 'professional_user_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function isCookingClass(): bool
+    {
+        return $this->category?->slug === config('akilil.cooking.pillar');
     }
 
     public function members(): HasMany

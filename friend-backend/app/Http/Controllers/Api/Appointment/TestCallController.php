@@ -25,6 +25,9 @@ class TestCallController extends Controller
      */
     public function __invoke(Request $request): JsonResponse
     {
+        // Creates a free session with an arbitrary account: demo builds only.
+        abort_unless(config('akilil.demo_mode'), 404);
+
         $user = $request->user();
         $data = $request->validate([
             'professional_user_id' => ['nullable', 'integer', 'exists:users,id'],

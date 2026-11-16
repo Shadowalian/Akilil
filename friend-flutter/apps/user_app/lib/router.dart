@@ -30,6 +30,9 @@ import 'features/profile/profile_screen.dart';
 import 'features/shell/main_shell.dart';
 import 'features/today/today_screen.dart';
 import 'features/groups/groups_screen.dart';
+import 'features/family/family_screen.dart';
+import 'features/cooking/recipe_screen.dart';
+import 'features/live/live_screens.dart';
 // Clinical & care features
 import 'features/worksheets/worksheets_screen.dart';
 import 'features/worksheets/worksheet_detail_screen.dart';
@@ -65,6 +68,8 @@ class AppRoutes {
   static const goals         = '/goals';
   static const wallet        = '/wallet';
   static const groups        = '/groups';
+  static const family        = '/family';
+  static const live          = '/live';
   // Clinical & care
   static const worksheets      = '/worksheets';
   static const crisis          = '/crisis';
@@ -253,6 +258,25 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: ':id',
                 builder: (_, s) =>
                     ClientGroupDetailScreen(groupId: s.pathParameters['id']!),
+              ),
+            ],
+          ),
+          GoRoute(path: AppRoutes.family, builder: (_, _) => const FamilyScreen()),
+          GoRoute(
+            path: '/recipes/:id',
+            builder: (_, s) => RecipeScreen(
+              recipeId: s.pathParameters['id']!,
+              appointmentId: s.uri.queryParameters['appointment'],
+              meetingId: s.uri.queryParameters['meeting'],
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.live,
+            builder: (_, _) => const LiveListScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (_, s) => LiveViewerScreen(streamId: s.pathParameters['id']!),
               ),
             ],
           ),

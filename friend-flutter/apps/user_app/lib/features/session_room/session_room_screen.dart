@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +24,8 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
   String? _jwt;
   String? _displayName;
   String? _clinicianName;
+  String? _error;
+  int? _recipeId;
 
   @override
   void initState() {
@@ -48,16 +51,26 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
             (data['display_name'] as String).isNotEmpty) {
           _displayName = data['display_name'] as String;
         }
-        if (_roomUrl == null || _roomUrl!.isEmpty) {
-          _roomUrl = 'https://meet.ffmuc.net/akilil-${widget.appointmentId}';
-        }
         _loading = false;
+        if (_roomUrl == null || _roomUrl!.isEmpty) {
+          _error = "Couldn't open the session room.";
+        }
+      });
+    } on DioException catch (e) {
+      if (!mounted) return;
+      final body = e.response?.data;
+      setState(() {
+        _loading = false;
+        _error = apiErrorMessage(body, "Couldn't open the session room.");
+        if (body is Map && body['code'] == 'ingredients_required') {
+          _recipeId = (body['recipe_id'] as num?)?.toInt();
+        }
       });
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _roomUrl = 'https://meet.ffmuc.net/akilil-${widget.appointmentId}';
         _loading = false;
+        _error = "Couldn't open the session room.";
       });
     }
   }
@@ -75,6 +88,31 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
     if (_loading) {
       return SessionConnectingView(
         message: 'Preparing your sanctuary chamber…',
+      );
+    }
+
+    if (_error != null) {
+      return Scaffold(
+        backgroundColor: FriendColors.background,
+        appBar: AppBar(leading: BackButton(onPressed: _leave)),
+        body: FriendEmptyState(
+          icon: _recipeId != null ? Icons.shopping_basket_outlined : Icons.videocam_off_outlined,
+          title: _recipeId != null ? 'Ingredients first' : "Can't join yet",
+          message: _error,
+          ctaLabel: _recipeId != null ? 'Open shopping list' : 'Try again',
+          onCta: () async {
+            if (_recipeId != null) {
+              await context.push('/recipes/$_recipeId?appointment=${widget.appointmentId}');
+            }
+            if (!mounted) return;
+            setState(() {
+              _error = null;
+              _recipeId = null;
+              _loading = true;
+            });
+            _initSession();
+          },
+        ),
       );
     }
 
@@ -122,7 +160,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'When you enter the chamber, video runs inside Akilil Meet with end-to-end encryption. You can stay voice-only if you prefer.',
+                    'When you enter the chamber, video runs inside Akilil Meet on an encrypted connection. You can stay voice-only if you prefer.',
                     style: GoogleFonts.inter(
                       fontSize: FriendTypeScale.bodySmall,
                       height: 1.45,
@@ -133,7 +171,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const FriendVaultBadge(label: 'Jitsi Secure Mesh • E2EE Addis-01'),
+            const FriendVaultBadge(label: 'Private session • encrypted in transit'),
           ],
         ),
         bottomNavigationBar: FriendStitchStickyBar(

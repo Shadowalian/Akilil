@@ -87,6 +87,20 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
+                  icon: Icons.family_restroom_rounded,
+                  title: 'Family',
+                  subtitle: 'Children you book for, session invitations',
+                  onTap: () => context.go(AppRoutes.family),
+                ),
+                const Divider(height: 1, indent: 18, endIndent: 18),
+                FriendMenuTile(
+                  icon: Icons.sensors_rounded,
+                  title: 'Live',
+                  subtitle: 'Spiritual reflections and cook-alongs',
+                  onTap: () => context.go(AppRoutes.live),
+                ),
+                const Divider(height: 1, indent: 18, endIndent: 18),
+                FriendMenuTile(
                   icon: Icons.groups_2_outlined,
                   title: 'Group therapy',
                   subtitle: 'Join open listening circles',

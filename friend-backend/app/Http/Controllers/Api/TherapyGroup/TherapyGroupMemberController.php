@@ -21,6 +21,8 @@ class TherapyGroupMemberController extends Controller
         abort_unless($user->role === 'user', 403, 'Only clients can join groups.');
 
         $group = TherapyGroup::withCount('activeMembers')->findOrFail($id);
+        // Groups are age-banded: adults-only unless the host set a teen group.
+        \App\Support\AgeGate::requireMinAge($user, (int) $group->min_age, 'join this group');
         abort_unless($group->status === 'active' && $group->is_open, 422, 'This group is not open for joining.');
         abort_unless(
             $group->active_members_count < $group->max_members,
@@ -41,7 +43,7 @@ class TherapyGroupMemberController extends Controller
         $member->joined_at = now();
         $member->save();
 
-        $group->load('professional')->loadCount('activeMembers');
+        $group->load(['professional', 'category'])->loadCount('activeMembers');
         $group->is_member = true;
 
         return response()->json([

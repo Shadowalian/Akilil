@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -41,16 +42,22 @@ class _SessionHostScreenState extends ConsumerState<SessionHostScreen> {
             (data['display_name'] as String).isNotEmpty) {
           _displayName = data['display_name'] as String;
         }
-        if (_roomUrl == null || _roomUrl!.isEmpty) {
-          _roomUrl = 'https://meet.ffmuc.net/akilil-${widget.appointmentId}';
-        }
         _loading = false;
+        if (_roomUrl == null || _roomUrl!.isEmpty) {
+          _error = "Couldn't open the session room.";
+        }
+      });
+    } on DioException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = apiErrorMessage(e.response?.data, "Couldn't open the session room.");
       });
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _roomUrl = 'https://meet.ffmuc.net/akilil-${widget.appointmentId}';
         _loading = false;
+        _error = "Couldn't open the session room.";
       });
     }
   }

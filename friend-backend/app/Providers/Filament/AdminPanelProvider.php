@@ -149,6 +149,8 @@ HTML),
             ])
             ->authMiddleware([
                 Authenticate::class,
+                // Staff must have TOTP on before they can open any admin page.
+                \App\Http\Middleware\PanelEnsureTwoFactorEnabled::class,
             ]);
     }
 
