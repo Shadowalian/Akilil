@@ -315,8 +315,10 @@ class _LiveRoomViewState extends State<LiveRoomView> {
   Widget _header(LiveRoomState state) {
     return Row(
       children: [
-        Flexible(
-          child: Container(
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
             padding: const EdgeInsets.fromLTRB(4, 4, 14, 4),
             decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(40)),
             child: Row(
@@ -354,6 +356,7 @@ class _LiveRoomViewState extends State<LiveRoomView> {
               ],
             ),
           ),
+          ),
         ),
         const SizedBox(width: 8),
         _pill(
@@ -381,7 +384,7 @@ class _LiveRoomViewState extends State<LiveRoomView> {
             ),
           ),
         ],
-        const Spacer(),
+        const SizedBox(width: 8),
         if (widget.isHost) ...[
           _roundButton(Icons.tune_rounded, _showHostSettings, tooltip: 'Broadcast settings'),
           const SizedBox(width: 6),
@@ -758,6 +761,7 @@ class _GiftTrayState extends State<GiftTray> {
                   for (final q in _quantities) ...[
                     ChoiceChip(
                       label: Text('×$q'),
+                      showCheckmark: false,
                       selected: _quantity == q,
                       onSelected: (_) => setState(() => _quantity = q),
                     ),
