@@ -54,6 +54,11 @@ use App\Http\Controllers\Api\Wellness\HabitController;
 use App\Http\Controllers\Api\Wellness\JournalController;
 use App\Http\Controllers\Api\Wellness\MoodController;
 use App\Http\Controllers\Api\Wellness\VentController;
+use App\Http\Controllers\Api\Cooking\RecipeController;
+use App\Http\Controllers\Api\Family\DependentController;
+use App\Http\Controllers\Api\Family\IntakeController;
+use App\Http\Controllers\Api\Live\LiveInteractionController;
+use App\Http\Controllers\Api\Live\LiveStreamController;
 use App\Models\Message;
 use Illuminate\Support\Facades\Route;
 
@@ -141,6 +146,55 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('appointments/{id}/accept',     [ListeningRequestController::class, 'accept'])->name('appointments.accept');
     Route::post('appointments/{id}/decline',    [ListeningRequestController::class, 'decline'])->name('appointments.decline');
 
+    Route::post('appointments/{id}/ingredients/confirm', [AppointmentController::class, 'confirmIngredients'])->name('appointments.ingredients.confirm');
+
+    /* Couples / family sessions — invitations for the other participants */
+    Route::get('appointment-invites',            [AppointmentController::class, 'invites'])->name('appointment-invites.index');
+    Route::post('appointment-invites/{action}',  [AppointmentController::class, 'respondToInvite'])
+        ->whereIn('action', ['accept', 'decline'])->name('appointment-invites.respond');
+
+    /* Family — the minors a guardian books and pays for */
+    Route::get('dependents',                     [DependentController::class, 'index'])->name('dependents.index');
+    Route::post('dependents',                    [DependentController::class, 'store'])->name('dependents.store');
+    Route::put('dependents/{id}',                [DependentController::class, 'update'])->name('dependents.update');
+    Route::delete('dependents/{id}',             [DependentController::class, 'destroy'])->name('dependents.destroy');
+    Route::post('dependents/{id}/teen-login',    [DependentController::class, 'createTeenLogin'])->name('dependents.teen-login.store');
+    Route::delete('dependents/{id}/teen-login',  [DependentController::class, 'revokeTeenLogin'])->name('dependents.teen-login.destroy');
+
+    /* Matching questionnaire */
+    Route::get('intake',                         [IntakeController::class, 'show'])->name('intake.show');
+    Route::post('intake',                        [IntakeController::class, 'store'])->name('intake.store');
+
+    /* Chef recipes + each participant's shopping checklist */
+    Route::get('recipes',                        [RecipeController::class, 'index'])->name('recipes.index');
+    Route::post('recipes',                       [RecipeController::class, 'store'])->name('recipes.store');
+    Route::get('recipes/{id}',                   [RecipeController::class, 'show'])->name('recipes.show');
+    Route::put('recipes/{id}',                   [RecipeController::class, 'update'])->name('recipes.update');
+    Route::delete('recipes/{id}',                [RecipeController::class, 'destroy'])->name('recipes.destroy');
+    Route::post('recipes/{id}/publish',          [RecipeController::class, 'publish'])->name('recipes.publish');
+    Route::post('recipes/{id}/archive',          [RecipeController::class, 'archive'])->name('recipes.archive');
+    Route::get('recipes/{id}/checklist',         [RecipeController::class, 'checklist'])->name('recipes.checklist.show');
+    Route::put('recipes/{id}/checklist',         [RecipeController::class, 'updateChecklist'])->name('recipes.checklist.update');
+
+    /* Live broadcasts — spiritual guides and chefs */
+    Route::get('gifts',                          [LiveInteractionController::class, 'catalogue'])->name('gifts.index');
+    Route::get('live-streams',                   [LiveStreamController::class, 'index'])->name('live-streams.index');
+    Route::post('live-streams',                  [LiveStreamController::class, 'store'])->name('live-streams.store');
+    Route::get('live-streams/{id}',              [LiveStreamController::class, 'show'])->name('live-streams.show');
+    Route::put('live-streams/{id}',              [LiveStreamController::class, 'update'])->name('live-streams.update');
+    Route::post('live-streams/{id}/start',       [LiveStreamController::class, 'start'])->name('live-streams.start');
+    Route::post('live-streams/{id}/end',         [LiveStreamController::class, 'end'])->name('live-streams.end');
+    Route::post('live-streams/{id}/join',        [LiveStreamController::class, 'join'])->name('live-streams.join');
+    Route::post('live-streams/{id}/leave',       [LiveStreamController::class, 'leave'])->name('live-streams.leave');
+    Route::post('live-streams/{id}/viewers/{userId}/ban', [LiveStreamController::class, 'ban'])->name('live-streams.ban');
+    // The feed is polled every couple of seconds by every viewer.
+    Route::get('live-streams/{id}/events',       [LiveInteractionController::class, 'events'])
+        ->withoutMiddleware('throttle:api')->middleware('throttle:120,1')->name('live-streams.events');
+    Route::post('live-streams/{id}/comments',    [LiveInteractionController::class, 'comment'])->name('live-streams.comments');
+    Route::post('live-streams/{id}/likes',       [LiveInteractionController::class, 'like'])->name('live-streams.likes');
+    Route::post('live-streams/{id}/gifts',       [LiveInteractionController::class, 'gift'])->name('live-streams.gifts');
+    Route::delete('live-stream-events/{id}',     [LiveInteractionController::class, 'removeEvent'])->name('live-stream-events.destroy');
+
     /* Therapy groups — multi-member rooms hosted by a professional */
     Route::get('therapy-groups',                [TherapyGroupController::class, 'index'])->name('therapy-groups.index');
     Route::post('therapy-groups',               [TherapyGroupController::class, 'store'])->name('therapy-groups.store');
@@ -153,6 +207,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('therapy-groups/{id}/meetings', [TherapyGroupMeetingController::class, 'store'])->name('therapy-groups.meetings.store');
     Route::post('therapy-group-meetings/{id}/start', [TherapyGroupMeetingController::class, 'start'])->name('therapy-group-meetings.start');
     Route::post('therapy-group-meetings/{id}/join',  [TherapyGroupMeetingController::class, 'join'])->name('therapy-group-meetings.join');
+    Route::post('therapy-group-meetings/{id}/reserve',     [TherapyGroupMeetingController::class, 'reserve'])->name('therapy-group-meetings.reserve');
+    Route::post('therapy-group-meetings/{id}/cancel-seat', [TherapyGroupMeetingController::class, 'cancelSeat'])->name('therapy-group-meetings.cancel-seat');
+    Route::post('therapy-group-meetings/{id}/ingredients/confirm', [TherapyGroupMeetingController::class, 'confirmIngredients'])->name('therapy-group-meetings.ingredients.confirm');
+    Route::post('therapy-group-meetings/{id}/end',    [TherapyGroupMeetingController::class, 'end'])->name('therapy-group-meetings.end');
+    Route::post('therapy-group-meetings/{id}/cancel', [TherapyGroupMeetingController::class, 'cancel'])->name('therapy-group-meetings.cancel');
 
     /* Sessions — Jitsi room lifecycle */
     Route::post('appointments/{id}/session/start', [SessionController::class, 'start'])->name('sessions.start');

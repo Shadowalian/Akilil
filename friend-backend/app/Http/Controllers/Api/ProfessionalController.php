@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Discovery\DiscoveryFiltersRequest;
 use App\Http\Resources\ProfessionalDetailResource;
 use App\Http\Resources\ProfessionalListResource;
+use App\Models\Dependent;
+use App\Models\IntakeResponse;
 use App\Models\ProfessionalProfile;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -44,6 +46,45 @@ class ProfessionalController extends Controller
 
         if ($sid = $request->input('specialty_id')) {
             $q->whereHas('specialties', fn ($s) => $s->where('specialties.id', $sid));
+        }
+
+        // Family care: who offers this format / works with this age group.
+        // Legacy profiles with no declaration count as individual + adults.
+        $careFormat = $request->input('care_format');
+        $ageGroup   = $request->input('age_group');
+        if ($depId = $request->input('dependent_id')) {
+            $dependent = Dependent::where('guardian_user_id', $request->user()->id)->find($depId);
+            abort_unless($dependent, 422, 'Unknown dependent.');
+            $ageGroup = $dependent->ageGroup();
+        }
+        // "Recommended" with no explicit filter falls back to the intake answers.
+        if ($sort === 'match' && ! $careFormat && ! $ageGroup && ! $request->hasAny(['category', 'category_id'])) {
+            $intake = IntakeResponse::where('user_id', $request->user()->id)->latest('id')->first();
+            if ($intake) {
+                $careFormat = $intake->care_format;
+                if ($intake->pillar) {
+                    $q->whereHas('category', fn ($c) => $c->where('slug', $intake->pillar));
+                }
+                if ($intake->dependent_id && ($d = Dependent::find($intake->dependent_id))) {
+                    $ageGroup = $d->ageGroup();
+                }
+            }
+        }
+        if ($careFormat) {
+            $q->where(function ($w) use ($careFormat) {
+                $w->whereJsonContains('care_formats', $careFormat);
+                if ($careFormat === 'individual') {
+                    $w->orWhereNull('care_formats');
+                }
+            });
+        }
+        if ($ageGroup) {
+            $q->where(function ($w) use ($ageGroup) {
+                $w->whereJsonContains('age_groups', $ageGroup);
+                if ($ageGroup === 'adults') {
+                    $w->orWhereNull('age_groups');
+                }
+            });
         }
 
         if ($gender = $request->input('gender')) {

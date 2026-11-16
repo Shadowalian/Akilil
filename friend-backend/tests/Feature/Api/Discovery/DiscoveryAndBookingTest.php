@@ -91,10 +91,12 @@ class DiscoveryAndBookingTest extends TestCase
         $this->assertCount(1, $res->json('data'));
         $this->assertEquals($pro2->id, $res->json('data.0.user_id'));
 
+        // Pin the ratings: the factory picks them at random.
+        $this->profile->update(['rating_avg' => 4.0]);
         $res2 = $this->actingAs($this->client)
             ->getJson('/api/professionals?min_rating=4.9');
         $res2->assertOk();
-        $this->assertCount(0, $res2->json('data'));  // our pro is 5.0 by default factory — actually let me check
+        $this->assertCount(0, $res2->json('data'));
     }
 
     public function test_discovery_show_returns_full_profile(): void
@@ -181,7 +183,8 @@ class DiscoveryAndBookingTest extends TestCase
         ]);
         $res->assertCreated();
         $res->assertJsonStructure(['id','status','scheduled_at','price_cents']);
-        $this->assertEquals('pending', $res->json('status'));
+        // Paid from the wallet at booking, so it is confirmed straight away.
+        $this->assertEquals('confirmed', $res->json('status'));
     }
 
     public function test_booking_rejects_past_time(): void
@@ -275,7 +278,8 @@ class DiscoveryAndBookingTest extends TestCase
             'user_timezone' => 'UTC',
         ]);
         $res->assertOk();
-        $this->assertEquals('rescheduled', $res->json('status'));
+        // A moved session stays confirmed and keeps occupying its new slot.
+        $this->assertEquals('confirmed', $res->json('status'));
     }
 
     public function test_client_can_cancel_own_appointment_with_full_refund_when_far_out(): void

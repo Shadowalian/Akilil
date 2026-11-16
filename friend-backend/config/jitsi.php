@@ -71,4 +71,65 @@ return [
         'interfaceConfig.MOBILE_APP_PROMO' => false,
         'interfaceConfig.DEFAULT_LOGO_URL' => 'images/akilil-logo.svg',
     ],
+
+    /*
+     * Room modes. Each mode is a set of overrides layered on top of
+     * `iframe_config`, so one Jitsi deployment serves very different rooms:
+     *
+     *   consult        1:1 / couples / family — everyone on camera.
+     *   group          group therapy or a cooking class — tile view,
+     *                  members join muted and raise a hand.
+     *   broadcast_host the person going live — full controls.
+     *   broadcast_view the audience — receive-only, no mic/camera buttons.
+     *                  Chat, likes and gifts are drawn by the app on top.
+     *
+     * Viewer lock-down here is client configuration. For hard,
+     * server-side receive-only at scale turn on Jitsi visitors
+     * (see jitsi/AKILIL.md).
+     */
+    'modes' => [
+        'consult' => [],
+
+        'group' => [
+            'startWithAudioMuted' => true,
+            'startWithVideoMuted' => false,
+            'startInTileView' => true,
+            'toolbarButtons' => [
+                'microphone', 'camera', 'chat', 'raisehand', 'tileview',
+                'participants-pane', 'hangup', 'settings', 'fullscreen',
+            ],
+        ],
+
+        'broadcast_host' => [
+            'startWithAudioMuted' => false,
+            'startWithVideoMuted' => false,
+            'disableFilmstripAutohiding' => false,
+            'filmstrip.disabled' => true,
+            'toolbarButtons' => [
+                'microphone', 'camera', 'desktop', 'participants-pane',
+                'select-background', 'settings', 'hangup',
+            ],
+            'notifications' => [],
+            'disableJoinLeaveSounds' => true,
+        ],
+
+        'broadcast_view' => [
+            'startWithAudioMuted' => true,
+            'startWithVideoMuted' => true,
+            'disableInitialGUM' => true,
+            'startSilent' => false,
+            'filmstrip.disabled' => true,
+            'disableFilmstripAutohiding' => false,
+            'disableSelfView' => true,
+            'filmstrip.disableSelfView' => true,
+            'hideParticipantsStats' => true,
+            'disableRemoteMute' => true,
+            'remoteVideoMenu.disabled' => true,
+            'disableProfile' => true,
+            'toolbarButtons' => [],
+            'notifications' => [],
+            'disableJoinLeaveSounds' => true,
+            'interfaceConfig.TOOLBAR_ALWAYS_VISIBLE' => false,
+        ],
+    ],
 ];

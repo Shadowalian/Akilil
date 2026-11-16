@@ -31,10 +31,18 @@ class JitsiService
         ];
     }
 
-    /** Build a joinable meet URL for an existing room name. */
-    public function roomUrlFor(string $roomName): string
+    /**
+     * Build a joinable meet URL for an existing room name.
+     *
+     * @param  string  $mode  One of config('jitsi.modes'): consult | group |
+     *                        broadcast_host | broadcast_view.
+     */
+    public function roomUrlFor(string $roomName, string $mode = 'consult'): string
     {
-        $config = collect(config('jitsi.iframe_config', []))
+        $config = collect(array_merge(
+            config('jitsi.iframe_config', []),
+            config("jitsi.modes.{$mode}", []),
+        ))
             ->map(function ($v, $k) {
                 $key = match (true) {
                     str_starts_with($k, 'config.') => $k,
@@ -61,15 +69,16 @@ class JitsiService
      *
      * @param  bool  $asModerator  Professionial/host gets Jitsi moderator rights.
      */
-    public function issueToken(User $user, string $roomName, bool $asModerator = false): ?string
+    public function issueToken(User $user, string $roomName, bool $asModerator = false, string $mode = 'consult'): ?string
     {
         if (! config('jitsi.use_jwt')) {
             return null;
         }
 
         $now = now()->timestamp;
-        $isModerator = $asModerator
-            || $user->hasAnyRole(['admin', 'support', 'moderator']);
+        // Being platform staff does not make someone a moderator of a
+        // private room; only the host of this room is.
+        $isModerator = $asModerator;
 
         $payload = [
             'iss' => config('jitsi.jwt.app_id'),
@@ -86,6 +95,16 @@ class JitsiService
                     'name' => $user->name,
                     'email' => $user->email,
                     'moderator' => $isModerator ? 'true' : 'false',
+                    // Read by the visitors / permissions modules when enabled.
+                    'role' => $mode === 'broadcast_view' ? 'visitor' : 'participant',
+                ],
+                // Nobody but the host records or restreams a room.
+                'features' => [
+                    'recording'     => 'false',
+                    'livestreaming' => 'false',
+                    'transcription' => 'false',
+                    'outbound-call' => 'false',
+                    'screen-sharing' => $mode === 'broadcast_view' ? 'false' : 'true',
                 ],
             ],
         ];
@@ -95,6 +114,30 @@ class JitsiService
             config('jitsi.jwt.secret'),
             config('jitsi.jwt.algorithm')
         );
+    }
+
+    /**
+     * Everything a client needs to enter a named room in a given mode.
+     *
+     * @return array{room_name:string, room_url:string, token:?string, is_host:bool, provider:string, mode:string, can_publish:bool}
+     */
+    public function sessionFor(User $user, string $roomName, string $mode, bool $isHost): array
+    {
+        return [
+            'room_url'    => $this->roomUrlFor($roomName, $mode),
+            'room_name'   => $roomName,
+            'token'       => $this->issueToken($user, $roomName, $isHost, $mode),
+            'is_host'     => $isHost,
+            'provider'    => 'jitsi',
+            'mode'        => $mode,
+            'can_publish' => $mode !== 'broadcast_view',
+        ];
+    }
+
+    /** A fresh, unguessable room name: `<prefix><kind>-<id>-<random>`. */
+    public function newRoomName(string $kind, int $id): string
+    {
+        return sprintf('%s%s-%d-%s', config('jitsi.room_prefix'), $kind, $id, Str::lower(Str::random(10)));
     }
 
     /**

@@ -40,6 +40,7 @@ class User extends Authenticatable implements FilamentUser
         'name', 'email', 'password',
         'role', 'locale', 'timezone',
         'avatar_path', 'gender', 'date_of_birth',
+        'guardian_user_id', 'seeking_care_for', 'phone', 'terms_accepted_at',
     ];
 
     protected $hidden = [
@@ -58,6 +59,7 @@ class User extends Authenticatable implements FilamentUser
             'date_of_birth'     => 'date',
             'last_seen_at'      => 'datetime',
             'totp_confirmed_at' => 'datetime',
+            'terms_accepted_at' => 'datetime',
         ];
     }
 
@@ -71,7 +73,67 @@ class User extends Authenticatable implements FilamentUser
     public function isProfessional(): bool { return $this->role === 'professional'; }
     public function isEndUser(): bool      { return $this->role === 'user'; }
 
+    /* ---- Age ---- */
+
+    /** Null when we were never told a date of birth. */
+    public function age(): ?int
+    {
+        return $this->date_of_birth ? (int) $this->date_of_birth->diffInYears(now()) : null;
+    }
+
+    /**
+     * Minors are guardian-managed teen logins, or anyone whose stated
+     * date of birth puts them under the adult age.
+     */
+    public function isMinor(): bool
+    {
+        if ($this->guardian_user_id) {
+            return true;
+        }
+        $age = $this->age();
+
+        return $age !== null && $age < (int) config('akilil.adult_age', 18);
+    }
+
+    /** children | teens | adults */
+    public static function ageGroupFor(int $age): string
+    {
+        foreach (config('akilil.age_groups') as $group => [$min, $max]) {
+            if ($age >= $min && $age <= $max) {
+                return $group;
+            }
+        }
+
+        return 'adults';
+    }
+
     /* ---- Relationships ---- */
+
+    public function guardian(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(self::class, 'guardian_user_id');
+    }
+
+    public function dependents(): HasMany
+    {
+        return $this->hasMany(Dependent::class, 'guardian_user_id');
+    }
+
+    /** The dependent record behind a teen login. */
+    public function dependentProfile(): HasOne
+    {
+        return $this->hasOne(Dependent::class, 'linked_user_id');
+    }
+
+    public function recipes(): HasMany
+    {
+        return $this->hasMany(Recipe::class, 'professional_user_id');
+    }
+
+    public function earnings(): HasMany
+    {
+        return $this->hasMany(Earning::class, 'professional_user_id');
+    }
 
     public function professionalProfile(): HasOne
     {

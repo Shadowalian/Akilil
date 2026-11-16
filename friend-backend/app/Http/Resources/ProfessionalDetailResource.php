@@ -29,12 +29,19 @@ class ProfessionalDetailResource extends JsonResource
             'sessions_completed'       => $this->sessions_completed,
             'is_accepting_clients'     => (bool) $this->is_accepting_clients,
             'offers_free_listening'    => (bool) ($this->offers_free_listening ?? false),
+            'care_formats'      => $this->offeredCareFormats(),
+            'age_groups'        => $this->servedAgeGroups(),
+            'couples_rate_cents' => $this->priceFor('couples'),
+            'family_rate_cents'  => $this->priceFor('family'),
             'specialties'              => $this->whenLoaded('specialties', fn () =>
                 $this->specialties->map(fn ($s) => ['id'=>$s->id,'slug'=>$s->slug,'name'=>$s->name])
             ),
             'languages'                => $this->whenLoaded('languages', fn () =>
                 $this->languages->map(fn ($l) => ['id'=>$l->id,'code'=>$l->code,'name'=>$l->name,'proficiency'=>$l->pivot->proficiency])
             ),
+            // Chefs: what you would cook together (clients pick one when booking).
+            'requires_recipe'          => $this->isCookingPillar(),
+            'cooking_min_lead_hours'   => $this->isCookingPillar() ? (int) config('akilil.cooking.min_lead_hours') : null,
             'approved_documents'       => $this->whenLoaded('documents', fn () =>
                 $this->documents->map(fn ($d) => ['id'=>$d->id,'document_type'=>$d->document_type])
             ),

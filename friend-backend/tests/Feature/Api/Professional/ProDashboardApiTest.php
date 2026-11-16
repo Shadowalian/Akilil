@@ -139,6 +139,15 @@ class ProDashboardApiTest extends TestCase
 
     public function test_payout_can_be_requested_and_listed(): void
     {
+        // Payouts draw on real earnings; give the pro some.
+        $pro = \App\Models\User::where('role', 'professional')->firstOrFail();
+        \App\Models\Earning::create([
+            'professional_user_id' => $pro->id, 'kind' => 'session',
+            'source_type' => 'seed', 'source_id' => 1,
+            'gross_cents' => 40000, 'fee_cents' => 8000, 'net_cents' => 32000,
+            'currency' => 'USD', 'status' => 'available',
+        ]);
+
         $this->withToken($this->proToken())->postJson('/api/professional/payouts', [
             'amount_cents' => 25000,
         ])->assertCreated()->assertJsonPath('display_status', 'requested');

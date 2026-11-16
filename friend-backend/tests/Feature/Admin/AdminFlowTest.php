@@ -56,6 +56,13 @@ class AdminFlowTest extends TestCase
         $this->actingAs($admin)->get('/admin/users')->assertOk();
     }
 
+    public function test_admin_can_open_the_live_and_gift_pages(): void
+    {
+        $admin = $this->adminWith2FA();
+        $this->actingAs($admin)->get('/admin/live-streams')->assertOk();
+        $this->actingAs($admin)->get('/admin/gifts')->assertOk();
+    }
+
     public function test_suspending_a_user_soft_deletes_the_record(): void
     {
         $admin = $this->adminWith2FA();

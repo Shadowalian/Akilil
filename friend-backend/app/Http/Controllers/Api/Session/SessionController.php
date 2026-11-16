@@ -55,6 +55,21 @@ class SessionController extends Controller
         $user = $request->user();
         $isHost = (int) $user->id === (int) $appt->professional_user_id;
 
+        // Cooking: the room opens near the scheduled time, and the client
+        // confirms they have the ingredients before cooking along.
+        if ($appt->recipe_id) {
+            if ($appt->scheduled_at) {
+                app(\App\Services\CookingRules::class)->requireNotTooEarly($appt->scheduled_at);
+            }
+            if (! $isHost && ! $appt->ingredients_confirmed_at) {
+                return response()->json([
+                    'message'   => 'Confirm you have the ingredients before joining.',
+                    'code'      => 'ingredients_required',
+                    'recipe_id' => $appt->recipe_id,
+                ], 422);
+            }
+        }
+
         $jitsi = null;
         $callSession = DB::transaction(function () use ($user, $appt, $isHost, &$jitsi) {
             $existing = CallSession::where('appointment_id', $appt->id)->first();
@@ -127,7 +142,7 @@ class SessionController extends Controller
     {
         $appt = Appointment::findOrFail($appointmentId);
         $user = $request->user();
-        $this->authorizeParties($user, $appt);
+        $this->authorizeParties($user, $appt, allowStaff: true);
 
         $isHost = (int) $user->id === (int) $appt->professional_user_id;
         $isAdmin = method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['admin', 'support']);
@@ -159,6 +174,10 @@ class SessionController extends Controller
                 'status' => 'completed',
                 'ended_at' => now(),
             ]);
+            // The session happened: the professional has earned it.
+            app(\App\Services\EarningsService::class)
+                ->record($appt->professional, 'session', (int) $appt->price_cents, $appt, $appt->currency);
+            $appt->professionalProfile?->increment('sessions_completed');
         });
 
         event(new SessionStateChanged($appt->fresh(), $callSession->fresh(), 'ended'));
@@ -173,10 +192,13 @@ class SessionController extends Controller
         ]);
     }
 
-    private function authorizeParties(\App\Models\User $user, Appointment $appt): void
+    /**
+     * Who may enter the room: the people in the session, nobody else.
+     * Staff can end a session (safety), but never join one.
+     */
+    private function authorizeParties(\App\Models\User $user, Appointment $appt, bool $allowStaff = false): void
     {
-        $isParty = $user->id === $appt->user_id || $user->id === $appt->professional_user_id;
-        $isAdmin = method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['admin', 'support']);
-        abort_unless($isParty || $isAdmin, 403, 'Not your session.');
+        $isAdmin = $allowStaff && method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['admin', 'support']);
+        abort_unless($isAdmin || $appt->canBeJoinedBy($user), 403, 'Not your session.');
     }
 }

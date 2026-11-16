@@ -25,13 +25,24 @@ class WalletService
 {
     public function __construct(private readonly PaymentGateway $gateway) {}
 
-    /** Lazily create the wallet the first time a user touches money. */
-    public function walletFor(User $user, string $currency = 'USD'): Wallet
+    /**
+     * The user's wallet, created on first use. A user has exactly one
+     * wallet (wallets.user_id is unique) in the platform currency.
+     */
+    public function walletFor(User $user, ?string $currency = null): Wallet
     {
         return Wallet::firstOrCreate(
-            ['user_id' => $user->id, 'currency' => $currency],
-            ['balance_cents' => 0, 'pending_cents' => 0],
+            ['user_id' => $user->id],
+            ['currency' => $currency ?: config('akilil.currency'), 'balance_cents' => 0, 'pending_cents' => 0],
         );
+    }
+
+    /** True when the wallet can cover a charge in this currency. */
+    public function canAfford(User $user, int $amountCents, string $currency): bool
+    {
+        $wallet = $this->walletFor($user, $currency);
+
+        return $wallet->currency === $currency && $wallet->balance_cents >= $amountCents;
     }
 
     /**
@@ -116,10 +127,11 @@ class WalletService
     public function debit(User $user, int $amountCents, string $currency, string $type, $reference = null): Transaction
     {
         return DB::transaction(function () use ($user, $amountCents, $currency, $type, $reference) {
-            $wallet = Wallet::where('user_id', $user->id)
-                ->where('currency', $currency)
-                ->lockForUpdate()
-                ->firstOrFail();
+            $this->walletFor($user, $currency);
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->firstOrFail();
+            if ($wallet->currency !== $currency) {
+                throw new \DomainException('Wallet currency does not match this charge');
+            }
             if ($wallet->balance_cents < $amountCents) {
                 throw new \DomainException('Insufficient wallet balance');
             }
@@ -141,6 +153,37 @@ class WalletService
                     'lifetime_spent_cents' => $wallet->lifetime_spent_cents + $amountCents,
                     'version'              => $wallet->version + 1,
                 ]);
+            return $tx;
+        });
+    }
+
+    /**
+     * Put money back into a wallet without touching the gateway — used for
+     * cancellation refunds of wallet-paid sessions and seats. The money
+     * never left the platform, so this is a pure ledger entry.
+     */
+    public function credit(User $user, int $amountCents, string $currency, string $type = 'refund', $reference = null, ?string $reason = null): Transaction
+    {
+        return DB::transaction(function () use ($user, $amountCents, $currency, $type, $reference, $reason) {
+            $this->walletFor($user, $currency);
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->firstOrFail();
+            $tx = Transaction::create([
+                'wallet_id'    => $wallet->id,
+                'user_id'      => $user->id,
+                'type'         => $type,
+                'status'       => 'succeeded',
+                'amount_cents' => $amountCents,
+                'currency'     => $currency,
+                'processed_at' => now(),
+                'reference_type' => $reference ? get_class($reference) : null,
+                'reference_id'   => $reference?->getKey(),
+                'failure_reason' => $reason,
+            ]);
+            $wallet->update([
+                'balance_cents' => $wallet->balance_cents + $amountCents,
+                'version'       => $wallet->version + 1,
+            ]);
+
             return $tx;
         });
     }

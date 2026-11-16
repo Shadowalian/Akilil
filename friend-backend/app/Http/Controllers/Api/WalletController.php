@@ -17,8 +17,7 @@ class WalletController extends Controller
     public function show(Request $request): JsonResponse
     {
         $user = $request->user();
-        $currency = $request->query('currency', 'USD');
-        $wallet = $this->wallets->walletFor($user, $currency);
+        $wallet = $this->wallets->walletFor($user);
         return response()->json([
             'currency' => $wallet->currency,
             'balance_cents'        => $wallet->balance_cents,
@@ -45,6 +44,9 @@ class WalletController extends Controller
      */
     public function topup(Request $request): JsonResponse
     {
+        // Minors never pay: their guardian tops up and books.
+        \App\Support\AgeGate::requireAdultPayer($request->user());
+
         $data = $request->validate([
             'amount_cents' => ['required', 'integer', 'min:100', 'max:10000000'],
             'currency'     => ['sometimes', 'string', Rule::in(['USD', 'ETB', 'EUR', 'GBP'])],
@@ -52,7 +54,7 @@ class WalletController extends Controller
         $result = $this->wallets->beginTopup(
             user: $request->user(),
             amountCents: $data['amount_cents'],
-            currency: $data['currency'] ?? 'USD',
+            currency: $this->wallets->walletFor($request->user())->currency,
         );
         return response()->json([
             'checkout_url'   => $result['session']->url,

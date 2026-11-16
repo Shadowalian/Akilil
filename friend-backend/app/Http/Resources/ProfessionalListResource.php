@@ -28,6 +28,10 @@ class ProfessionalListResource extends JsonResource
             'verification_status' => $this->verification_status,
             'is_accepting_clients' => (bool) $this->is_accepting_clients,
             'offers_free_listening' => (bool) ($this->offers_free_listening ?? false),
+            'care_formats'      => $this->offeredCareFormats(),
+            'age_groups'        => $this->servedAgeGroups(),
+            'couples_rate_cents' => $this->priceFor('couples'),
+            'family_rate_cents'  => $this->priceFor('family'),
             'intro_video_url'   => $this->intro_video_url,
         ];
     }
