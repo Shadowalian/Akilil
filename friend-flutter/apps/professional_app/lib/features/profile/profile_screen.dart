@@ -38,6 +38,27 @@ class ProfileScreen extends ConsumerWidget {
             onTap: () => context.go('/clients'),
           ),
           ListTile(
+            leading: const Icon(Icons.sensors_rounded),
+            title: const Text('Go live'),
+            subtitle: const Text('Broadcast to many, receive gifts'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/live'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.restaurant_menu_rounded),
+            title: const Text('My recipes'),
+            subtitle: const Text('Chefs: required for every cooking session'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/recipes'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.family_restroom_rounded),
+            title: const Text('Who I work with'),
+            subtitle: const Text('Couples, families, children, teens'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/care-settings'),
+          ),
+          ListTile(
             leading: const Icon(Icons.edit_outlined),
             title: const Text('Edit profile'),
             trailing: const Icon(Icons.chevron_right),

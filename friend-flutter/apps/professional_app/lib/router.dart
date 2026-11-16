@@ -16,6 +16,7 @@ import 'features/earnings/earnings_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/shell/main_shell.dart';
 import 'features/groups/groups_screen.dart';
+import 'features/studio/studio_screens.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -98,6 +99,20 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GroupDetailScreen(groupId: s.pathParameters['id']!),
             ),
           ]),
+          GoRoute(path: '/recipes', builder: (_, __) => const RecipesScreen(), routes: [
+            GoRoute(path: 'new', builder: (_, __) => const RecipeEditorScreen()),
+            GoRoute(
+              path: ':id',
+              builder: (_, s) => RecipeEditorScreen(recipeId: s.pathParameters['id']),
+            ),
+          ]),
+          GoRoute(path: '/live', builder: (_, __) => const LiveStudioScreen(), routes: [
+            GoRoute(
+              path: ':id/host',
+              builder: (_, s) => LiveHostScreen(streamId: s.pathParameters['id']!),
+            ),
+          ]),
+          GoRoute(path: '/care-settings', builder: (_, __) => const CareSettingsScreen()),
           GoRoute(path: AppRoutes.clients,  builder: (_, __) => const ClientsScreen()),
           GoRoute(path: AppRoutes.earnings, builder: (_, __) => const EarningsScreen()),
           GoRoute(path: AppRoutes.profile,  builder: (_, __) => const ProfileScreen()),

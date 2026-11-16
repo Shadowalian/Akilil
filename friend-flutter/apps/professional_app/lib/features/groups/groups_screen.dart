@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../studio/studio_screens.dart';
+
 final _proGroupsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final dio = ref.read(dioProvider);
@@ -162,7 +164,17 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   }
 
   Future<void> _scheduleMeeting() async {
-    final when = DateTime.now().add(const Duration(minutes: 5));
+    // A cooking class needs a recipe and a day's notice so people can shop.
+    final isCooking = _group?['is_cooking_class'] == true;
+    int? recipeId;
+    var when = DateTime.now().add(const Duration(minutes: 5));
+    if (isCooking) {
+      recipeId = await pickPublishedRecipe(context, ref);
+      if (recipeId == null || !mounted) return;
+      final picked = await pickDateTime(context, earliest: DateTime.now().add(const Duration(hours: 25)));
+      if (picked == null || !mounted) return;
+      when = picked;
+    }
     try {
       final dio = ref.read(dioProvider);
       await dio.post(
@@ -171,9 +183,15 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           'scheduled_at': when.toUtc().toIso8601String(),
           'title': _group?['title'],
           'duration_minutes': 60,
+          if (recipeId != null) 'recipe_id': recipeId,
         },
       );
       await _load();
+    } on DioException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(apiErrorMessage(e.response?.data, 'Could not schedule'))),
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -357,7 +375,13 @@ class _GroupMeetingHostScreenState
         roomUrl: _roomUrl!,
         jwt: _jwt,
         displayName: _displayName,
+        mode: JitsiRoomMode.group,
+        title: 'Group session',
         onLeave: () {
+          if (widget.asHost) {
+            // Closing the room as host ends the meeting and books earnings.
+            ref.read(dioProvider).post('/therapy-group-meetings/${widget.meetingId}/end').ignore();
+          }
           if (mounted) Navigator.of(context).maybePop();
         },
       ),
