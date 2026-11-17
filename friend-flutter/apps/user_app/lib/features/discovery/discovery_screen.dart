@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -266,33 +267,23 @@ class DiscoveryScreen extends ConsumerWidget {
     S s,
   ) {
     if (chip == 'all') return list;
-    final needle = _chipSearchTerm(chip, s)?.toLowerCase();
-    if (needle == null || needle.isEmpty) return list;
+    // Match on English keywords whatever the UI language: bios and
+    // specialties are written in English, so searching for the Amharic
+    // label used to return nothing.
+    final needles = switch (chip) {
+      'orthodox' => const ['orthodox', 'ኦርቶዶክስ'],
+      'muslim' => const ['muslim', 'islam', 'ሙስሊም'],
+      'protestant' => const ['protestant', 'evangelical', 'ፕሮቴስታንት'],
+      'catholic' => const ['catholic', 'ካቶሊክ'],
+      'psychiatrists' => ['psychiatr'],
+      'psychologists' => ['psycholog'],
+      'counselors' => ['counsel'],
+      _ => [chip],
+    };
     return list.where((pro) {
       final text = _proSearchBlob(pro);
-      return text.contains(needle);
+      return needles.any(text.contains);
     }).toList();
-  }
-
-  String? _chipSearchTerm(String chip, S s) {
-    switch (chip) {
-      case 'orthodox':
-        return s.faithOrthodox;
-      case 'muslim':
-        return s.faithMuslim;
-      case 'protestant':
-        return s.faithProtestant;
-      case 'catholic':
-        return s.faithCatholic;
-      case 'psychiatrists':
-        return 'psychiatr';
-      case 'psychologists':
-        return 'psycholog';
-      case 'counselors':
-        return 'counsel';
-      default:
-        return chip;
-    }
   }
 
   String _proSearchBlob(Map<String, dynamic> pro) {
@@ -300,10 +291,11 @@ class DiscoveryScreen extends ConsumerWidget {
         (pro['user'] as Map?)?['name'] as String? ??
         '';
     final category = pro['category'] as Map<String, dynamic>?;
-    final specialty = category?['name'] as String? ?? '';
+    final specialty = tr(category?['name'] as String? ?? '');
     final title = pro['title'] as String? ?? pro['headline'] as String? ?? '';
     final bio = pro['bio'] as String? ?? '';
-    return '$name $specialty $title $bio'.toLowerCase();
+    final specialties = ((pro['specialties'] as List?) ?? []).map((e) => e is Map ? e['name'] : e).join(' ');
+    return '$name $specialty $title $bio $specialties'.toLowerCase();
   }
 
   void _showFilters(BuildContext context, WidgetRef ref) {
@@ -311,7 +303,7 @@ class DiscoveryScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: FriendColors.surface,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(FriendRadii.large),
         ),
@@ -484,9 +476,9 @@ class _FaithChipsRow extends ConsumerWidget {
     if (chips.length <= 1) return const SizedBox.shrink();
 
     return SizedBox(
-      height: 44,
+      height: 60,
       child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
         scrollDirection: Axis.horizontal,
         itemCount: chips.length,
         separatorBuilder: (context, index) => const SizedBox(width: 8),
@@ -570,6 +562,16 @@ class _DiscoverChip extends StatelessWidget {
   }
 }
 
+/// What is actually live in this pillar right now (nothing → no card).
+final _liveInPillarProvider = FutureProvider.autoDispose.family<Map<String, dynamic>?, String>((ref, pillar) async {
+  final res = await ref.read(dioProvider).get<Map<String, dynamic>>(
+    '/live-streams',
+    queryParameters: {'category': pillar, 'status': 'live', 'per_page': 1},
+  );
+  final list = (res.data?['data'] as List?) ?? const [];
+  return list.isEmpty ? null : Map<String, dynamic>.from(list.first as Map);
+});
+
 class _LiveNowCard extends ConsumerWidget {
   const _LiveNowCard({required this.category});
 
@@ -578,11 +580,16 @@ class _LiveNowCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(stringsProvider);
-    final cooking = category == 'cooking';
-    final title = cooking ? s.liveChefShiro : s.liveEveningPrayer;
-    final meta = cooking ? s.liveChefTsion : s.liveMemhirDaniel;
+    final stream = ref.watch(_liveInPillarProvider(category)).valueOrNull;
+    if (stream == null) return const SizedBox.shrink();
 
-    return Material(
+    final host = (stream['host'] as Map?)?['name'] ?? '';
+    final watching = (stream['viewer_count'] as num?)?.toInt() ?? 0;
+    final meta = s.t('$host · $watching watching', '$host · $watching ሰዎች እየተመለከቱ ነው');
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Material(
       color: FriendColors.surfaceLowest,
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -590,69 +597,56 @@ class _LiveNowCard extends ConsumerWidget {
         side: const BorderSide(color: FriendColors.border),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              s.liveNow.toUpperCase(),
-              style: _geist(
-                context,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.1,
-                color: FriendColors.primaryContainer,
+      child: InkWell(
+        onTap: () => context.push('/live/${stream['id']}'),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(color: FriendColors.coral, shape: BoxShape.circle),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          s.liveNow.toUpperCase(),
+                          style: _geist(context, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.1, color: FriendColors.coral),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${stream['title']}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: _geist(context, fontSize: 17, fontWeight: FontWeight.w800, letterSpacing: -0.3, color: FriendColors.textPrimary),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(meta, style: _geist(context, fontSize: 13, fontWeight: FontWeight.w500, color: FriendColors.textSecondary)),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: _geist(
-                context,
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
-                color: FriendColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              meta,
-              style: _geist(
-                context,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: FriendColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton(
-                onPressed: () => context.go(AppRoutes.groups),
+              const SizedBox(width: 12),
+              FilledButton(
+                onPressed: () => context.push('/live/${stream['id']}'),
                 style: FilledButton.styleFrom(
                   backgroundColor: FriendColors.ink,
                   foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(FriendRadii.pill),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(FriendRadii.pill)),
                 ),
-                child: Text(
-                  s.join,
-                  style: _geist(
-                    context,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
+                child: Text(s.t('Watch', 'ይመልከቱ')),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
       ),
     );
   }
@@ -668,7 +662,7 @@ class _ProListRow extends ConsumerWidget {
     final s = ref.watch(stringsProvider);
     final name = pro['display_name'] as String? ??
         (pro['user'] as Map?)?['name'] as String? ??
-        'Professional';
+        tr('Professional');
     final avatar = pro['avatar_url'] as String? ??
         (pro['user'] as Map?)?['avatar_url'] as String?;
     final category = pro['category'] as Map<String, dynamic>?;
@@ -676,7 +670,7 @@ class _ProListRow extends ConsumerWidget {
     final specialty = category?['name'] as String? ??
         pro['title'] as String? ??
         pillar?.name ??
-        'Akilil';
+        tr('Akilil');
     final rate = pro['hourly_rate_cents'] as int? ?? 0;
     final badge = pro['badge_active'] == true;
     final ratingAvg = (pro['rating_avg'] as num?)?.toDouble() ?? 0;
@@ -702,7 +696,7 @@ class _ProListRow extends ConsumerWidget {
               FriendAvatar(
                 size: 52,
                 imageUrl: avatar,
-                initials: name.isNotEmpty ? name[0].toUpperCase() : '?',
+                initials: personInitial(name),
                 verified: badge,
               ),
               const SizedBox(width: 12),
@@ -807,9 +801,9 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    const langs = [
-      ('en', 'English'),
-      ('am', 'Amharic'),
+    final langs = [
+      ('en', tr('English')),
+      ('am', tr('Amharic')),
       ('om', 'Oromo'),
       ('sw', 'Swahili'),
     ];
@@ -902,7 +896,7 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
             ),
             const SizedBox(height: 18),
             Text(
-              'Max price / session',
+              tr('Max price / session'),
               style: _geist(
                 context,
                 fontSize: 13,

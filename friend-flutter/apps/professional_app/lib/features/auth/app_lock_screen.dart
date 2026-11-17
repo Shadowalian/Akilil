@@ -39,7 +39,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
       CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
     );
     // Auto-prompt biometrics on show.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _tryBiometrics());
+    WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _tryBiometrics(); });
   }
 
   @override

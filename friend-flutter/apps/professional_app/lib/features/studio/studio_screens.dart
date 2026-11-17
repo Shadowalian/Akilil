@@ -240,14 +240,14 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: _saving ? null : () => _save(publish: false),
-                  child: const Text('Save'),
+                  child: Text(_status == 'published' ? 'Save' : 'Save draft'),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: FilledButton(
                   onPressed: _saving ? null : () => _save(publish: true),
-                  child: Text(_status == 'published' ? 'Save & keep published' : 'Publish'),
+                  child: Text(_status == 'published' ? 'Update' : 'Publish'),
                 ),
               ),
             ],
@@ -292,29 +292,14 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
             Card(
               margin: const EdgeInsets.only(top: 8),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 4, 8),
+                padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
                 child: Column(
                   children: [
                     Row(children: [
                       Expanded(
-                        flex: 3,
                         child: TextField(
                           controller: _ingredients[i].name,
-                          decoration: const InputDecoration(labelText: 'Ingredient'),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: TextField(
-                          controller: _ingredients[i].quantity,
-                          decoration: const InputDecoration(labelText: 'Qty'),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: TextField(
-                          controller: _ingredients[i].unit,
-                          decoration: const InputDecoration(labelText: 'Unit'),
+                          decoration: InputDecoration(labelText: 'Ingredient ${i + 1}'),
                         ),
                       ),
                       IconButton(
@@ -323,21 +308,40 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
                         onPressed: () => setState(() => _ingredients.removeAt(i).dispose()),
                       ),
                     ]),
+                    const SizedBox(height: 8),
                     Row(children: [
-                      Expanded(
+                      SizedBox(
+                        width: 84,
                         child: TextField(
-                          controller: _ingredients[i].substitute,
-                          decoration: const InputDecoration(labelText: 'Substitute (optional)'),
+                          controller: _ingredients[i].quantity,
+                          decoration: const InputDecoration(labelText: 'Amount'),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 96,
+                        child: TextField(
+                          controller: _ingredients[i].unit,
+                          decoration: const InputDecoration(labelText: 'Unit'),
+                        ),
+                      ),
+                      const Spacer(),
                       FilterChip(
                         label: const Text('Optional'),
+                        showCheckmark: false,
                         selected: _ingredients[i].optional,
                         onSelected: (v) => setState(() => _ingredients[i].optional = v),
                       ),
                       const SizedBox(width: 8),
                     ]),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: TextField(
+                        controller: _ingredients[i].substitute,
+                        decoration: const InputDecoration(labelText: 'Substitute if hard to find (optional)'),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -675,6 +679,9 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
   Set<String> _ages = {'adults'};
   final _couples = TextEditingController();
   final _family = TextEditingController();
+  final _bio = TextEditingController();
+  final _rate = TextEditingController();
+  bool _accepting = true;
   String _currency = '';
   bool _loading = true;
 
@@ -691,6 +698,9 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
       _formats = ((p['care_formats'] as List?) ?? const ['individual']).map((e) => '$e').toSet();
       _ages = ((p['age_groups'] as List?) ?? const ['adults']).map((e) => '$e').toSet();
       _currency = (p['currency'] ?? '').toString();
+      _bio.text = (p['bio'] ?? '').toString();
+      _rate.text = '${((p['hourly_rate_cents'] as num?) ?? 0) / 100}';
+      _accepting = p['is_accepting_clients'] != false;
       if (p['couples_rate_cents'] != null) _couples.text = '${(p['couples_rate_cents'] as num) / 100}';
       if (p['family_rate_cents'] != null) _family.text = '${(p['family_rate_cents'] as num) / 100}';
     } catch (_) {}
@@ -705,6 +715,9 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
   Future<void> _save() async {
     try {
       await ref.read(dioProvider).put('/me/professional-profile', data: {
+        'bio': _bio.text.trim(),
+        'hourly_rate_cents': _cents(_rate.text) ?? 0,
+        'is_accepting_clients': _accepting,
         'care_formats': _formats.toList(),
         'age_groups': _ages.toList(),
         'couples_rate_cents': _cents(_couples.text),
@@ -722,6 +735,8 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
   void dispose() {
     _couples.dispose();
     _family.dispose();
+    _bio.dispose();
+    _rate.dispose();
     super.dispose();
   }
 
@@ -736,6 +751,7 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
             for (final o in options.entries)
               FilterChip(
                 label: Text(o.value),
+                showCheckmark: false,
                 selected: selected.contains(o.key),
                 onSelected: (v) => setState(() => v ? selected.add(o.key) : selected.remove(o.key)),
               ),
@@ -744,10 +760,29 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      appBar: AppBar(title: const Text('Who I work with')),
+      appBar: AppBar(title: const Text('Practice profile')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Accepting new clients'),
+            subtitle: const Text('Turn off to pause new bookings'),
+            value: _accepting,
+            onChanged: (v) => setState(() => _accepting = v),
+          ),
+          TextField(
+            controller: _bio,
+            maxLines: 4,
+            maxLength: 600,
+            decoration: const InputDecoration(labelText: 'About you', alignLabelWithHint: true),
+          ),
+          TextField(
+            controller: _rate,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(labelText: 'Price per session ($_currency)'),
+          ),
+          const SizedBox(height: 20),
           Text('Session formats', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           chips(const {

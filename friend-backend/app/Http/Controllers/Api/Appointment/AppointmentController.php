@@ -197,7 +197,8 @@ class AppointmentController extends Controller
             return $appt;
         });
 
-        // Reminders + invitations go out after the booking is committed.
+        // Confirmation, reminders and invitations go out after the booking is committed.
+        $client->notify(new \App\Notifications\BookingConfirmedNotification($appt));
         SendAppointmentReminderJob::dispatch($appt->id, 'reminder_24h')->delay($startUtc->subHours(24));
         SendAppointmentReminderJob::dispatch($appt->id, 'reminder_1h')->delay($startUtc->subHour());
 

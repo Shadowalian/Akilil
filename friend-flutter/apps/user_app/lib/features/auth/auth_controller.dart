@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:core/core.dart';
 
+import 'onboarding_prefs.dart';
+
 /// Authenticated user shape — what `/api/me` returns.
 /// Minimal fields used by the app; full profile is fetched on demand.
 @immutable
@@ -92,14 +94,22 @@ class AuthController extends ChangeNotifier {
 
   /// `POST /api/auth/login` — server returns token + user; use that so we
   /// don't depend on a slow/wrapping `/me` round-trip to finish sign-in.
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({
+    required String email,
+    required String password,
+    Future<String?> Function()? askTwoFactorCode,
+  }) async {
     final res = await _dio.post<Map<String, dynamic>>(
       '/auth/login',
       data: {'email': email, 'password': password},
     );
-    final data = res.data ?? const {};
+    var data = res.data ?? const <String, dynamic>{};
     if (data['requires_2fa'] == true) {
-      throw StateError('Two-factor login is not supported in this build yet.');
+      final code = await askTwoFactorCode?.call();
+      if (code == null || code.isEmpty) {
+        throw StateError('Sign-in cancelled.');
+      }
+      data = await completeTwoFactor(_dio, data['challenge_token'] as String, code);
     }
     final token = data['token'] as String?;
     if (token == null || token.isEmpty) {
@@ -154,6 +164,7 @@ class AuthController extends ChangeNotifier {
     try {
       await _storage.write(token);
     } catch (_) {/* memory token still set */}
+    await _sendPendingIntake(token, seekingCareFor);
     final embedded = data['user'];
     if (embedded is Map) {
       _user = AuthUser.fromJson(Map<String, dynamic>.from(embedded));
@@ -169,6 +180,28 @@ class AuthController extends ChangeNotifier {
     }
     _user = AuthUser.fromJson(me.data!);
     notifyListeners();
+  }
+
+  /// Hands the pre-sign-up questionnaire to the matching API so
+  /// "Recommended" reflects it. Best effort: sign-up never fails over this.
+  Future<void> _sendPendingIntake(String token, String seekingCareFor) async {
+    final intake = await takePendingIntake();
+    if (intake == null) return;
+    try {
+      await _dio.post(
+        '/intake',
+        data: {
+          if (intake['pillar'] != null) 'pillar': intake['pillar'],
+          'care_format': switch (seekingCareFor) {
+            'couple' => 'couples',
+            'family' => 'family',
+            _ => 'individual',
+          },
+          'answers': intake['answers'] ?? const {},
+        },
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } catch (_) {}
   }
 
   /// `POST /api/auth/logout` — revokes the current token server-side.

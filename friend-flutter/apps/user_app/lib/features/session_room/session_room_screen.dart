@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,7 +88,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return SessionConnectingView(
-        message: 'Preparing your sanctuary chamber…',
+        message: tr('Getting your room ready…'),
       );
     }
 
@@ -97,9 +98,9 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
         appBar: AppBar(leading: BackButton(onPressed: _leave)),
         body: FriendEmptyState(
           icon: _recipeId != null ? Icons.shopping_basket_outlined : Icons.videocam_off_outlined,
-          title: _recipeId != null ? 'Ingredients first' : "Can't join yet",
+          title: _recipeId != null ? tr('Ingredients first') : tr("Can't join yet"),
           message: _error,
-          ctaLabel: _recipeId != null ? 'Open shopping list' : 'Try again',
+          ctaLabel: _recipeId != null ? 'Open shopping list' : tr('Try again'),
           onCta: () async {
             if (_recipeId != null) {
               await context.push('/recipes/$_recipeId?appointment=${widget.appointmentId}');
@@ -120,7 +121,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
       return Scaffold(
         backgroundColor: FriendColors.background,
         appBar: FriendStitchGlassHeader(
-          title: 'Pre Session Waiting Room',
+          title: tr('Waiting room'),
           onBack: _leave,
           onSos: () => context.push(AppRoutes.crisis),
           showProfileAvatar: false,
@@ -133,7 +134,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
             24,
           ),
           children: [
-            _WaitingRoomCard(clinicianName: _clinicianName ?? 'Your clinician'),
+            _WaitingRoomCard(clinicianName: _clinicianName ?? tr('Your clinician')),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
@@ -150,7 +151,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
                       Icon(Icons.videocam_outlined, color: FriendColors.primary, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        'Camera & audio check',
+                        tr('Camera & audio check'),
                         style: GoogleFonts.plusJakartaSans(
                           fontWeight: FontWeight.w600,
                           fontSize: FriendTypeScale.headlineSmall,
@@ -160,7 +161,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'When you enter the chamber, video runs inside Akilil Meet on an encrypted connection. You can stay voice-only if you prefer.',
+                    tr('Your camera and microphone turn on when you join. You can switch your camera off at any time inside the room.'),
                     style: GoogleFonts.inter(
                       fontSize: FriendTypeScale.bodySmall,
                       height: 1.45,
@@ -171,11 +172,11 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const FriendVaultBadge(label: 'Private session • encrypted in transit'),
+            FriendVaultBadge(label: tr('Private session • encrypted in transit')),
           ],
         ),
         bottomNavigationBar: FriendStitchStickyBar(
-          primaryLabel: 'Enter Sanctuary Chamber',
+          primaryLabel: tr('Join session'),
           primaryEnabled: _roomUrl != null,
           onPrimary: () => setState(() => _admitted = true),
         ),
@@ -227,7 +228,7 @@ class _WaitingRoomCard extends StatelessWidget {
                     const FriendLivePulse(size: 8),
                     const SizedBox(width: 6),
                     Text(
-                      'CHAMBER RESERVED',
+                      tr('ROOM READY'),
                       style: GoogleFonts.inter(
                         fontSize: FriendTypeScale.micro,
                         fontWeight: FontWeight.w700,
@@ -242,7 +243,7 @@ class _WaitingRoomCard extends StatelessWidget {
               Icon(Icons.lock_outline_rounded, size: 16, color: FriendColors.primary),
               const SizedBox(width: 4),
               Text(
-                'E2EE',
+                tr('PRIVATE'),
                 style: GoogleFonts.inter(
                   fontSize: FriendTypeScale.micro,
                   fontWeight: FontWeight.w700,
@@ -279,7 +280,7 @@ class _WaitingRoomCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Reviewing your clinical intake and will admit you momentarily.',
+                      tr('Your professional joins at the session time. You will see them here when they arrive.'),
                       style: GoogleFonts.inter(
                         fontSize: FriendTypeScale.bodySmall,
                         color: FriendColors.textSecondary,

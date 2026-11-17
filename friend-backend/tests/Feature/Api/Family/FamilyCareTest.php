@@ -377,4 +377,25 @@ class FamilyCareTest extends TestCase
 
         $this->actingAs($admin)->postJson("/api/appointments/{$id}/session/start")->assertForbidden();
     }
+
+    public function test_recommended_honours_intake_preferences_but_never_returns_nobody(): void
+    {
+        $me = $this->adult();
+        $woman = $this->pro();
+        $woman->update(['gender' => 'female']);
+        $man = $this->pro();
+        $man->update(['gender' => 'male']);
+
+        $this->actingAs($me)->postJson('/api/intake', [
+            'care_format' => 'individual', 'answers' => ['gender_preference' => 'female'],
+        ])->assertCreated();
+        $ids = collect($this->actingAs($me)->getJson('/api/professionals/recommended')->json('data'))->pluck('user_id')->all();
+        $this->assertSame([$woman->id], $ids);
+
+        // A preference nobody meets falls back to everyone.
+        $this->actingAs($me)->postJson('/api/intake', [
+            'care_format' => 'individual', 'answers' => ['languages' => ['ti']],
+        ])->assertCreated();
+        $this->assertCount(2, $this->actingAs($me)->getJson('/api/professionals/recommended')->json('data'));
+    }
 }

@@ -1,7 +1,7 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -25,9 +25,9 @@ class MoodAnalyticsScreen extends ConsumerWidget {
     final async = ref.watch(_moodAnalyticsProvider);
 
     return FriendPageScaffold(
-      eyebrow: 'Insights',
-      title: 'Mood trends',
-      subtitle: 'Trends over weeks, not days, are what matter.',
+      eyebrow: tr('Insights'),
+      title: tr('Mood trends'),
+      subtitle: tr('Trends over weeks, not days, are what matter.'),
       onRefresh: () async => ref.invalidate(_moodAnalyticsProvider),
       body: async.when(
         loading: () => const Center(
@@ -39,17 +39,17 @@ class MoodAnalyticsScreen extends ConsumerWidget {
         error: (e, _) => FriendEmptyState(
           icon: Icons.cloud_off_outlined,
           title: "Couldn't load analytics",
-          message: 'Check your connection and try again.',
-          ctaLabel: 'Retry',
+          message: tr('Check your connection and try again.'),
+          ctaLabel: tr('Retry'),
           onCta: () => ref.invalidate(_moodAnalyticsProvider),
         ),
         data: (data) {
           final series = (data['series'] as List? ?? const []).cast<Map<String, dynamic>>();
           if (series.isEmpty) {
-            return const FriendEmptyState(
+            return FriendEmptyState(
               icon: Icons.show_chart,
-              title: 'Log a few moods to see trends',
-              message: 'Your chart will appear after a few check-ins.',
+              title: tr('Log a few moods to see trends'),
+              message: tr('Your chart will appear after a few check-ins.'),
             );
           }
           final spots = <FlSpot>[];
@@ -62,7 +62,7 @@ class MoodAnalyticsScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Average (30 days): ${avg.toStringAsFixed(1)} / 7',
+                trx('Average (30 days): ${avg.toStringAsFixed(1)} / 7', 'የ30 ቀን አማካይ፦ ${avg.toStringAsFixed(1)} / 7'),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 16),
@@ -108,7 +108,7 @@ class MoodAnalyticsScreen extends ConsumerWidget {
                           }
                           final d = DateTime.tryParse(series[i]['date'] as String? ?? '');
                           return Text(
-                            d == null ? '' : DateFormat('M/d').format(d),
+                            d == null ? '' : trDate('M/d', d),
                             style: const TextStyle(fontSize: 11),
                           );
                         },

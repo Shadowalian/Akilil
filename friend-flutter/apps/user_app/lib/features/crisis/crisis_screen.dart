@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +8,8 @@ import 'package:core/core.dart';
 
 import '../../l10n/app_locale.dart';
 import '../../router.dart';
-import '../core_data/seed_data.dart';
+import 'help_request.dart';
+import 'safety_plan_store.dart';
 import '../worksheets/box_breathing_dialog.dart';
 
 class CrisisScreen extends ConsumerWidget {
@@ -41,44 +43,63 @@ class CrisisScreen extends ConsumerWidget {
     } catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Contact: $target')),
+        SnackBar(content: Text(trx('Contact: $target', 'ይደውሉ፦ $target'))),
       );
     }
   }
 
-  int _safetyPlanProgress() {
-    final p = SeedData.safetyPlan;
-    var done = 0;
-    if ((p['warning_signs'] as List).isNotEmpty) done++;
-    if ((p['internal_coping'] as List).isNotEmpty) done++;
-    if ((p['trusted_people'] as List).isNotEmpty) done++;
-    return done;
-  }
+  /// Numbers that work in Ethiopia. Deliberately short: in a crisis, fewer
+  /// choices is kinder. Review with a local clinical advisor before launch.
+  static List<Map<String, dynamic>> get _resources => <Map<String, dynamic>>[
+    {
+      'name': tr('Ambulance'),
+      'desc': tr('Medical emergency, overdose or serious injury.'),
+      'action_type': 'call',
+      'action_target': '907',
+      'badge': tr('Call 907'),
+      'icon': 'phone_in_talk_rounded',
+    },
+    {
+      'name': tr('Police'),
+      'desc': tr('If you or someone else is in immediate danger.'),
+      'action_type': 'call',
+      'action_target': '991',
+      'badge': tr('Call 991'),
+      'icon': 'shield_rounded',
+    },
+    {
+      'name': tr('Outside Ethiopia?'),
+      'desc': tr('Find a free, confidential helpline in your country.'),
+      'action_type': 'url',
+      'action_target': 'https://findahelpline.com',
+      'badge': tr('Worldwide'),
+      'icon': 'public_rounded',
+    },
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final resources = SeedData.crisisResources;
+    final resources = _resources;
     final s = ref.watch(stringsProvider);
-    final trusted =
-        (SeedData.safetyPlan['trusted_people'] as List).cast<Map<String, String>>();
-    final contact = trusted.isNotEmpty
-        ? trusted.first
-        : const <String, String>{'name': 'Selam', 'phone': ''};
-    final planDone = _safetyPlanProgress();
+    final plan = ref.watch(safetyPlanProvider);
+    final person = plan.people.isEmpty ? null : plan.people.first;
+    final planDone = plan.stepsDone;
 
     return FriendPageScaffold(
       eyebrow: s.crisis,
       title: s.notAlone,
       showBack: true,
       subtitle: s.someoneCanTalkNow,
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 32),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _PrimaryCtaCard(
             title: s.talkToListenerNow,
             subtitle: s.listenersAvailableFree,
             onTap: () => context.push(AppRoutes.home),
           ),
+          const SizedBox(height: 14),
+          _HelpRequestCard(),
           const SizedBox(height: 14),
           _EmergencyCard(
             title: s.emergencyServices,
@@ -90,20 +111,22 @@ class CrisisScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 14),
-          _ContactCard(
-            name: contact['name'] ?? 'Selam',
-            role: s.trustedContact,
-            phone: contact['phone'],
-            onCall: contact['phone']?.isNotEmpty == true
-                ? () => _handleAction(
-                      context,
-                      {
-                        'action_type': 'call',
-                        'action_target': contact['phone'],
-                      },
-                    )
-                : null,
-          ),
+          if (person != null)
+            _ContactCard(
+              name: person.name,
+              role: s.trustedContact,
+              phone: person.phone,
+              onCall: person.phone.isNotEmpty
+                  ? () => _handleAction(context, {'action_type': 'call', 'action_target': person.phone})
+                  : null,
+            )
+          else
+            _ToolkitCard(
+              title: tr('Add someone you trust'),
+              subtitle: tr('So their number is one tap away when you need it'),
+              icon: Icons.person_add_alt_1_rounded,
+              onTap: () => context.push(AppRoutes.safetyPlan),
+            ),
           const SizedBox(height: 14),
           _ToolkitCard(
             title: s.breatheWithMe,
@@ -114,7 +137,7 @@ class CrisisScreen extends ConsumerWidget {
           const SizedBox(height: 14),
           _ToolkitCard(
             title: s.mySafetyPlan,
-            subtitle: s.safetyPlanStepsComplete(planDone, 3),
+            subtitle: s.safetyPlanStepsComplete(planDone, 4),
             icon: Icons.shield_outlined,
             onTap: () => context.push(AppRoutes.safetyPlan),
           ),
@@ -505,6 +528,53 @@ class _CrisisResourceCard extends StatelessWidget {
               size: 20,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Ask our team to reach out", or the status of a request already sent.
+class _HelpRequestCard extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(stringsProvider);
+    final alert = ref.watch(helpRequestProvider).valueOrNull;
+    final state = alert?['state'] as String?;
+    final active = state == 'waiting' || state == 'in_progress';
+    final theme = Theme.of(context);
+
+    return CandyCard(
+      tint: FriendColors.primary,
+      accentStripe: true,
+      onTap: () => showHelpRequestSheet(context, ref),
+      child: Row(
+        children: [
+          Icon(active ? Icons.mark_chat_read_rounded : Icons.support_agent_rounded, color: FriendColors.primary, size: 28),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  !active
+                      ? s.t('Ask our team to reach out', 'ቡድናችን እንዲያገኝዎት ይጠይቁ')
+                      : state == 'in_progress'
+                          ? s.t('Our team is contacting you', 'ቡድናችን እያገኘዎት ነው')
+                          : s.t('Our team has been told', 'ለቡድናችን ተነግሯል'),
+                  style: theme.textTheme.titleSmall,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  active
+                      ? s.t('Keep your phone near you. Tap to add details.', 'ስልክዎን አጠገብዎ ያድርጉ። ተጨማሪ ለመንገር ይንኩ።')
+                      : s.t('A real person from Akilil will call or message you', 'ከአኪሊል አንድ ሰው ይደውልልዎታል ወይም መልዕክት ይልክልዎታል'),
+                  style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded),
         ],
       ),
     );

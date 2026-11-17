@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -44,7 +45,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
       CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
     );
     // Auto-prompt biometrics on show.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _tryBiometrics());
+    WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _tryBiometrics(); });
   }
 
   @override
@@ -62,7 +63,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
     setState(() => _busy = false);
     if (!ok && lock.biometricsAvailable) {
       // Show error only if biometrics are available but failed
-      setState(() => _error = 'Biometric check failed — use your password.');
+      setState(() => _error = tr('Biometric check failed — use your password.'));
     }
     if (!ok && !lock.biometricsAvailable) {
       // Device has no biometrics → jump straight to password field
@@ -73,7 +74,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
   Future<void> _submitPassword() async {
     final pwd = _passCtrl.text.trim();
     if (pwd.length < 6) {
-      setState(() => _error = 'Password must be at least 6 characters.');
+      setState(() => _error = tr('Password must be at least 6 characters.'));
       return;
     }
     setState(() {
@@ -89,7 +90,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
       if (!mounted) return;
       ref.read(appLockProvider.notifier).unlockWithPassword();
     } catch (_) {
-      if (mounted) setState(() => _error = 'Incorrect password. Try again.');
+      if (mounted) setState(() => _error = tr('Incorrect password. Try again.'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -124,7 +125,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                     const SizedBox(height: 16),
 
                     Text(
-                      'Welcome back, $name',
+                      trx('Welcome back, $name', 'እንኳን ደህና ተመለሱ፣ $name'),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 26,
@@ -135,7 +136,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Verify it\'s you to continue',
+                      tr('Verify it\'s you to continue'),
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
@@ -189,7 +190,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Tap to use Face ID or Fingerprint',
+                        tr('Tap to use Face ID or Fingerprint'),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
@@ -204,7 +205,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                           _error = null;
                         }),
                         child: Text(
-                          'Use password instead',
+                          tr('Use password instead'),
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -224,7 +225,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'Enter your password',
+                              tr('Enter your password'),
                               style: GoogleFonts.urbanist(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
@@ -266,7 +267,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                             ],
                             const SizedBox(height: 20),
                             FriendGlowButton(
-                              label: _busy ? 'Verifying…' : 'Unlock',
+                              label: _busy ? 'Verifying…' : tr('Unlock'),
                               icon: Icons.lock_open_rounded,
                               expanded: true,
                               onPressed: _busy ? null : _submitPassword,
@@ -283,7 +284,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                           }),
                           icon: const Icon(Icons.fingerprint_rounded, size: 18),
                           label: Text(
-                            'Use biometrics',
+                            tr('Use biometrics'),
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -304,7 +305,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                         context.go(AppRoutes.login);
                       },
                       child: Text(
-                        'Sign in with a different account',
+                        tr('Sign in with a different account'),
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,

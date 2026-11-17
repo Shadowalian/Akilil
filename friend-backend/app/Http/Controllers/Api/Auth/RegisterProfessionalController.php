@@ -37,9 +37,12 @@ class RegisterProfessionalController extends Controller
 
             $demo = (bool) config('akilil.demo_mode');
 
-            $categoryId = $request->filled('category_id')
-                ? $request->integer('category_id')
-                : (int) (Category::query()->orderBy('id')->value('id') ?? 1);
+            $categoryId = match (true) {
+                $request->filled('category_id') => $request->integer('category_id'),
+                $request->filled('category')    => (int) Category::where('slug', $request->input('category'))->value('id'),
+                default => (int) (Category::where('slug', 'psychiatry')->value('id')
+                    ?? Category::query()->orderBy('id')->value('id') ?? 1),
+            };
 
             ProfessionalProfile::create([
                 'user_id'              => $user->id,

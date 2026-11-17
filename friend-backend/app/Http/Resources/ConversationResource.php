@@ -34,7 +34,13 @@ class ConversationResource extends JsonResource
                     'last_read_at' => optional($p->last_read_at)?->toIso8601String(),
                 ])
             ),
-            'unread_count'  => $me ? max(0, (int) $this->last_message_id - (int) $me->last_read_message_id) : 0,
+            // Messages from others newer than what I last read.
+            'unread_count'  => $me
+                ? \App\Models\Message::where('conversation_id', $this->id)
+                    ->where('sender_id', '!=', $user->id)
+                    ->where('id', '>', (int) $me->last_read_message_id)
+                    ->count()
+                : 0,
             'created_at'    => optional($this->created_at)?->toIso8601String(),
         ];
     }

@@ -113,4 +113,17 @@ class MessagingTest extends TestCase
         $res2->assertOk();
         $this->assertEquals($id1, $res2->json('id'));
     }
+
+    public function test_a_client_cannot_cold_message_a_stranger_but_can_message_their_professional(): void
+    {
+        $stranger = User::factory()->create();
+        $this->actingAs($this->alice)->postJson('/api/conversations', ['participant_user_id' => $stranger->id])->assertForbidden();
+
+        $pro = User::factory()->create(['role' => 'professional']);
+        \App\Models\Appointment::factory()->create([
+            'user_id' => $this->alice->id, 'professional_user_id' => $pro->id,
+            'professional_profile_id' => \App\Models\ProfessionalProfile::factory()->create(['user_id' => $pro->id])->id,
+        ]);
+        $this->actingAs($this->alice)->postJson('/api/conversations', ['participant_user_id' => $pro->id])->assertCreated();
+    }
 }

@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,18 +47,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
     final dob = _dob;
     if (dob == null) {
-      setState(() => _error = 'Please tell us your date of birth.');
+      setState(() => _error = tr('Please tell us your date of birth.'));
       return;
     }
     final now = DateTime.now();
     final age = now.year - dob.year - ((now.month < dob.month || (now.month == dob.month && now.day < dob.day)) ? 1 : 0);
     if (age < 18) {
       setState(() => _error =
-          'Akilil accounts are for adults. Ask a parent or guardian to sign up and add you — they can book and pay for your sessions.');
+          tr('Akilil accounts are for adults. Ask a parent or guardian to sign up and add you — they can book and pay for your sessions.'));
       return;
     }
     if (!_terms) {
-      setState(() => _error = 'Please accept the terms and privacy policy.');
+      setState(() => _error = tr('Please accept the terms and privacy policy.'));
       return;
     }
     setState(() {
@@ -75,7 +76,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           );
     } on DioException catch (e) {
       setState(() {
-        _error = _readableError(e) ?? 'Registration failed. Please try again.';
+        _error = _readableError(e) ?? tr('Registration failed. Please try again.');
       });
     } catch (e) {
       setState(() => _error = e.toString());
@@ -124,7 +125,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'Create Your Account',
+                              tr('Create Your Account'),
                               textAlign: TextAlign.center,
                               style: GoogleFonts.urbanist(
                                 fontSize: 30,
@@ -136,7 +137,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              'Your answers are saved. One more step and you are in.',
+                              tr('Your answers are saved. One more step and you are in.'),
                               textAlign: TextAlign.center,
                               style: GoogleFonts.urbanist(
                                 fontSize: 15,
@@ -147,7 +148,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ),
                             const SizedBox(height: 26),
                             FreudField(
-                              label: 'Full Name',
+                              label: tr('Full Name'),
                               controller: _name,
                               hint: 'Selam Bekele',
                               icon: const Icon(
@@ -159,12 +160,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               autofillHints: const [AutofillHints.name],
                               validator: (v) =>
                                   (v == null || v.trim().length < 2)
-                                      ? 'Enter your name'
+                                      ? tr('Enter your name')
                                       : null,
                             ),
                             const SizedBox(height: 22),
                             FreudField(
-                              label: 'Email Address',
+                              label: tr('Email Address'),
                               controller: _email,
                               hint: 'you@example.com',
                               icon: FigmaAssets.email(),
@@ -173,14 +174,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               autofillHints: const [AutofillHints.email],
                               validator: (v) =>
                                   (v == null || !v.contains('@'))
-                                      ? 'Enter a valid email'
+                                      ? tr('Enter a valid email')
                                       : null,
                             ),
                             const SizedBox(height: 22),
                             FreudField(
-                              label: 'Password',
+                              label: tr('Password'),
                               controller: _pass,
-                              hint: 'At least 8 characters',
+                              hint: tr('At least 8 characters'),
                               icon: FigmaAssets.lock(),
                               obscureText: _obscure,
                               textInputAction: TextInputAction.next,
@@ -198,23 +199,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                               validator: (v) {
                                 if (v == null || v.length < 8) {
-                                  return 'At least 8 characters';
+                                  return tr('At least 8 characters');
                                 }
                                 if (!RegExp(r'[A-Z]').hasMatch(v) ||
                                     !RegExp(r'[a-z]').hasMatch(v)) {
-                                  return 'Use upper and lower case letters';
+                                  return tr('Use upper and lower case letters');
                                 }
                                 if (!RegExp(r'[0-9]').hasMatch(v)) {
-                                  return 'Include at least one number';
+                                  return tr('Include at least one number');
                                 }
                                 return null;
                               },
                             ),
                             const SizedBox(height: 22),
                             FreudField(
-                              label: 'Confirm Password',
+                              label: tr('Confirm Password'),
                               controller: _pass2,
-                              hint: 'Repeat your password',
+                              hint: tr('Repeat your password'),
                               icon: FigmaAssets.lock(),
                               obscureText: true,
                               textInputAction: TextInputAction.done,
@@ -224,51 +225,85 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   : "Passwords don't match",
                             ),
                             const SizedBox(height: 22),
-                            OutlinedButton.icon(
-                              icon: const Icon(Icons.cake_outlined, size: 18),
-                              label: Text(_dob == null
-                                  ? 'Date of birth'
-                                  : 'Born ${_dob!.day}/${_dob!.month}/${_dob!.year}'),
-                              onPressed: () async {
-                                final now = DateTime.now();
-                                final picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: _dob ?? DateTime(now.year - 25),
-                                  firstDate: DateTime(1900),
-                                  lastDate: now,
-                                  helpText: 'Your date of birth',
-                                );
-                                if (picked != null) setState(() => _dob = picked);
-                              },
+                            Text(
+                              tr('Date of Birth'),
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: FriendColors.primaryDeep,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                             ),
-                            const SizedBox(height: 16),
-                            Text('Who are you looking for support for?',
-                                style: Theme.of(context).textTheme.labelLarge),
                             const SizedBox(height: 8),
+                            Material(
+                              color: FriendColors.surface,
+                              borderRadius: BorderRadius.circular(FriendRadii.pill),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(FriendRadii.pill),
+                                onTap: () async {
+                                  final now = DateTime.now();
+                                  final picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: _dob ?? DateTime(now.year - 25),
+                                    firstDate: DateTime(1900),
+                                    lastDate: now,
+                                    helpText: tr('Your date of birth'),
+                                  );
+                                  if (picked != null) setState(() => _dob = picked);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.cake_outlined, size: 22, color: FriendColors.wood),
+                                      const SizedBox(width: 14),
+                                      Text(
+                                        _dob == null
+                                            ? tr('Select your date of birth')
+                                            : '${_dob!.day} ${const ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][_dob!.month - 1]} ${_dob!.year}',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: _dob == null ? FriendColors.textMuted : FriendColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              tr('Akilil accounts are for adults. Parents and guardians can add children after signing up.'),
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
+                            ),
+                            SizedBox(height: 16),
+                            Text(tr('Who are you looking for support for?'),
+                                style: Theme.of(context).textTheme.labelLarge),
+                            SizedBox(height: 8),
                             Wrap(
                               spacing: 8,
                               runSpacing: 4,
                               children: [
-                                for (final o in const [
-                                  ('self', 'Myself'),
-                                  ('couple', 'Me & my partner'),
-                                  ('child', 'My child'),
-                                  ('family', 'My family'),
+                                for (final o in [
+                                  ('self', tr('Myself')),
+                                  ('couple', tr('Me & my partner')),
+                                  ('child', tr('My child')),
+                                  ('family', tr('My family')),
                                 ])
                                   ChoiceChip(
                                     label: Text(o.$2),
+                                    showCheckmark: false,
                                     selected: _careFor == o.$1,
                                     onSelected: (_) => setState(() => _careFor = o.$1),
                                   ),
                               ],
                             ),
+                            const SizedBox(height: 8),
                             CheckboxListTile(
                               contentPadding: EdgeInsets.zero,
                               controlAffinity: ListTileControlAffinity.leading,
                               value: _terms,
                               onChanged: (v) => setState(() => _terms = v ?? false),
                               title: Text(
-                                'I am 18 or older and accept the Terms and Privacy Policy.',
+                                tr('I am 18 or older and accept the Terms and Privacy Policy.'),
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
@@ -278,13 +313,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ],
                             const SizedBox(height: 30),
                             FreudPillButton(
-                              label: _busy ? '…' : 'Create Account',
+                              label: _busy ? '…' : tr('Create Account'),
                               onPressed: _busy ? null : _submit,
                             ),
                             const SizedBox(height: 26),
                             FreudLink(
-                              leading: 'Already have an account? ',
-                              label: 'Sign In',
+                              leading: tr('Already have an account? '),
+                              label: tr('Sign In'),
                               onTap: () => context.go(AppRoutes.login),
                             ),
                           ],

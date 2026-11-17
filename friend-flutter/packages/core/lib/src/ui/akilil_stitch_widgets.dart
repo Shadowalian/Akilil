@@ -1,6 +1,7 @@
 /// Google Stitch — Akilil client chrome (SOS, progress, intent chips, CTAs).
 library;
 
+import '../util/i18n.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -96,7 +97,7 @@ class FriendSosChip extends StatelessWidget {
               Icon(Icons.emergency_rounded, size: 15, color: FriendColors.onErrorContainer),
               const SizedBox(width: 4),
               Text(
-                'SOS',
+                coreTr('SOS'),
                 style: _labelMd(context, color: FriendColors.onErrorContainer),
               ),
             ],
@@ -111,7 +112,7 @@ class FriendSosChip extends StatelessWidget {
 class FriendVaultBadge extends StatelessWidget {
   const FriendVaultBadge({
     super.key,
-    this.label = 'Zero-Knowledge Vault • AES-256 Encrypted',
+    this.label = 'Private and confidential',
   });
 
   final String label;
@@ -229,7 +230,7 @@ class FriendStitchProgressTrack extends StatelessWidget {
   }
 }
 
-/// Glassmorphic sticky app header with E2EE subline + SOS.
+/// Glassmorphic sticky app header with a privacy subline + SOS.
 class FriendStitchGlassHeader extends StatelessWidget implements PreferredSizeWidget {
   const FriendStitchGlassHeader({
     super.key,
@@ -307,7 +308,7 @@ class FriendStitchGlassHeader extends StatelessWidget implements PreferredSizeWi
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'E2EE SESSION',
+                          coreTr('PRIVATE'),
                           style: _micro(context),
                         ),
                       ],

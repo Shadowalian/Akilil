@@ -142,9 +142,21 @@ class _EarningsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('12 weeks: ${cents.toStringAsFixed(2)} $currency',
-                style: Theme.of(context).textTheme.titleLarge),
+            Text('Available to withdraw', style: Theme.of(context).textTheme.labelLarge),
+            Text(formatMoney(data['available_cents'] as num?, currency),
+                style: Theme.of(context).textTheme.headlineMedium),
+            const SizedBox(height: 4),
+            Text(
+              'After platform fee · sessions ${formatMoney((data['by_source'] as Map?)?['sessions'] as num?)} · '
+              'groups ${formatMoney((data['by_source'] as Map?)?['groups'] as num?)} · '
+              'gifts ${formatMoney((data['by_source'] as Map?)?['gifts'] as num?)}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 8),
+            Text('Booked in the last 12 weeks: ${cents.toStringAsFixed(2)} $currency',
+                style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 12),
+            if (cents > 0)
             SizedBox(
               height: 180,
               child: LineChart(LineChartData(

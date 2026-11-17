@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -150,14 +151,14 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
   }
 
   String? get _problem {
-    if (_loading) return 'Loading…';
-    if (_format == 'minor' && _dependent == null) return 'Choose which child this session is for.';
+    if (_loading) return tr('Loading…');
+    if (_format == 'minor' && _dependent == null) return tr('Choose which child this session is for.');
     if (_format == 'couples' && _partnerName.text.trim().length < 2) return "Add your partner's name.";
     if (_format == 'couples' && _partnerEmail.text.trim().isNotEmpty && !_partnerEmail.text.contains('@')) {
       return "Check your partner's email address.";
     }
-    if (_requiresRecipe && _recipes.isEmpty) return 'This chef has not published a recipe yet.';
-    if (_requiresRecipe && _recipeId == null) return 'Choose what you will cook.';
+    if (_requiresRecipe && _recipes.isEmpty) return tr('This chef has not published a recipe yet.');
+    if (_requiresRecipe && _recipeId == null) return tr('Choose what you will cook.');
     return null;
   }
 
@@ -200,10 +201,10 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final options = <({String key, String label, IconData icon})>[
-      if (_formats.contains('individual')) (key: 'individual', label: 'Just me', icon: Icons.person_rounded),
-      if (_formats.contains('couples')) (key: 'couples', label: 'Me & my partner', icon: Icons.favorite_rounded),
-      if (_formats.contains('family')) (key: 'family', label: 'My family', icon: Icons.family_restroom_rounded),
-      if (_offersMinors) (key: 'minor', label: 'My child', icon: Icons.child_care_rounded),
+      if (_formats.contains('individual')) (key: 'individual', label: tr('Just me'), icon: Icons.person_rounded),
+      if (_formats.contains('couples')) (key: 'couples', label: tr('Me & my partner'), icon: Icons.favorite_rounded),
+      if (_formats.contains('family')) (key: 'family', label: tr('My family'), icon: Icons.family_restroom_rounded),
+      if (_offersMinors) (key: 'minor', label: tr('My child'), icon: Icons.child_care_rounded),
     ];
     final showWho = options.length > 1 || _format != 'individual';
 
@@ -213,7 +214,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (showWho) ...[
-          Text('Who is this session for?', style: theme.textTheme.titleSmall),
+          Text(tr('Who is this session for?'), style: theme.textTheme.titleSmall),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
@@ -222,6 +223,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
               for (final o in options)
                 ChoiceChip(
                   avatar: Icon(o.icon, size: 16),
+                  showCheckmark: false,
                   label: Text(o.label),
                   selected: _format == o.key,
                   onSelected: (_) => _pick(o.key),
@@ -253,7 +255,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
       children: [
         if (_dependents.isEmpty)
           Text(
-            'Add your child to your account first. As their parent or guardian you book and pay; they join the session with you.',
+            tr('Add your child to your account first. As their parent or guardian you book and pay; they join the session with you.'),
             style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
           ),
         for (final d in _dependents)
@@ -273,7 +275,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
                     }
                   : null,
               title: Text('${d['name']} · ${d['age']}'),
-              subtitle: ok ? null : const Text('This professional does not work with this age group'),
+              subtitle: ok ? null : Text(tr('This professional does not work with this age group')),
             );
           }),
         Align(
@@ -284,7 +286,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
               if (mounted) _load();
             },
             icon: const Icon(Icons.add_rounded, size: 18),
-            label: Text(_dependents.isEmpty ? 'Add my child' : 'Add another child'),
+            label: Text(_dependents.isEmpty ? 'Add my child' : tr('Add another child')),
           ),
         ),
       ],
@@ -308,8 +310,8 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
         ),
         const SizedBox(height: 8),
         Text(
-          'We email your partner an invitation so they can join from their own phone. '
-          'Leave it empty if you will sit together on one device. You pay once for both of you.',
+          tr('We email your partner an invitation so they can join from their own phone. '
+          'Leave it empty if you will sit together on one device. You pay once for both of you.'),
           style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
         ),
       ],
@@ -321,7 +323,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Add relatives who will join from their own device. Anyone sitting with you does not need an invitation.',
+          tr('Add relatives who will join from their own device. Anyone sitting with you does not need an invitation.'),
           style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
         ),
         for (var i = 0; i < _family.length; i++)
@@ -333,7 +335,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
                   child: TextField(
                     controller: _family[i].name,
                     textCapitalization: TextCapitalization.words,
-                    decoration: const InputDecoration(labelText: 'Name'),
+                    decoration: InputDecoration(labelText: tr('Name')),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -341,11 +343,11 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
                   child: TextField(
                     controller: _family[i].email,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Email'),
+                    decoration: InputDecoration(labelText: tr('Email')),
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Remove',
+                  tooltip: tr('Remove'),
                   icon: const Icon(Icons.close_rounded),
                   onPressed: () {
                     final row = _family.removeAt(i);
@@ -362,12 +364,12 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
           child: TextButton.icon(
             onPressed: _family.length >= 5 ? null : _addFamilyMember,
             icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-            label: const Text('Invite a family member'),
+            label: Text(tr('Invite a family member')),
           ),
         ),
         if (_dependents.isNotEmpty) ...[
           const SizedBox(height: 4),
-          Text('Is one of your children part of it?', style: theme.textTheme.labelLarge),
+          Text(tr('Is one of your children part of it?'), style: theme.textTheme.labelLarge),
           _childPicker(theme, required: false),
         ],
       ],
@@ -379,11 +381,13 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('What will you cook?', style: theme.textTheme.titleSmall),
+        Text(tr('What will you cook?'), style: theme.textTheme.titleSmall),
         const SizedBox(height: 4),
         Text(
-          'You cook along at home, so you need the ingredients ready. '
-          'Pick a time at least $lead hours away to leave time for shopping.',
+          trx(
+            'You cook along at home, so you need the ingredients ready. Pick a time at least $lead hours away to leave time for shopping.',
+            'እቤትዎ ሆነው አብረው ስለሚያበስሉ ግብዓቶቹ ዝግጁ መሆን አለባቸው። ለመገበያያ ጊዜ እንዲኖርዎ ቢያንስ ከ$lead ሰዓት በኋላ ያለ ሰዓት ይምረጡ።',
+          ),
           style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
         ),
         const SizedBox(height: 10),
@@ -421,7 +425,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
                     ),
                     TextButton(
                       onPressed: () => context.push('/recipes/$id'),
-                      child: const Text('Ingredients'),
+                      child: Text(tr('Ingredients')),
                     ),
                   ],
                 ),

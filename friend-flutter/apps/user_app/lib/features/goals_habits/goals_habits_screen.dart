@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
@@ -68,7 +69,7 @@ class GoalsHabitsScreen extends ConsumerWidget {
 
       builder: (ctx) => AlertDialog(
 
-        title: Text('New $label'),
+        title: Text(trx('New $label', label == 'goal' ? 'አዲስ ግብ' : 'አዲስ ልማድ')),
 
         content: TextField(
 
@@ -78,7 +79,7 @@ class GoalsHabitsScreen extends ConsumerWidget {
 
           textCapitalization: TextCapitalization.sentences,
 
-          decoration: InputDecoration(hintText: 'Name this $label'),
+          decoration: InputDecoration(hintText: trx('Name this $label', label == 'goal' ? 'ግቡን ይሰይሙ' : 'ልማዱን ይሰይሙ')),
 
           onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
 
@@ -90,7 +91,7 @@ class GoalsHabitsScreen extends ConsumerWidget {
 
             onPressed: () => Navigator.pop(ctx),
 
-            child: const Text('Cancel'),
+            child: Text(tr('Cancel')),
 
           ),
 
@@ -98,7 +99,7 @@ class GoalsHabitsScreen extends ConsumerWidget {
 
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
 
-            child: const Text('Add'),
+            child: Text(tr('Add')),
 
           ),
 
@@ -126,7 +127,7 @@ class GoalsHabitsScreen extends ConsumerWidget {
 
       ScaffoldMessenger.of(context).showSnackBar(
 
-        SnackBar(content: Text("Couldn't add that $label.")),
+        SnackBar(content: Text(trx("Couldn't add that $label.", 'መጨመር አልተቻለም።'))),
 
       );
 
@@ -148,11 +149,11 @@ class GoalsHabitsScreen extends ConsumerWidget {
 
     return FriendPageScaffold(
 
-      eyebrow: 'Growth',
+      eyebrow: tr('Growth'),
 
-      title: 'What you\'re building',
+      title: tr('What you\'re building'),
 
-      subtitle: 'Big things you\'re heading towards, small things you repeat.',
+      subtitle: tr('Big things you\'re heading towards, small things you repeat.'),
 
       onRefresh: () async {
 
@@ -170,11 +171,11 @@ class GoalsHabitsScreen extends ConsumerWidget {
 
           _Section(
 
-            title: 'Goals',
+            title: tr('Goals'),
 
             icon: Icons.flag_outlined,
 
-            emptyMessage: 'Name one thing you\'re moving towards.',
+            emptyMessage: tr('Name one thing you\'re moving towards.'),
 
             async: goals,
 
@@ -196,11 +197,11 @@ class GoalsHabitsScreen extends ConsumerWidget {
 
           _Section(
 
-            title: 'Habits',
+            title: tr('Habits'),
 
             icon: Icons.repeat,
 
-            emptyMessage: 'Small things, repeated, add up.',
+            emptyMessage: tr('Small things, repeated, add up.'),
 
             async: habits,
 
@@ -276,7 +277,7 @@ class _Section extends StatelessWidget {
 
             Expanded(child: Text(title, style: theme.textTheme.headlineSmall)),
 
-            FriendGlowButton(label: 'Add', icon: Icons.add, onPressed: onAdd),
+            FriendGlowButton(label: tr('Add'), icon: Icons.add, onPressed: onAdd),
 
           ],
 
@@ -318,7 +319,7 @@ class _Section extends StatelessWidget {
 
                   icon: icon,
 
-                  title: 'No ${title.toLowerCase()} yet',
+                  title: trx('No ${title.toLowerCase()} yet', 'እስካሁን ምንም የለም'),
 
                   message: emptyMessage,
 
@@ -356,7 +357,7 @@ class _Section extends StatelessWidget {
 
                               Text(
 
-                                item['title'] as String? ?? 'Untitled',
+                                item['title'] as String? ?? tr('Untitled'),
 
                                 style: theme.textTheme.bodyLarge,
 

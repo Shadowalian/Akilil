@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,65 +24,65 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
 
   int _step = 0;
   final _answers = <int?>[null, null, null];
-  final _concerns = <int>{0, 1};
+  final _concerns = <int>{};
   int _genderPref = 0;
   final _languages = <int>{0};
   final _modalities = <int>{0};
 
-  static const _concernItems = [
-    (Icons.psychology_rounded, 'Cognitive Overwhelm & Burnout', 'Mental exhaustion, chronic strain'),
-    (Icons.monitor_heart_outlined, 'Grief & Somatic Tension', 'Physical holding, bereavement'),
-    (Icons.trending_up_rounded, 'Life Transitions & Career Pressure', 'Relocation, milestones, decisions'),
-    (Icons.diversity_1_outlined, 'Relationship & Family Dynamics', 'Attachment, boundaries, conflict'),
-    (Icons.bedtime_outlined, 'Sleep Regulation & Restlessness', 'Insomnia, nocturnal overactivation'),
+  static List<(IconData, String, String)> get _concernItems => [
+    (Icons.psychology_rounded, tr('Cognitive Overwhelm & Burnout'), tr('Mental exhaustion, chronic strain')),
+    (Icons.monitor_heart_outlined, tr('Grief & Somatic Tension'), tr('Physical holding, bereavement')),
+    (Icons.trending_up_rounded, tr('Life Transitions & Career Pressure'), tr('Relocation, milestones, decisions')),
+    (Icons.diversity_1_outlined, tr('Relationship & Family Dynamics'), tr('Attachment, boundaries, conflict')),
+    (Icons.bedtime_outlined, tr('Sleep Regulation & Restlessness'), tr('Insomnia, nocturnal overactivation')),
   ];
 
-  static const _phqOptions = [
-    ('Not at all', '0 pts'),
-    ('Several days', '+1 pt'),
-    ('More than half the days', '+2 pts'),
-    ('Nearly every day', '+3 pts'),
+  static List<(String, String)> get _phqOptions => [
+    (tr('Not at all'), '0'),
+    (tr('Several days'), '+1'),
+    (tr('More than half the days'), '+2'),
+    (tr('Nearly every day'), '+3'),
   ];
 
   List<_Q> _questions(S s) => [
-        const _Q(
-          'How have you been feeling lately?',
-          'There is no wrong answer here.',
+        _Q(
+          tr('How have you been feeling lately?'),
+          tr('There is no wrong answer here.'),
           [
-            'Overwhelmed',
-            'A bit low',
-            'Okay',
-            'Mostly good',
-            'Really well',
+            tr('Overwhelmed'),
+            tr('A bit low'),
+            tr('Okay'),
+            tr('Mostly good'),
+            tr('Really well'),
           ],
         ),
         _Q(
-          'What kind of support are you looking for?',
-          'This sets the path we open first.',
+          tr('What kind of support are you looking for?'),
+          tr('This sets the path we open first.'),
           [
             s.spiritualPsychiatry,
             s.psychiatry,
             s.cooking,
-            'Not sure yet',
+            tr('Not sure yet'),
           ],
         ),
-        const _Q(
-          'How would you prefer to connect?',
-          'You can change this any time.',
+        _Q(
+          tr('How would you prefer to connect?'),
+          tr('You can change this any time.'),
           [
-            'Private video sessions',
-            'Journaling first',
-            'Community circles',
-            'A mix of all three',
+            tr('Private video sessions'),
+            tr('Journaling first'),
+            tr('Community circles'),
+            tr('A mix of all three'),
           ],
         ),
       ];
 
   String get _stepLabel => switch (_step) {
-        0 => 'Step 1 of $_totalSteps • Presenting Concerns',
-        1 => 'Step 2 of $_totalSteps • Clinical Alignment & Modality',
-        2 => 'Step 3 of $_totalSteps • Therapeutic Modality',
-        _ => 'Step 4 of $_totalSteps • Connection Preference',
+        0 => trx('Step 1 of $_totalSteps • What brings you here', 'ደረጃ 1 ከ$_totalSteps • ምን አመጣዎት'),
+        1 => trx('Step 2 of $_totalSteps • How you feel', 'ደረጃ 2 ከ$_totalSteps • ስሜትዎ'),
+        2 => trx('Step 3 of $_totalSteps • Your path', 'ደረጃ 3 ከ$_totalSteps • የሚፈልጉት ድጋፍ'),
+        _ => trx('Step 4 of $_totalSteps • How to connect', 'ደረጃ 4 ከ$_totalSteps • የሚመርጡት አገናኝ'),
       };
 
   bool get _canContinue => switch (_step) {
@@ -97,6 +98,18 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
       final slug = AkililPillars.all[pathAnswer].slug;
       ref.read(discoverPillarProvider.notifier).state = slug;
     }
+    // Kept until the account exists, then sent to the matching API.
+    await savePendingIntake({
+      'pillar': pathAnswer != null && pathAnswer < 3 ? AkililPillars.all[pathAnswer].slug : null,
+      'answers': {
+        'concerns': [for (final i in _concerns) _concernItems[i].$2],
+        'feeling': _answers[0],
+        'connect': _answers[2],
+        'gender_preference': const ['none', 'female', 'male'][_genderPref],
+        'languages': [for (final i in _languages) const ['en', 'am', 'om', 'ti'][i]],
+        'approach': [for (final i in _modalities) i],
+      },
+    });
     if (!mounted) return;
     context.go(AppRoutes.register);
     await ref.read(onboardingDoneProvider.notifier).complete();
@@ -128,7 +141,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     return Scaffold(
       backgroundColor: FriendColors.background,
       appBar: FriendStitchGlassHeader(
-        title: 'Clinical Intake Form',
+        title: tr('A few questions'),
         onBack: _back,
         onSos: () => context.push(AppRoutes.crisis),
       ),
@@ -153,7 +166,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                   const FriendVaultBadge(),
                   const SizedBox(height: 12),
                   Text(
-                    'Tailor your therapeutic sanctuary.',
+                    tr('Help us find the right person.'),
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: FriendTypeScale.headlineMedium,
                       fontWeight: FontWeight.w700,
@@ -163,7 +176,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Your confidential responses calibrate our matching algorithm to pair you with certified psychologists and specialized listeners.',
+                    tr('Your answers help us suggest people who fit. Only you and the professional you book can see them.'),
                     style: GoogleFonts.inter(
                       fontSize: FriendTypeScale.bodyMedium,
                       height: 1.45,
@@ -183,7 +196,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
           ),
           FriendStitchStickyBar(
             onBack: _step > 0 ? _back : null,
-            primaryLabel: isLast ? 'Create Account' : s.continueLabel,
+            primaryLabel: isLast ? tr('Create Account') : s.continueLabel,
             primaryEnabled: _canContinue,
             onPrimary: _canContinue ? _continue : null,
           ),
@@ -202,7 +215,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
           children: [
             Expanded(
               child: Text(
-                'What brings you to Akilil today?',
+                tr('What brings you to Akilil today?'),
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: FriendTypeScale.headlineSmall,
                   fontWeight: FontWeight.w600,
@@ -211,7 +224,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
               ),
             ),
             Text(
-              'SELECT ALL',
+              tr('SELECT ALL'),
               style: GoogleFonts.inter(
                 fontSize: FriendTypeScale.micro,
                 fontWeight: FontWeight.w700,
@@ -249,7 +262,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: FriendColors.recessed,
             borderRadius: BorderRadius.circular(FriendRadii.large),
@@ -260,10 +273,10 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
             children: [
               Row(
                 children: [
-                  const FriendLivePulse(size: 8),
-                  const SizedBox(width: 8),
+                  FriendLivePulse(size: 8),
+                  SizedBox(width: 8),
                   Text(
-                    'STANDARDIZED CLINICAL TRIAGE',
+                    tr('A QUICK CHECK-IN'),
                     style: GoogleFonts.inter(
                       fontSize: FriendTypeScale.micro,
                       fontWeight: FontWeight.w700,
@@ -271,9 +284,9 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                       color: FriendColors.accent,
                     ),
                   ),
-                  const Spacer(),
+                  Spacer(),
                   Text(
-                    'PHQ-4 SCALE',
+                    tr('NOT A DIAGNOSIS'),
                     style: GoogleFonts.inter(
                       fontSize: FriendTypeScale.micro,
                       fontWeight: FontWeight.w600,
@@ -282,16 +295,16 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Text(
-                'Over the last 2 weeks, how often have you felt down, depressed, or hopeless?',
+                tr('Over the last 2 weeks, how often have you felt down, depressed, or hopeless?'),
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: FriendTypeScale.headlineSmall,
                   fontWeight: FontWeight.w600,
                   color: FriendColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 q.hint,
                 style: GoogleFonts.inter(
@@ -299,10 +312,10 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                   color: FriendColors.textSecondary,
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               for (var i = 0; i < q.options.length && i < _phqOptions.length; i++)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.only(bottom: 8),
                   child: FriendPhqRadioOption(
                     label: q.options[i],
                     pointsLabel: _phqOptions[i].$2,
@@ -318,20 +331,20 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
   }
 
   Widget _buildModalityStep(_Q q) {
-    const modalityLabels = [
-      'Cognitive Behavioral (CBT)',
-      'Somatic & Breathwork',
-      'Psychodynamic',
-      'Empathetic Peer Listening',
+    final modalityLabels = [
+      tr('Practical tools for thoughts (CBT)'),
+      tr('Body and breathing'),
+      tr('Talking it through in depth'),
+      tr('Someone who just listens'),
     ];
-    const genderLabels = ['No preference', 'Female', 'Male'];
-    const langLabels = ['English', 'Amharic', 'Afaan Oromoo', 'Tigrinya'];
+    final genderLabels = [tr('No preference'), tr('A woman'), tr('A man')];
+    final langLabels = [tr('English'), tr('Amharic'), tr('Afaan Oromoo'), tr('Tigrinya')];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Therapeutic Modality & Practitioner',
+          tr('Who would you like to talk to?'),
           style: GoogleFonts.plusJakartaSans(
             fontSize: FriendTypeScale.headlineSmall,
             fontWeight: FontWeight.w600,
@@ -339,7 +352,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Filter your clinical network by therapeutic methodology and communication comfort.',
+          tr('Tell us what would make you most comfortable. You can change it later.'),
           style: GoogleFonts.inter(
             fontSize: FriendTypeScale.bodySmall,
             color: FriendColors.textSecondary,
@@ -347,7 +360,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          'PREFERRED APPROACH',
+          tr('HOW YOU LIKE TO WORK'),
           style: GoogleFonts.inter(
             fontSize: FriendTypeScale.caption,
             fontWeight: FontWeight.w600,
@@ -379,7 +392,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          'PRACTITIONER GENDER',
+          tr('I WOULD PREFER TO TALK TO'),
           style: GoogleFonts.inter(
             fontSize: FriendTypeScale.caption,
             fontWeight: FontWeight.w600,
@@ -433,7 +446,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          'LANGUAGE FLUENCY',
+          tr('LANGUAGES I SPEAK'),
           style: GoogleFonts.inter(
             fontSize: FriendTypeScale.caption,
             fontWeight: FontWeight.w600,

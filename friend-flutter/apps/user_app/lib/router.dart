@@ -19,7 +19,6 @@ import 'features/goals_habits/goals_habits_screen.dart';
 import 'features/payments/wallet_screen.dart';
 import 'features/vents/vents_screen.dart';
 import 'features/session_room/session_room_screen.dart';
-import 'features/session_room/video_setup_screen.dart';
 import 'features/messaging/conversations_screen.dart';
 import 'features/messaging/conversation_screen.dart';
 import 'features/journal/journal_list_screen.dart';
@@ -76,9 +75,9 @@ class AppRoutes {
   static const safetyPlan      = '/crisis/safety-plan';
   static const assessments     = '/assessments';
   static const notifications   = '/notifications';
-  static const settings        = '/settings';
-  static const subscription    = '/settings/subscription';
-  static const switchTherapist = '/settings/switch-therapist';
+  static final settings        = '/settings';
+  static final subscription    = '/settings/subscription';
+  static final switchTherapist = '/settings/switch-therapist';
 }
 
 /// The single go_router instance for the user app.
@@ -116,7 +115,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (authNotifier.isAuthenticated == true) {
-        if (isPreAuth) return AppRoutes.today;
+        // Signed-in people can still open 2FA setup from Settings.
+        if (isPreAuth && loc != AppRoutes.setup2fa) return AppRoutes.today;
         return null;
       }
 
@@ -142,10 +142,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: AppRoutes.welcome, builder: (_, _) => const WelcomeScreen()),
+      GoRoute(path: AppRoutes.welcome, builder: (_, _) => WelcomeScreen()),
       GoRoute(
         path: AppRoutes.onboarding,
-        builder: (_, _) => const OnboardingScreen(),
+        builder: (_, _) => OnboardingScreen(),
       ),
       GoRoute(
         path: AppRoutes.assessment,
@@ -189,7 +189,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: ':id/setup',
-                builder: (_, s) => VideoSetupScreen(appointmentId: s.pathParameters['id']!),
+                // The waiting room doubles as the pre-join check.
+                builder: (_, s) => SessionRoomScreen(appointmentId: s.pathParameters['id']!),
               ),
             ],
           ),
@@ -242,11 +243,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.wallet,
-            builder: (_, _) => const WalletScreen(),
+            builder: (_, _) => WalletScreen(),
           ),
           GoRoute(
             path: AppRoutes.groups,
-            builder: (_, _) => const ClientGroupsScreen(),
+            builder: (_, _) => ClientGroupsScreen(),
             routes: [
               GoRoute(
                 path: 'meetings/:id/join',
@@ -261,7 +262,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          GoRoute(path: AppRoutes.family, builder: (_, _) => const FamilyScreen()),
+          GoRoute(path: AppRoutes.family, builder: (_, _) => FamilyScreen()),
           GoRoute(
             path: '/recipes/:id',
             builder: (_, s) => RecipeScreen(
@@ -272,7 +273,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.live,
-            builder: (_, _) => const LiveListScreen(),
+            builder: (_, _) => LiveListScreen(),
             routes: [
               GoRoute(
                 path: ':id',
@@ -283,7 +284,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // ── Clinical & care routes ──────────────────────────────────
           GoRoute(
             path: AppRoutes.worksheets,
-            builder: (_, _) => const WorksheetsScreen(),
+            builder: (_, _) => WorksheetsScreen(),
             routes: [
               GoRoute(
                 path: ':id',
@@ -294,27 +295,27 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.crisis,
-            builder: (_, _) => const CrisisScreen(),
+            builder: (_, _) => CrisisScreen(),
           ),
           GoRoute(
             path: AppRoutes.safetyPlan,
-            builder: (_, _) => const SafetyPlanScreen(),
+            builder: (_, _) => SafetyPlanScreen(),
           ),
           GoRoute(
             path: AppRoutes.assessments,
-            builder: (_, _) => const SymptomTrackerScreen(),
+            builder: (_, _) => SymptomTrackerScreen(),
           ),
           GoRoute(
             path: AppRoutes.notifications,
-            builder: (_, _) => const NotificationsScreen(),
+            builder: (_, _) => NotificationsScreen(),
           ),
           GoRoute(
             path: AppRoutes.settings,
-            builder: (_, _) => const SettingsScreen(),
+            builder: (_, _) => SettingsScreen(),
           ),
           GoRoute(
             path: AppRoutes.subscription,
-            builder: (_, _) => const SubscriptionScreen(),
+            builder: (_, _) => SubscriptionScreen(),
           ),
           GoRoute(
             path: AppRoutes.switchTherapist,

@@ -1,3 +1,4 @@
+import '../util/i18n.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -40,6 +41,7 @@ final dioProvider = Provider<Dio>((ref) {
       if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';
       }
+      options.headers['Accept-Language'] = coreLanguageCode;
       handler.next(options);
     },
   ));

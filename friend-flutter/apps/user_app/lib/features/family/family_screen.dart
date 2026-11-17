@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +67,7 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
       initialDate: DateTime(now.year - (adult ? 25 : 8)),
       firstDate: DateTime(adult ? 1900 : now.year - 18),
       lastDate: now,
-      helpText: 'Date of birth',
+      helpText: tr('Date of birth'),
     );
   }
 
@@ -94,27 +95,27 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Add a child', style: Theme.of(context).textTheme.titleLarge),
+              Text(tr('Add a child'), style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 12),
               TextField(controller: name, decoration: const InputDecoration(labelText: "Child's name")),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               OutlinedButton.icon(
-                icon: const Icon(Icons.cake_outlined, size: 18),
+                icon: Icon(Icons.cake_outlined, size: 18),
                 label: Text(dob == null ? 'Date of birth' : '${dob!.day}/${dob!.month}/${dob!.year}'),
                 onPressed: () async {
                   final d = await _pickDate(adult: false);
                   if (d != null) setSheet(() => dob = d);
                 },
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 initialValue: relationship,
-                decoration: const InputDecoration(labelText: 'I am their'),
-                items: const [
-                  DropdownMenuItem(value: 'parent', child: Text('Parent')),
-                  DropdownMenuItem(value: 'legal_guardian', child: Text('Legal guardian')),
-                  DropdownMenuItem(value: 'grandparent', child: Text('Grandparent')),
-                  DropdownMenuItem(value: 'other_relative', child: Text('Other relative')),
+                decoration: InputDecoration(labelText: tr('I am their')),
+                items: [
+                  DropdownMenuItem(value: 'parent', child: Text(tr('Parent'))),
+                  DropdownMenuItem(value: 'legal_guardian', child: Text(tr('Legal guardian'))),
+                  DropdownMenuItem(value: 'grandparent', child: Text(tr('Grandparent'))),
+                  DropdownMenuItem(value: 'other_relative', child: Text(tr('Other relative'))),
                 ],
                 onChanged: (v) => setSheet(() => relationship = v ?? 'parent'),
               ),
@@ -124,7 +125,7 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
                 value: consent,
                 onChanged: (v) => setSheet(() => consent = v ?? false),
                 title: Text(
-                  'I am this child\'s parent or legal guardian and I consent to them receiving care on Akilil. I will book and pay for their sessions.',
+                  tr('I am this child\'s parent or legal guardian and I consent to them receiving care on Akilil. I will book and pay for their sessions.'),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
@@ -132,7 +133,7 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
                 onPressed: consent && dob != null && name.text.trim().length >= 2
                     ? () => Navigator.pop(sheet, true)
                     : null,
-                child: const Text('Add child'),
+                child: Text(tr('Add child')),
               ),
             ],
           ),
@@ -147,7 +148,7 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
         'relationship': relationship,
         'guardian_consent': true,
       }),
-      'Child added',
+      tr('Child added'),
     );
   }
 
@@ -157,22 +158,22 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (d) => AlertDialog(
-        title: Text('Login for ${child['name']}'),
+        title: Text(trx('Login for ${child['name']}', 'ለ${child['name']} መግቢያ')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('They can join sessions and message their professional. You still book and pay.'),
-            TextField(controller: email, decoration: const InputDecoration(labelText: 'Their email')),
+            Text(tr('They can join sessions and message their professional. You still book and pay.')),
+            TextField(controller: email, decoration: InputDecoration(labelText: tr('Their email'))),
             TextField(
               controller: pass,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password (8+, upper, lower, number)'),
+              decoration: InputDecoration(labelText: tr('Password (8+, upper, lower, number)')),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(d, true), child: const Text('Create')),
+          TextButton(onPressed: () => Navigator.pop(d, false), child: Text(tr('Cancel'))),
+          FilledButton(onPressed: () => Navigator.pop(d, true), child: Text(tr('Create'))),
         ],
       ),
     );
@@ -183,7 +184,7 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
         'password': pass.text,
         'password_confirmation': pass.text,
       }),
-      'Login created',
+      tr('Login created'),
     );
   }
 
@@ -191,24 +192,27 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return FriendPageScaffold(
-      eyebrow: 'Family',
-      title: 'People you care for',
-      subtitle: 'Book and pay for your children, and join sessions you are invited to.',
+      eyebrow: tr('Family'),
+      title: tr('People you care for'),
+      subtitle: tr('Book and pay for your children, and join sessions you are invited to.'),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
-          : ListView(
-              padding: const EdgeInsets.all(FriendLayout.horizontal),
+          ? const Padding(
+              padding: EdgeInsets.all(40),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (_needsDob)
                   CandyCard(
                     tint: FriendColors.accent,
                     accentStripe: true,
                     onTap: _setMyDob,
-                    child: const ListTile(
+                    child: ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: Icon(Icons.cake_outlined),
-                      title: Text('Add your date of birth'),
-                      subtitle: Text('Needed before you can book or pay.'),
+                      title: Text(tr('Add your date of birth')),
+                      subtitle: Text(tr('Needed before you can book or pay.')),
                     ),
                   ),
                 for (final i in _invites)
@@ -229,16 +233,16 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
                               FilledButton(
                                 onPressed: () => _run(
                                   () => _dio.post('/appointment-invites/accept', data: {'invite_id': i['id']}),
-                                  'Added to your sessions',
+                                  tr('Added to your sessions'),
                                 ),
-                                child: const Text('Accept'),
+                                child: Text(tr('Accept')),
                               ),
                               TextButton(
                                 onPressed: () => _run(
                                   () => _dio.post('/appointment-invites/decline', data: {'invite_id': i['id']}),
-                                  'Declined',
+                                  tr('Declined'),
                                 ),
-                                child: const Text('Decline'),
+                                child: Text(tr('Decline')),
                               ),
                             ],
                           ),
@@ -247,11 +251,11 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
                     ),
                   ),
                 const SizedBox(height: 16),
-                Text('My children', style: theme.textTheme.titleMedium),
+                Text(tr('My children'), style: theme.textTheme.titleMedium),
                 const SizedBox(height: 8),
                 if (_children.isEmpty)
                   Text(
-                    'Children under 18 cannot have their own account. Add them here and you can book sessions with professionals who work with their age group.',
+                    tr('Children under 18 cannot have their own account. Add them here and you can book sessions with professionals who work with their age group.'),
                     style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                   ),
                 for (final c in _children)
@@ -259,7 +263,7 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
                     child: ListTile(
                       leading: const CircleAvatar(child: Icon(Icons.child_care_rounded)),
                       title: Text('${c['name']} · ${c['age']}'),
-                      subtitle: Text(c['has_teen_login'] == true ? 'Has their own login' : 'Joins with you'),
+                      subtitle: Text(c['has_teen_login'] == true ? 'Has their own login' : tr('Joins with you')),
                       trailing: PopupMenuButton<String>(
                         onSelected: (v) {
                           if (v == 'login') _teenLogin(c);
@@ -270,16 +274,16 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
                         },
                         itemBuilder: (_) => [
                           if (c['can_have_teen_login'] == true && c['has_teen_login'] != true)
-                            const PopupMenuItem(value: 'login', child: Text('Create their own login')),
+                            PopupMenuItem(value: 'login', child: Text(tr('Create their own login'))),
                           if (c['has_teen_login'] == true)
-                            const PopupMenuItem(value: 'revoke', child: Text('Remove their login')),
-                          const PopupMenuItem(value: 'remove', child: Text('Remove child')),
+                            PopupMenuItem(value: 'revoke', child: Text(tr('Remove their login'))),
+                          PopupMenuItem(value: 'remove', child: Text(tr('Remove child'))),
                         ],
                       ),
                     ),
                   ),
                 const SizedBox(height: 8),
-                FriendGlowButton(label: 'Add a child', icon: Icons.add_rounded, onPressed: _addChild, expanded: true),
+                FriendGlowButton(label: tr('Add a child'), icon: Icons.add_rounded, onPressed: _addChild, expanded: true),
               ],
             ),
     );

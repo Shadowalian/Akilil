@@ -1,241 +1,186 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
-import '../core_data/seed_data.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class NotificationsScreen extends StatefulWidget {
+final _notificationsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final res = await ref.read(dioProvider).get<Map<String, dynamic>>('/notifications', queryParameters: {'per_page': 50});
+  return ((res.data?['data'] as List?) ?? const []).cast<Map<String, dynamic>>();
+});
+
+/// One notification turned into words, an icon and where tapping it goes.
+class _Presented {
+  const _Presented(this.icon, this.color, this.title, this.body, this.route, this.group);
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String body;
+  final String? route;
+  final String group; // Sessions | Messages | Account
+}
+
+_Presented _present(Map<String, dynamic> n) {
+  final data = (n['data'] is Map) ? Map<String, dynamic>.from(n['data'] as Map) : const <String, dynamic>{};
+  final type = (data['type'] ?? n['type'] ?? '').toString();
+  final when = DateTime.tryParse('${data['scheduled_at']}')?.toLocal();
+  final at = when == null ? '' : trDate('EEE MMM d, h:mm a', when);
+  final appt = data['appointment_id'];
+  final pro = data['professional'] ?? 'your professional';
+
+  return switch (type) {
+    'booking_confirmed' => _Presented(Icons.event_available_rounded, FriendColors.primary, tr('Session booked'),
+        trx('With $pro${at.isEmpty ? '' : ' · $at'}', 'ከ$pro ጋር${at.isEmpty ? '' : ' · $at'}'), '/appointments', 'Sessions'),
+    'reminder_24h' => _Presented(Icons.alarm_rounded, FriendColors.accent, tr('Your session is tomorrow'),
+        at.isEmpty ? tr('Check your sessions for the time.') : at, '/appointments', 'Sessions'),
+    'reminder_1h' => _Presented(Icons.videocam_rounded, FriendColors.coral, tr('Your session starts in an hour'),
+        tr('Open the waiting room a few minutes early.'), appt == null ? '/appointments' : '/appointments/$appt/room', 'Sessions'),
+    'new_message' => _Presented(Icons.forum_rounded, FriendColors.wood, tr('New message'),
+        (data['preview'] ?? tr('You have a new message.')).toString(),
+        data['conversation_id'] == null ? '/messages' : '/messages/${data['conversation_id']}', 'Messages'),
+    _ => _Presented(Icons.notifications_rounded, FriendColors.primary, tr('Update'),
+        (data['message'] ?? data['body'] ?? tr('Something changed on your account.')).toString(), null, 'Account'),
+  };
+}
+
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  late List<Map<String, dynamic>> _items;
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  // Internal values stay English; only the chip labels are translated.
   String _filter = 'All';
 
-  @override
-  void initState() {
-    super.initState();
-    _items = List<Map<String, dynamic>>.from(SeedData.notifications);
+  Future<void> _markAllRead() async {
+    try {
+      await ref.read(dioProvider).post('/notifications/read-all');
+    } catch (_) {}
+    ref.invalidate(_notificationsProvider);
   }
 
-  void _markAllRead() {
-    setState(() {
-      for (final item in _items) {
-        item['is_read'] = true;
-      }
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('All notifications marked as read.')),
-    );
-  }
-
-  IconData _iconForType(String? type) {
-    switch (type) {
-      case 'session':
-        return Icons.videocam_rounded;
-      case 'message':
-        return Icons.forum_rounded;
-      case 'worksheet':
-        return Icons.edit_note_rounded;
-      case 'achievement':
-        return Icons.emoji_events_rounded;
-      case 'group':
-        return Icons.groups_2_rounded;
-      default:
-        return Icons.notifications_rounded;
+  Future<void> _open(Map<String, dynamic> n, _Presented p) async {
+    if (n['read_at'] == null) {
+      ref.read(dioProvider).post('/notifications/${n['id']}/read').ignore();
     }
-  }
-
-  Color _colorForType(String? type) {
-    switch (type) {
-      case 'session':
-        return FriendColors.primary;
-      case 'message':
-        return FriendColors.wood;
-      case 'worksheet':
-        return FriendColors.accent;
-      case 'achievement':
-        return FriendColors.green;
-      case 'group':
-        return FriendColors.primaryDeep;
-      default:
-        return FriendColors.primary;
+    if (p.route != null) {
+      context.push(p.route!);
     }
+    ref.invalidate(_notificationsProvider);
   }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _filter == 'All'
-        ? _items
-        : _items.where((x) {
-            final t = x['type'] as String? ?? '';
-            if (_filter == 'Sessions') return t == 'session';
-            if (_filter == 'Messages') return t == 'message';
-            if (_filter == 'Exercises') return t == 'worksheet';
-            if (_filter == 'Groups') return t == 'group';
-            return true;
-          }).toList();
-
+    final async = ref.watch(_notificationsProvider);
+    final theme = Theme.of(context);
     return FriendPageScaffold(
-      eyebrow: 'Activity',
-      title: 'Notifications',
-      subtitle: 'Session alerts, messages from Dr. Maya Lin, and worksheet updates.',
-      showBack: true,
-      trailing: TextButton.icon(
+      eyebrow: tr('Activity'),
+      title: tr('Notifications'),
+      trailing: IconButton(
         onPressed: _markAllRead,
-        icon: const Icon(Icons.done_all_rounded, size: 16),
-        label: const Text('Mark Read'),
-        style: TextButton.styleFrom(
-          foregroundColor: FriendColors.primaryDeep,
-          textStyle: GoogleFonts.urbanist(fontWeight: FontWeight.w700),
-        ),
+        tooltip: tr('Mark all read'),
+        icon: const Icon(Icons.done_all_rounded),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Filter Chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: ['All', 'Sessions', 'Messages', 'Exercises', 'Groups'].map((cat) {
-                final isSel = _filter == cat;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(cat),
-                    selected: isSel,
-                    onSelected: (val) {
-                      if (val) setState(() => _filter = cat);
-                    },
-                    selectedColor: FriendColors.primaryLight,
-                    backgroundColor: FriendColors.surface,
-                    labelStyle: GoogleFonts.urbanist(
-                      fontSize: 13,
-                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
-                      color: isSel ? FriendColors.primaryDeep : FriendColors.textSecondary,
+      onRefresh: () async => ref.invalidate(_notificationsProvider),
+      body: async.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(40),
+          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        ),
+        error: (_, _) => FriendEmptyState(
+          icon: Icons.cloud_off_outlined,
+          title: "Couldn't load notifications",
+          ctaLabel: tr('Try again'),
+          onCta: () => ref.invalidate(_notificationsProvider),
+        ),
+        data: (all) {
+          final items = [
+            for (final n in all) (n, _present(n)),
+          ].where((e) => _filter == 'All' || e.$2.group == _filter).toList();
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (final f in const ['All', 'Sessions', 'Messages', 'Account'])
+                    ChoiceChip(
+                      label: Text(tr(f)),
+                      showCheckmark: false,
+                      selected: _filter == f,
+                      onSelected: (_) => setState(() => _filter = f),
                     ),
-                    side: BorderSide(
-                      color: isSel ? FriendColors.primary : FriendColors.border,
+                ],
+              ),
+              const SizedBox(height: 14),
+              if (items.isEmpty)
+                FriendEmptyState(
+                  icon: Icons.notifications_none_rounded,
+                  title: tr('You are all caught up'),
+                  message: tr('Bookings, reminders and messages will show up here.'),
+                ),
+              for (final (n, p) in items)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: CandyCard(
+                    onTap: () => _open(n, p),
+                    padding: const EdgeInsets.all(14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: p.color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(p.icon, color: p.color, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(p.title, style: theme.textTheme.titleSmall),
+                              const SizedBox(height: 2),
+                              Text(p.body,
+                                  style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary)),
+                              const SizedBox(height: 6),
+                              Text(
+                                _ago(DateTime.tryParse('${n['created_at']}')),
+                                style: theme.textTheme.labelSmall?.copyWith(color: FriendColors.textMuted),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (n['read_at'] == null)
+                          Container(
+                            margin: const EdgeInsets.only(top: 6, left: 8),
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(color: FriendColors.primary, shape: BoxShape.circle),
+                          ),
+                      ],
                     ),
                   ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 18),
-
-          for (final item in filtered) ...[
-            _NotificationTile(
-              item: item,
-              icon: _iconForType(item['type'] as String?),
-              color: _colorForType(item['type'] as String?),
-              onTap: () {
-                setState(() => item['is_read'] = true);
-                final route = item['route'] as String?;
-                if (route != null && route.isNotEmpty) {
-                  context.push(route);
-                }
-              },
-            ),
-            const SizedBox(height: 10),
-          ],
-          const SizedBox(height: 32),
-        ],
+                ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _NotificationTile extends StatelessWidget {
-  const _NotificationTile({
-    required this.item,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  final Map<String, dynamic> item;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final title = item['title'] as String? ?? '';
-    final body = item['body'] as String? ?? '';
-    final time = item['time'] as String? ?? '';
-    final isRead = item['is_read'] == true;
-
-    return CandyCard(
-      onTap: onTap,
-      tint: isRead ? null : FriendColors.primary,
-      padding: const EdgeInsets.all(14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 14,
-                          fontWeight: isRead ? FontWeight.w700 : FontWeight.w800,
-                          color: FriendColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    if (!isRead)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: FriendColors.primary,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  body,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    height: 1.4,
-                    color: isRead ? FriendColors.textSecondary : FriendColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  time,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: FriendColors.textMuted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+String _ago(DateTime? t) {
+  if (t == null) return '';
+  final d = DateTime.now().difference(t.toLocal());
+  if (d.inMinutes < 1) return tr('Just now');
+  if (d.inMinutes < 60) return trx('${d.inMinutes} min ago', 'ከ${d.inMinutes} ደቂቃ በፊት');
+  if (d.inHours < 24) return trx('${d.inHours} h ago', 'ከ${d.inHours} ሰዓት በፊት');
+  if (d.inDays < 7) return trx('${d.inDays} d ago', 'ከ${d.inDays} ቀን በፊት');
+  return trDate('MMM d', t.toLocal());
 }

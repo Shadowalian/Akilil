@@ -1,7 +1,7 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -374,6 +374,30 @@ class _ExploreSupportSection extends ConsumerWidget {
         Row(
           children: [
             Expanded(
+              child: _QuickCard(
+                icon: Icons.sensors_rounded,
+                color: FriendColors.coral,
+                title: tr('Live'),
+                subtitle: tr('Reflections & cook-alongs'),
+                onTap: () => context.go(AppRoutes.live),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _QuickCard(
+                icon: Icons.family_restroom_rounded,
+                color: FriendColors.primary,
+                title: tr('Family'),
+                subtitle: tr('Book for your child'),
+                onTap: () => context.go(AppRoutes.family),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Row(
+          children: [
+            Expanded(
               child: Text(
                 s.exploreSupport,
                 style: sectionTitle(context),
@@ -555,7 +579,7 @@ class _NextSessionHero extends ConsumerWidget {
         final proName =
             (appt['professional'] as Map<String, dynamic>?)?['name']
                     as String? ??
-                'Akilil';
+                tr('Akilil');
         final status = appt['status'] as String? ?? 'pending';
         final duration = appt['duration_minutes'] as int? ?? 45;
         final end = when.add(Duration(minutes: duration));
@@ -571,7 +595,7 @@ class _NextSessionHero extends ConsumerWidget {
                 (minsUntil <= 15 && minsUntil >= -(duration + 30)));
 
         final timeRange =
-            '${DateFormat('h:mm a').format(when)} – ${DateFormat('h:mm a').format(end)}';
+            '${trDate('h:mm a', when)} – ${trDate('h:mm a', end)}';
 
         return CandyCard(
           padding: const EdgeInsets.all(20),
@@ -593,7 +617,7 @@ class _NextSessionHero extends ConsumerWidget {
                   FriendAvatar(
                     size: 48,
                     initials:
-                        proName.isNotEmpty ? proName[0].toUpperCase() : 'A',
+                        personInitial(proName, 'A'),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -826,6 +850,55 @@ class _QuietNote extends StatelessWidget {
               fontFamily: 'Geist',
               fontFamilyFallback: TodayScreen._ethiopicFallback,
             ),
+      ),
+    );
+  }
+}
+
+/// Compact shortcut tile on the home screen.
+class _QuickCard extends StatelessWidget {
+  const _QuickCard({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return CandyCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(height: 12),
+          Text(title, style: theme.textTheme.titleSmall),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
+          ),
+        ],
       ),
     );
   }

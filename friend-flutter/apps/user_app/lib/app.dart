@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'l10n/app_locale.dart';
+import 'l10n/tr.dart';
 import 'router.dart';
 import 'features/auth/app_lock_controller.dart';
 import 'features/auth/app_lock_screen.dart';
@@ -44,6 +45,9 @@ class FriendApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final lang = ref.watch(localeControllerProvider);
+    trAmharic = lang == AppLanguage.am;
+    coreTr = tr;
+    coreLanguageCode = lang.code;
     final base = FriendAppTheme.light();
 
     final theme = lang == AppLanguage.am
@@ -58,17 +62,23 @@ class FriendApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: theme,
       themeMode: ThemeMode.light,
-      // Keep framework locale on English — `am` crashes MaterialLocalizations.
-      locale: const Locale('en'),
-      supportedLocales: const [Locale('en')],
+      // Flutter ships Amharic for its own widgets (date picker, dialogs).
+      locale: lang.locale,
+      supportedLocales: const [Locale('en'), Locale('am')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: router,
-      builder: (context, child) =>
-          _AppLockWrapper(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => ColoredBox(
+        color: FriendColors.background,
+        // Re-key on language so every screen re-reads its copy.
+        child: KeyedSubtree(
+          key: ValueKey(lang),
+          child: _AppLockWrapper(child: child ?? const SizedBox.shrink()),
+        ),
+      ),
     );
   }
 }

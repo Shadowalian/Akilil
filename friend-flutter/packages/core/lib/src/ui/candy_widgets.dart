@@ -1,6 +1,7 @@
 /// Akilil Platform — shared UI kit (23.dev polish × Higgsfield structure).
 library;
 
+import '../util/i18n.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -205,14 +206,19 @@ class FriendPageScaffold extends StatelessWidget {
       ],
     );
 
-    if (onRefresh != null) {
-      return RefreshIndicator(
-        color: FriendColors.primary,
-        onRefresh: onRefresh!,
-        child: SingleChildScrollView(child: header),
-      );
-    }
-    return SingleChildScrollView(child: header);
+    final page = onRefresh != null
+        ? RefreshIndicator(
+            color: FriendColors.primary,
+            onRefresh: onRefresh!,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: header,
+            ),
+          )
+        : SingleChildScrollView(child: header);
+    // Pages pushed outside the tab shell have no Material above them; without
+    // one, text renders in Flutter's red debug style.
+    return Material(type: MaterialType.transparency, child: SafeArea(bottom: false, child: page));
   }
 }
 
@@ -310,7 +316,7 @@ class CandyGradientHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FriendPageHeader(
-      eyebrow: 'Akilil',
+      eyebrow: coreTr('Akilil'),
       title: title,
       subtitle: subtitle,
       trailing: action,

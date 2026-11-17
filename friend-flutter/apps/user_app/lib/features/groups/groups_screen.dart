@@ -1,9 +1,9 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 final _clientGroupsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
@@ -26,10 +26,10 @@ class ClientGroupsScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const FriendPageHeader(
-            eyebrow: 'Together',
-            title: 'Group therapy',
-            subtitle: 'Join open groups and meet when the host goes live.',
+          FriendPageHeader(
+            eyebrow: tr('Together'),
+            title: tr('Group therapy'),
+            subtitle: tr('Join open groups and meet when the host goes live.'),
           ),
           Expanded(
             child: async.when(
@@ -41,10 +41,10 @@ class ClientGroupsScreen extends ConsumerWidget {
               ),
               data: (list) {
                 if (list.isEmpty) {
-                  return const FriendEmptyState(
+                  return FriendEmptyState(
                     icon: Icons.groups_outlined,
-                    title: 'No open groups yet',
-                    message: 'Listeners can create open groups for you to join.',
+                    title: tr('No open groups yet'),
+                    message: tr('Listeners can create open groups for you to join.'),
                   );
                 }
                 return RefreshIndicator(
@@ -79,19 +79,19 @@ class ClientGroupsScreen extends ConsumerWidget {
                             Row(
                               children: [
                                 Text(
-                                  '${g['member_count'] ?? 0} members',
+                                  trx('${g['member_count'] ?? 0} members', '${g['member_count'] ?? 0} አባላት'),
                                   style: Theme.of(context).textTheme.bodySmall,
                                 ),
                                 const Spacer(),
                                 if (isMember)
                                   FriendGlowButton(
-                                    label: 'Open',
+                                    label: tr('Open'),
                                     onPressed: () =>
                                         context.go('/groups/${g['id']}'),
                                   )
                                 else
                                   FriendGlowButton(
-                                    label: 'Join group',
+                                    label: tr('Join group'),
                                     onPressed: () async {
                                       try {
                                         final dio = ref.read(dioProvider);
@@ -108,7 +108,7 @@ class ClientGroupsScreen extends ConsumerWidget {
                                           SnackBar(
                                             content: Text(
                                               e.response?.data?['message'] ??
-                                                  'Join failed',
+                                                  tr('Join failed'),
                                             ),
                                           ),
                                         );
@@ -205,7 +205,7 @@ class _ClientGroupDetailScreenState
     if (!hasSeat && price > 0) {
       return FilledButton(
         onPressed: () => _post('/therapy-group-meetings/${m['id']}/reserve', 'Seat reserved'),
-        child: Text('Reserve · ${formatMoney(price, m['currency'] as String?)}'),
+        child: Text(trx('Reserve · ${formatMoney(price, m['currency'] as String?)}', 'ቦታ ይያዙ · ${formatMoney(price, m['currency'] as String?)}')),
       );
     }
     if (recipe != null && seat?['ingredients_confirmed'] != true) {
@@ -216,16 +216,16 @@ class _ClientGroupDetailScreenState
           await context.push('/recipes/${recipe['id']}?meeting=${m['id']}');
           _load();
         },
-        child: const Text('Ingredients'),
+        child: Text(tr('Ingredients')),
       );
     }
     if (status == 'live') {
       return FilledButton(
         onPressed: () => context.go('/groups/meetings/${m['id']}/join'),
-        child: const Text('Join'),
+        child: Text(tr('Join')),
       );
     }
-    return Text(hasSeat ? 'Seat reserved' : 'Scheduled', style: Theme.of(context).textTheme.bodySmall);
+    return Text(hasSeat ? 'Seat reserved' : tr('Scheduled'), style: Theme.of(context).textTheme.bodySmall);
   }
 
   @override
@@ -237,27 +237,44 @@ class _ClientGroupDetailScreenState
     }
     final title = _group?['title'] as String? ?? 'Group';
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      backgroundColor: FriendColors.background,
+      appBar: AppBar(title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'When your host starts a meeting, Join opens the shared video room.',
+            tr('When your host starts a meeting, Join opens the shared video room.'),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: FriendColors.textSecondary,
                 ),
           ),
           const SizedBox(height: 16),
           for (final m in _meetings)
-            Card(
-              child: ListTile(
-                title: Text(m['title'] as String? ?? 'Meeting'),
-                subtitle: Text(
-                  DateFormat('EEE MMM d · h:mm a').format(
-                    DateTime.parse(m['scheduled_at'] as String).toLocal(),
-                  ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: CandyCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(m['title'] as String? ?? 'Meeting', style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 4),
+                    Text(
+                      trDate('EEE MMM d · h:mm a', 
+                        DateTime.parse(m['scheduled_at'] as String).toLocal(),
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
+                    ),
+                    if (m['recipe'] is Map) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        trx('Cooking: ${(m['recipe'] as Map)['title']}', 'የሚበስለው፦ ${(m['recipe'] as Map)['title']}'),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.woodDeep),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    Align(alignment: Alignment.centerRight, child: _meetingAction(m)),
+                  ],
                 ),
-                trailing: _meetingAction(m),
               ),
             ),
         ],
@@ -304,7 +321,7 @@ class _ClientGroupMeetingScreenState
       setState(() {
         _roomUrl = session['room_url'] as String?;
         _jwt = session['token'] as String?;
-        _displayName = res.data?['display_name'] as String? ?? 'Akilil';
+        _displayName = res.data?['display_name'] as String? ?? tr('Akilil');
         _starting = false;
       });
     } on DioException catch (e) {
@@ -331,7 +348,7 @@ class _ClientGroupMeetingScreenState
           icon: Icons.videocam_off_outlined,
           title: "Couldn't join",
           message: _error,
-          ctaLabel: 'Retry',
+          ctaLabel: tr('Retry'),
           onCta: _join,
         ),
       );
@@ -348,7 +365,7 @@ class _ClientGroupMeetingScreenState
         jwt: _jwt,
         displayName: _displayName,
         mode: JitsiRoomMode.group,
-        title: 'Group session',
+        title: tr('Group session'),
         onLeave: () {
           if (mounted) Navigator.of(context).maybePop();
         },

@@ -23,6 +23,7 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
   final _pass  = TextEditingController();
   final _pass2 = TextEditingController();
   bool _busy = false;
+  String? _pillar;
   String? _error;
 
   @override
@@ -36,6 +37,10 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_pillar == null) {
+      setState(() => _error = 'Choose what you practise.');
+      return;
+    }
     setState(() { _busy = true; _error = null; });
     try {
       await ref.read(authControllerProvider).registerProfessional(
@@ -43,12 +48,11 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
             email: _email.text.trim(),
             password: _pass.text,
             passwordConfirmation: _pass2.text,
+            pillar: _pillar,
           );
     } on DioException catch (e) {
       setState(() {
-        _error = e.response?.data is Map
-            ? ((e.response!.data['message'] ?? 'Sign-up failed') as String)
-            : 'Sign-up failed.';
+        _error = apiErrorMessage(e.response?.data, 'Sign-up failed.');
       });
     } catch (e) {
       setState(() => _error = e.toString());
@@ -83,10 +87,18 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
                     const SizedBox(height: 16),
                     Text('Apply to be an Akilil Pro', style: theme.textTheme.headlineMedium),
                     const SizedBox(height: 8),
-                    Text("A few details. We'll set up your practice together.",
+                    Text("A few details. Our team checks every professional before clients can book them.",
                         style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 24),
+                    Text('What do you practise?', style: theme.textTheme.titleSmall),
+                    const SizedBox(height: 10),
+                    FriendPillarPicker(
+                      selectedSlug: _pillar,
+                      compact: true,
+                      onSelected: (slug) => setState(() => _pillar = slug),
+                    ),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _name,
                       decoration: const InputDecoration(labelText: 'Your name'),
@@ -106,7 +118,13 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
                       controller: _pass,
                       obscureText: true,
                       decoration: const InputDecoration(labelText: 'Password'),
-                      validator: (v) => (v == null || v.length < 8) ? 'At least 8 characters' : null,
+                      validator: (v) {
+                        if (v == null || v.length < 8) return 'At least 8 characters';
+                        if (!RegExp(r'[A-Z]').hasMatch(v) || !RegExp(r'[a-z]').hasMatch(v) || !RegExp(r'[0-9]').hasMatch(v)) {
+                          return 'Use upper and lower case letters and a number';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 12),
                     TextFormField(

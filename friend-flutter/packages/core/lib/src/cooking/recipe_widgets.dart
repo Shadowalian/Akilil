@@ -1,3 +1,4 @@
+import '../util/i18n.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/design_tokens.dart';
@@ -32,9 +33,9 @@ class RecipeMetaRow extends StatelessWidget {
       spacing: 14,
       runSpacing: 6,
       children: [
-        if (total > 0) fact(Icons.schedule_rounded, '$total min'),
-        if (servings != null) fact(Icons.people_outline_rounded, 'Serves $servings'),
-        if (count != null) fact(Icons.shopping_basket_outlined, '$count ingredients'),
+        if (total > 0) fact(Icons.schedule_rounded, coreTr('{n} min').replaceAll('{n}', '$total')),
+        if (servings != null) fact(Icons.people_outline_rounded, coreTr('Serves {n}').replaceAll('{n}', '$servings')),
+        if (count != null) fact(Icons.shopping_basket_outlined, coreTr('{n} ingredients').replaceAll('{n}', '$count')),
         if ((recipe['difficulty'] ?? '').toString().isNotEmpty)
           fact(Icons.local_fire_department_outlined, recipe['difficulty'].toString()),
       ],
@@ -75,7 +76,7 @@ class RecipeIngredientList extends StatelessWidget {
               TextSpan(children: [
                 TextSpan(text: (ing['name'] ?? '').toString()),
                 if (optional)
-                  TextSpan(text: '  optional', style: theme.textTheme.labelSmall?.copyWith(color: FriendColors.textMuted)),
+                  TextSpan(text: '  ${coreTr('optional')}', style: theme.textTheme.labelSmall?.copyWith(color: FriendColors.textMuted)),
               ]),
               style: theme.textTheme.bodyLarge?.copyWith(
                 decoration: checked ? TextDecoration.lineThrough : null,
@@ -84,7 +85,7 @@ class RecipeIngredientList extends StatelessWidget {
             );
             final details = [
               if (note.isNotEmpty) note,
-              if (substitute.isNotEmpty) 'No luck finding it? Use $substitute',
+              if (substitute.isNotEmpty) coreTr('No luck finding it? Use {x}').replaceAll('{x}', substitute),
             ].join('\n');
 
             return InkWell(
@@ -180,7 +181,7 @@ class RecipeStepList extends StatelessWidget {
                       Text((steps[i]['instruction'] ?? '').toString(), style: theme.textTheme.bodyLarge),
                       if (steps[i]['duration_minutes'] != null)
                         Text(
-                          '${steps[i]['duration_minutes']} min',
+                          coreTr('{n} min').replaceAll('{n}', '${steps[i]['duration_minutes']}'),
                           style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                         ),
                     ],
@@ -213,7 +214,7 @@ class RecipeTagWrap extends StatelessWidget {
             borderRadius: BorderRadius.circular(FriendRadii.pill),
           ),
           child: Text(
-            warn ? 'Contains $label' : label,
+            warn ? coreTr('Contains {x}').replaceAll('{x}', label) : label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: warn ? FriendColors.onErrorContainer : FriendColors.primaryDeep,
                   fontWeight: FontWeight.w600,

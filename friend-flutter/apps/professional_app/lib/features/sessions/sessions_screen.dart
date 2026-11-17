@@ -159,7 +159,7 @@ class SessionsScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                 ],
                 if (upcoming.isNotEmpty) ...[
-                  Text('Ready to join',
+                  Text('Upcoming',
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   for (final a in upcoming) _ApptTile(appt: a),
@@ -194,19 +194,30 @@ class _ApptTile extends StatelessWidget {
     final priceCents = (appt['price_cents'] as num?)?.toInt() ?? -1;
     final waiting =
         kind == 'listening_request' && status == 'pending';
+    // Mirrors the server's join window: 2 hours before until 2 hours after.
+    final minsUntil = startsAt.difference(DateTime.now()).inMinutes;
+    final inWindow = priceCents == 0 || status == 'in_progress' || (minsUntil <= 120 && minsUntil >= -((appt['duration_minutes'] as num?)?.toInt() ?? 50) - 120);
     final canJoin = joinable &&
         !waiting &&
+        inWindow &&
         (status == 'confirmed' ||
             status == 'in_progress' ||
             (status == 'pending' && priceCents == 0));
+    final format = appt['care_format'] as String? ?? 'individual';
+    final who = switch (format) {
+      'couples' => ' · couples',
+      'family' => ' · family',
+      'child' || 'teen' => ' · for ${(appt['dependent'] as Map?)?['name'] ?? 'a child'}',
+      _ => '',
+    };
+    final cooking = appt['recipe'] is Map ? ' · ${(appt['recipe'] as Map)['title']}' : '';
 
     return Card(
       child: ListTile(
         title: Text(name),
         subtitle: Text(
           '${DateFormat('EEE, MMM d • h:mm a').format(startsAt.toLocal())}'
-          '${kind == 'listening_request' ? ' · listening' : ''}'
-          ' · $status',
+          '${kind == 'listening_request' ? ' · listening' : ''}$who$cooking',
         ),
         trailing: canJoin
             ? FilledButton.icon(
@@ -214,9 +225,9 @@ class _ApptTile extends StatelessWidget {
                 icon: const Icon(Icons.videocam, size: 18),
                 label: const Text('Join'),
               )
-            : Text(
-                status,
-                style: TextStyle(color: _statusColor(status), fontSize: 12),
+            : FriendStatusChip(
+                label: status == 'confirmed' && !inWindow ? 'Upcoming' : status[0].toUpperCase() + status.substring(1),
+                color: _statusColor(status),
               ),
         onTap: canJoin
             ? () => context.go('/sessions/${appt['id']}/host')

@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,7 +36,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     super.initState();
     // If biometrics available, offer them immediately.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _tryBiometric());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _tryBiometric();
+    });
   }
 
   @override
@@ -49,6 +52,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final lock = ref.read(appLockProvider.notifier);
     await lock.ensureInitialized();
     final hasSaved = await lock.hasSavedBiometricCredentials();
+    if (!mounted) return;
     if (!lock.biometricsAvailable || !lock.biometricEnabled || !hasSaved) return;
 
     setState(() => _bioBusy = true);
@@ -61,11 +65,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           await ref.read(authControllerProvider).login(
                 email: creds.email,
                 password: creds.password,
+                askTwoFactorCode: () => showTwoFactorPrompt(context),
               );
           return;
         } catch (_) {
           if (mounted) {
-            setState(() => _error = 'Biometric session expired. Please sign in with password.');
+            setState(() => _error = tr('Biometric session expired. Please sign in with password.'));
           }
         }
       }
@@ -85,6 +90,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref.read(authControllerProvider).login(
             email: email,
             password: password,
+            askTwoFactorCode: () => showTwoFactorPrompt(context),
           );
       // Save credentials for future biometric 1-tap sign-ins
       await ref.read(appLockProvider.notifier).saveBiometricCredentials(
@@ -267,7 +273,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Sign in with Face ID / Fingerprint',
+                                    tr('Sign in with Face ID / Fingerprint'),
                                     style: GoogleFonts.urbanist(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -278,8 +284,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               );
                             }),
                             const SizedBox(height: 26),
-                            const FreudSocialRow(),
-                            const SizedBox(height: 26),
                             FreudLink(
                               leading: s.dontHaveAccount,
                               label: s.signUp,
@@ -288,13 +292,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             const SizedBox(height: 14),
                             Center(
                               child: GestureDetector(
-                                onTap: () => ScaffoldMessenger.of(context)
-                                    .showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Password reset is coming soon — reach out to support for now.',
-                                    ),
-                                  ),
+                                onTap: () => showForgotPasswordFlow(
+                                  context,
+                                  ref.read(dioProvider),
+                                  initialEmail: _emailCtrl.text.trim(),
                                 ),
                                 child: Text(
                                   s.forgotPassword,

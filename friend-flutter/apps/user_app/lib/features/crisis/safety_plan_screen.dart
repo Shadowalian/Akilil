@@ -1,86 +1,67 @@
+import 'package:friend_user/l10n/tr.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core/core.dart';
-import '../../l10n/app_locale.dart';
-import '../core_data/seed_data.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-const _ethiopicFallback = ['NotoSansEthiopic'];
+import 'safety_plan_store.dart';
 
-TextStyle _geist({
-  double? size,
-  FontWeight weight = FontWeight.w600,
-  Color? color,
-  double? height,
-}) {
-  return TextStyle(
-    fontFamily: 'Geist',
-    fontFamilyFallback: _ethiopicFallback,
-    fontSize: size,
-    fontWeight: weight,
-    color: color ?? FriendColors.textPrimary,
-    height: height,
-  );
-}
-
-class SafetyPlanScreen extends ConsumerStatefulWidget {
+/// A personal crisis safety plan (Stanley–Brown model): warning signs,
+/// things I can do alone, people I can reach, and making things safer.
+/// Written in calm moments, read in hard ones.
+class SafetyPlanScreen extends ConsumerWidget {
   const SafetyPlanScreen({super.key});
 
-  @override
-  ConsumerState<SafetyPlanScreen> createState() => _SafetyPlanScreenState();
-}
-
-class _SafetyPlanScreenState extends ConsumerState<SafetyPlanScreen> {
-  late List<String> _warningSigns;
-  late List<String> _internalCoping;
-  late List<Map<String, String>> _trustedPeople;
-  late List<String> _safeEnvironment;
-
-  @override
-  void initState() {
-    super.initState();
-    final p = SeedData.safetyPlan;
-    _warningSigns = List<String>.from(p['warning_signs'] as List);
-    _internalCoping = List<String>.from(p['internal_coping'] as List);
-    _trustedPeople = (p['trusted_people'] as List)
-        .map((x) => Map<String, String>.from(x as Map))
-        .toList();
-    _safeEnvironment = List<String>.from(p['safe_environment'] as List);
-  }
-
-  void _addWarningSign() async {
-    final text = await _promptUser('Add Warning Sign', 'e.g. Trouble sleeping past 3 AM');
-    if (text != null && text.isNotEmpty) {
-      setState(() => _warningSigns.add(text));
-    }
-  }
-
-  void _addCopingStrategy() async {
-    final text = await _promptUser('Add Coping Strategy', 'e.g. 10-minute breathwork');
-    if (text != null && text.isNotEmpty) {
-      setState(() => _internalCoping.add(text));
-    }
-  }
-
-  Future<String?> _promptUser(String title, String hint) async {
+  Future<String?> _ask(BuildContext context, String title, String hint) {
     final c = TextEditingController();
     return showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title, style: _geist(weight: FontWeight.w800)),
+      builder: (d) => AlertDialog(
+        title: Text(title),
         content: TextField(
           controller: c,
           autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
           decoration: InputDecoration(hintText: hint),
+          onSubmitted: (v) => Navigator.pop(d, v.trim()),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(d), child: Text(tr('Cancel'))),
+          FilledButton(onPressed: () => Navigator.pop(d, c.text.trim()), child: Text(tr('Add'))),
+        ],
+      ),
+    );
+  }
+
+  Future<({String name, String phone})?> _askPerson(BuildContext context) {
+    final name = TextEditingController();
+    final phone = TextEditingController();
+    return showDialog<({String name, String phone})>(
+      context: context,
+      builder: (d) => AlertDialog(
+        title: Text(tr('Someone I can call')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: name,
+              autofocus: true,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(labelText: tr('Name')),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: phone,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(labelText: tr('Phone number')),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(d), child: Text(tr('Cancel'))),
           FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(c.text.trim()),
-            style: FilledButton.styleFrom(backgroundColor: FriendColors.primary),
-            child: const Text('Add'),
+            onPressed: () => Navigator.pop(d, (name: name.text.trim(), phone: phone.text.trim())),
+            child: Text(tr('Add')),
           ),
         ],
       ),
@@ -88,271 +69,203 @@ class _SafetyPlanScreenState extends ConsumerState<SafetyPlanScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final s = ref.watch(stringsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final plan = ref.watch(safetyPlanProvider);
+    final store = ref.read(safetyPlanProvider.notifier);
+    final theme = Theme.of(context);
+
+    Widget step({
+      required int n,
+      required String title,
+      required String hint,
+      required List<String> items,
+      required String addTitle,
+      required String addHint,
+      required void Function(List<String>) save,
+    }) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: CandyCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _StepHeader(n: n, title: title, hint: hint),
+              for (final (i, item) in items.indexed)
+                _Item(text: item, onRemove: () => save([...items]..removeAt(i))),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () async {
+                    final t = await _ask(context, addTitle, addHint);
+                    if (t != null && t.isNotEmpty) save([...items, t]);
+                  },
+                  icon: const Icon(Icons.add_rounded, size: 18),
+                  label: Text(items.isEmpty ? tr('Add the first one') : tr('Add another')),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: FriendColors.background,
-      appBar: AppBar(
-        backgroundColor: FriendColors.surface,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          s.mySafetyPlan,
-          style: _geist(size: 18, weight: FontWeight.w800),
-        ),
-      ),
+      appBar: AppBar(title: Text(tr('My safety plan'))),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 8, FriendLayout.horizontal, 32),
         children: [
-          CandyCard(
-            tint: FriendColors.primary,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.verified_user_rounded, color: FriendColors.primary, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Co-Created with Dr. Maya Lin',
-                      style: _geist(
-                        size: 12,
-                        weight: FontWeight.w700,
-                        color: FriendColors.primaryDeep,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Your 6-Step Safety Protocol',
-                  style: _geist(
-                    size: 20,
-                    weight: FontWeight.w800,
-                    color: FriendColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Having a predefined plan removes cognitive load during acute emotional distress or overwhelm. Keep this accessible.',
-                  style: _geist(
-                    size: 13,
-                    height: 1.45,
-                    color: FriendColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
+          Text(
+            tr('Fill this in on a calmer day. When things get hard, you will not have to think — just follow it. '
+            'The professionals you book and the Akilil safety team can read it, so they can help you if you reach out.'),
+            style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
           ),
-          const SizedBox(height: 24),
-
-          // Step 1: Warning Signs
-          _buildStepCard(
-            stepNumber: 1,
-            title: 'Warning Signs of Overwhelm',
-            subtitle: 'Thoughts, moods, or bodily sensations that signal distress is escalating.',
-            items: _warningSigns,
-            onAdd: _addWarningSign,
-            onRemove: (idx) => setState(() => _warningSigns.removeAt(idx)),
+          const SizedBox(height: 6),
+          LinearProgressIndicator(value: plan.stepsDone / 4, minHeight: 4, borderRadius: BorderRadius.circular(2)),
+          const SizedBox(height: 4),
+          Text(trx('${plan.stepsDone} of 4 steps filled in', 'ከ4 ደረጃዎች ${plan.stepsDone} ተሞልተዋል'), style: theme.textTheme.labelSmall),
+          const SizedBox(height: 18),
+          step(
+            n: 1,
+            title: tr('My warning signs'),
+            hint: tr('Thoughts, moods or situations that tell me a crisis may be coming.'),
+            items: plan.warningSigns,
+            addTitle: tr('A warning sign'),
+            addHint: tr('e.g. I stop answering calls'),
+            save: (l) => store.update(plan.copyWith(warningSigns: l)),
           ),
-          const SizedBox(height: 20),
-
-          // Step 2: Internal Coping Strategies
-          _buildStepCard(
-            stepNumber: 2,
-            title: 'Internal Coping Tools (Without Calling Anyone)',
-            subtitle: 'Things you can do solo to calm your nervous system down.',
-            items: _internalCoping,
-            onAdd: _addCopingStrategy,
-            onRemove: (idx) => setState(() => _internalCoping.removeAt(idx)),
+          step(
+            n: 2,
+            title: tr('Things I can do on my own'),
+            hint: tr('Ways to take my mind off things without contacting anyone.'),
+            items: plan.coping,
+            addTitle: tr('Something that helps'),
+            addHint: tr('e.g. A walk around the block'),
+            save: (l) => store.update(plan.copyWith(coping: l)),
           ),
-          const SizedBox(height: 20),
-
-          // Step 3: Trusted People
-          CandyCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    _stepBadge(3),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'People I Can Reach Out To',
-                        style: _geist(
-                          size: 16,
-                          weight: FontWeight.w800,
-                          color: FriendColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Friends, partners, or family members who provide calm, grounded distraction or care.',
-                  style: _geist(
-                    size: 12,
-                    color: FriendColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                for (final p in _trustedPeople) ...[
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: FriendColors.background,
-                      borderRadius: BorderRadius.circular(FriendRadii.small),
-                      border: Border.all(color: FriendColors.border),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.person_outline_rounded, size: 18, color: FriendColors.primary),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            p['name'] ?? '',
-                            style: _geist(
-                              size: 14,
-                              weight: FontWeight.w700,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: CandyCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _StepHeader(n: 3, title: tr('People I can reach'), hint: tr('Friends or family I can call when I need help.')),
+                  for (final (i, p) in plan.people.indexed)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: FriendAvatar(initials: personInitial(p.name), size: 36),
+                      title: Text(p.name),
+                      subtitle: p.phone.isEmpty ? null : Text(p.phone),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (p.phone.isNotEmpty)
+                            IconButton(
+                              tooltip: tr('Call'),
+                              icon: const Icon(Icons.call_rounded, color: FriendColors.primary),
+                              onPressed: () => launchUrl(Uri.parse('tel:${p.phone}')),
                             ),
+                          IconButton(
+                            tooltip: tr('Remove'),
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                            onPressed: () => store.update(plan.copyWith(people: [...plan.people]..removeAt(i))),
                           ),
-                        ),
-                        Text(
-                          p['phone'] ?? '',
-                          style: _geist(
-                            size: 13,
-                            color: FriendColors.textSecondary,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        final p = await _askPerson(context);
+                        if (p != null && p.name.isNotEmpty) store.update(plan.copyWith(people: [...plan.people, p]));
+                      },
+                      icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                      label: Text(tr('Add a person')),
                     ),
                   ),
                 ],
-              ],
+              ),
             ),
           ),
-          const SizedBox(height: 20),
-
-          // Step 4: Making Environment Safe
-          _buildStepCard(
-            stepNumber: 4,
-            title: 'Making My Environment Safe',
-            subtitle: 'Immediate steps to minimize stress inputs and sensory triggers.',
-            items: _safeEnvironment,
-            onAdd: () async {
-              final text = await _promptUser('Add Environmental Step', 'e.g. Dim lights');
-              if (text != null && text.isNotEmpty) {
-                setState(() => _safeEnvironment.add(text));
-              }
-            },
-            onRemove: (idx) => setState(() => _safeEnvironment.removeAt(idx)),
+          step(
+            n: 4,
+            title: tr('Making things safer'),
+            hint: tr('Steps to put distance between me and anything I could use to hurt myself.'),
+            items: plan.environment,
+            addTitle: tr('A step'),
+            addHint: tr('e.g. Give my medication to my sister to keep'),
+            save: (l) => store.update(plan.copyWith(environment: l)),
           ),
-          const SizedBox(height: 36),
+          Text(
+            tr('If you are in danger right now, call 907 for an ambulance or 991 for police.'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.error, fontWeight: FontWeight.w600),
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _stepBadge(int num) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: FriendColors.primary,
-        borderRadius: BorderRadius.circular(FriendRadii.pill),
-      ),
-      child: Center(
-        child: Text(
-          '$num',
-          style: _geist(
-            size: 14,
-            weight: FontWeight.w800,
-            color: Colors.white,
+class _StepHeader extends StatelessWidget {
+  const _StepHeader({required this.n, required this.title, required this.hint});
+  final int n;
+  final String title;
+  final String hint;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 13,
+            backgroundColor: FriendColors.primary,
+            child: Text('$n', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
           ),
-        ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: theme.textTheme.titleSmall),
+                const SizedBox(height: 2),
+                Text(hint, style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildStepCard({
-    required int stepNumber,
-    required String title,
-    required String subtitle,
-    required List<String> items,
-    required VoidCallback onAdd,
-    required ValueChanged<int> onRemove,
-  }) {
-    return CandyCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+class _Item extends StatelessWidget {
+  const _Item({required this.text, required this.onRemove});
+  final String text;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 6),
+      padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+      decoration: BoxDecoration(
+        color: FriendColors.background,
+        borderRadius: BorderRadius.circular(FriendRadii.small),
+      ),
+      child: Row(
         children: [
-          Row(
-            children: [
-              _stepBadge(stepNumber),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  title,
-                  style: _geist(
-                    size: 16,
-                    weight: FontWeight.w800,
-                    color: FriendColors.textPrimary,
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add_circle_outline_rounded, color: FriendColors.primary),
-                onPressed: onAdd,
-              ),
-            ],
+          Expanded(child: Text(text)),
+          IconButton(
+            tooltip: tr('Remove'),
+            icon: const Icon(Icons.close_rounded, size: 18),
+            onPressed: onRemove,
           ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: _geist(
-              size: 12,
-              color: FriendColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 14),
-          for (var i = 0; i < items.length; i++) ...[
-            Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: FriendColors.background,
-                borderRadius: BorderRadius.circular(FriendRadii.small),
-                border: Border.all(color: FriendColors.border),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.check_circle_outline_rounded, size: 16, color: FriendColors.primary),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      items[i],
-                      style: _geist(
-                        size: 13,
-                        weight: FontWeight.w600,
-                        color: FriendColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => onRemove(i),
-                    child: const Icon(Icons.close_rounded, size: 16, color: FriendColors.textMuted),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );

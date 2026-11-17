@@ -171,7 +171,7 @@ class ProStitchCommandHeader extends StatelessWidget {
                   radius: 16,
                   backgroundColor: FriendColors.primary,
                   child: Text(
-                    (avatarInitial ?? 'P').substring(0, 1).toUpperCase(),
+                    personInitial(avatarInitial, 'P'),
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -218,7 +218,7 @@ class ProStitchDossierHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'AKILIL SANCTUARY',
+                      'CLIENT',
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -227,7 +227,7 @@ class ProStitchDossierHeader extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Clinical Dossier',
+                      'Client record',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -251,7 +251,7 @@ class ProStitchDossierHeader extends StatelessWidget {
                     Icon(Icons.verified_user, size: 14, color: FriendColors.accent),
                     const SizedBox(width: 4),
                     Text(
-                      'E2EE',
+                      'PRIVATE',
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -269,7 +269,7 @@ class ProStitchDossierHeader extends StatelessWidget {
                 radius: 16,
                 backgroundColor: FriendColors.primary,
                 child: Text(
-                  (avatarInitial ?? 'P').substring(0, 1).toUpperCase(),
+                  personInitial(avatarInitial, 'P'),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

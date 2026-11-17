@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -86,24 +87,36 @@ class ProfileScreen extends ConsumerWidget {
                   onTap: () => context.go(AppRoutes.goals),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(18, 12, 12, 12),
+                  child: Row(
+                    children: [
+                      Icon(Icons.translate_rounded, size: 20, color: FriendColors.primary),
+                      SizedBox(width: 14),
+                      Expanded(child: Text(tr('Language'))),
+                      LanguageToggle(compact: true),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.family_restroom_rounded,
-                  title: 'Family',
-                  subtitle: 'Children you book for, session invitations',
+                  title: tr('Family'),
+                  subtitle: tr('Children you book for, session invitations'),
                   onTap: () => context.go(AppRoutes.family),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.sensors_rounded,
-                  title: 'Live',
-                  subtitle: 'Spiritual reflections and cook-alongs',
+                  title: tr('Live'),
+                  subtitle: tr('Spiritual reflections and cook-alongs'),
                   onTap: () => context.go(AppRoutes.live),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.groups_2_outlined,
-                  title: 'Group therapy',
-                  subtitle: 'Join open listening circles',
+                  title: tr('Group therapy'),
+                  subtitle: tr('Join open listening circles'),
                   onTap: () => context.go(AppRoutes.groups),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
@@ -119,36 +132,36 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 26),
 
           // ── Clinical Tools ──────────────────────────────────────────
-          _GroupLabel('Clinical tools'),
+          _GroupLabel(tr('Clinical tools')),
           CandyCard(
             padding: EdgeInsets.zero,
             child: Column(
               children: [
                 FriendMenuTile(
                   icon: Icons.description_outlined,
-                  title: 'Worksheets',
-                  subtitle: 'CBT, DBT & mindfulness exercises',
+                  title: tr('Worksheets'),
+                  subtitle: tr('CBT, DBT & mindfulness exercises'),
                   onTap: () => context.go(AppRoutes.worksheets),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.fact_check_outlined,
-                  title: 'Assessments',
-                  subtitle: 'PHQ-9 & GAD-7 self-checks',
+                  title: tr('Assessments'),
+                  subtitle: tr('PHQ-9 & GAD-7 self-checks'),
                   onTap: () => context.go(AppRoutes.assessments),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.emergency_outlined,
-                  title: 'Crisis resources',
-                  subtitle: 'Hotlines and immediate support',
+                  title: tr('Crisis resources'),
+                  subtitle: tr('Hotlines and immediate support'),
                   onTap: () => context.go(AppRoutes.crisis),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.shield_outlined,
-                  title: 'Safety plan',
-                  subtitle: 'My personalised crisis action plan',
+                  title: tr('Safety plan'),
+                  subtitle: tr('My personalised crisis action plan'),
                   onTap: () => context.go(AppRoutes.safetyPlan),
                 ),
               ],
@@ -157,36 +170,36 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 26),
 
           // ── Care settings ───────────────────────────────────────────
-          _GroupLabel('Care settings'),
+          _GroupLabel(tr('Care settings')),
           CandyCard(
             padding: EdgeInsets.zero,
             child: Column(
               children: [
                 FriendMenuTile(
                   icon: Icons.star_outline_rounded,
-                  title: 'My subscription',
-                  subtitle: 'Plan, billing and premium features',
+                  title: tr('Pricing & refunds'),
+                  subtitle: tr('How sessions, classes and gifts are charged'),
                   onTap: () => context.go(AppRoutes.subscription),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.swap_horiz_rounded,
-                  title: 'Switch therapist',
-                  subtitle: 'Find a better match for your needs',
+                  title: tr('Switch professional'),
+                  subtitle: tr('Find a better match for your needs'),
                   onTap: () => context.go(AppRoutes.switchTherapist),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.notifications_outlined,
-                  title: 'Notifications',
-                  subtitle: 'Session reminders and updates',
+                  title: tr('Notifications'),
+                  subtitle: tr('Session reminders and updates'),
                   onTap: () => context.go(AppRoutes.notifications),
                 ),
                 const Divider(height: 1, indent: 18, endIndent: 18),
                 FriendMenuTile(
                   icon: Icons.settings_outlined,
-                  title: 'Settings',
-                  subtitle: 'Privacy, preferences and more',
+                  title: tr('Settings'),
+                  subtitle: tr('Privacy, preferences and more'),
                   onTap: () => context.go(AppRoutes.settings),
                 ),
               ],

@@ -161,6 +161,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('dependents/{id}/teen-login',    [DependentController::class, 'createTeenLogin'])->name('dependents.teen-login.store');
     Route::delete('dependents/{id}/teen-login',  [DependentController::class, 'revokeTeenLogin'])->name('dependents.teen-login.destroy');
 
+    /* Safety: ask the team to reach out; the person's safety plan */
+    Route::post('crisis/alerts',                 [\App\Http\Controllers\Api\Safety\CrisisAlertController::class, 'store'])
+        ->middleware('throttle:10,60')->name('crisis.alerts.store');
+    Route::get('crisis/alerts/latest',           [\App\Http\Controllers\Api\Safety\CrisisAlertController::class, 'latest'])->name('crisis.alerts.latest');
+    Route::get('me/safety-plan',                 [\App\Http\Controllers\Api\Safety\SafetyPlanController::class, 'show'])->name('safety-plan.show');
+    Route::put('me/safety-plan',                 [\App\Http\Controllers\Api\Safety\SafetyPlanController::class, 'update'])->name('safety-plan.update');
+    Route::get('professional/clients/{userId}/safety-plan', [\App\Http\Controllers\Api\Safety\SafetyPlanController::class, 'forClient'])->name('professional.clients.safety-plan');
+
     /* Matching questionnaire */
     Route::get('intake',                         [IntakeController::class, 'show'])->name('intake.show');
     Route::post('intake',                        [IntakeController::class, 'store'])->name('intake.store');
@@ -243,6 +251,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     /* Notifications */
     Route::get ('notifications',                  [NotificationController::class, 'index'])->name('notifications.index');
     Route::get ('notifications/unread-count',     [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    Route::post('notifications/read-all',         [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
     Route::post('notifications/{id}/read',        [NotificationController::class, 'markRead'])->name('notifications.read');
 
     /* Devices — push tokens */

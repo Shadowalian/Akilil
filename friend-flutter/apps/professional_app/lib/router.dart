@@ -52,7 +52,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (authNotifier.isAuthenticated == false && !isAuthRoute) {
         return AppRoutes.login;
       }
-      if (authNotifier.isAuthenticated == true && isAuthRoute) {
+      if (authNotifier.isAuthenticated == true && isAuthRoute && state.matchedLocation != AppRoutes.setup2fa) {
         return AppRoutes.home;
       }
       return null;

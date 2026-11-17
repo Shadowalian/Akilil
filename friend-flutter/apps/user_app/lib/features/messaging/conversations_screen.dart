@@ -1,56 +1,32 @@
+import 'package:friend_user/l10n/tr.dart';
+import 'package:core/core.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:core/core.dart';
 
-final _conversationsProvider =
-    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  try {
-    final dio = ref.read(dioProvider);
-    final res = await dio.get<Map<String, dynamic>>('/conversations');
-    final list = ((res.data?['data'] as List?) ?? const [])
-        .cast<Map<String, dynamic>>();
-    if (list.isNotEmpty) return list;
-  } catch (_) {
-    // Fall back to seed conversations
-  }
+import '../auth/auth_controller.dart';
+import 'care_team.dart';
 
-  // Guaranteed fallback conversation with Primary Assigned Counselor
-  return [
-    {
-      'id': 'conv-dr-maya-lin',
-      'other_user': {
-        'id': 'pro-maya-lin',
-        'name': 'Dr. Maya Lin, Psy.D.',
-        'role': 'Primary Assigned Counselor',
-        'is_primary': true,
-      },
-      'last_message': {
-        'body':
-            'Our next live video session is scheduled for today at 3:00 PM. Looking forward to connecting!',
-        'created_at': DateTime.now().subtract(const Duration(minutes: 45)).toIso8601String(),
-      },
-      'unread_count': 1,
-      'updated_at': DateTime.now().subtract(const Duration(minutes: 45)).toIso8601String(),
-    },
-    {
-      'id': 'conv-marcus-vance',
-      'other_user': {
-        'id': 'pro-marcus-vance',
-        'name': 'Marcus Vance, LCSW',
-        'role': 'Trauma Support Group Host',
-        'is_primary': false,
-      },
-      'last_message': {
-        'body': 'Here are the somatic grounding notes from our Saturday circle.',
-        'created_at': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
-      },
-      'unread_count': 0,
-      'updated_at': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
-    },
-  ];
+final _conversationsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final res = await ref.read(dioProvider).get<Map<String, dynamic>>('/conversations');
+  return ((res.data?['data'] as List?) ?? const []).cast<Map<String, dynamic>>();
 });
+
+/// Opens (or creates) the 1:1 thread with a professional you have booked.
+Future<void> openConversationWith(BuildContext context, WidgetRef ref, int userId) async {
+  try {
+    final res = await ref.read(dioProvider).post<Map<String, dynamic>>(
+      '/conversations',
+      data: {'participant_user_id': userId},
+    );
+    if (context.mounted) context.push('/messages/${res.data?['id']}');
+  } on DioException catch (e) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(apiErrorMessage(e.response?.data))));
+    }
+  }
+}
 
 class ConversationsScreen extends ConsumerWidget {
   const ConversationsScreen({super.key});
@@ -58,222 +34,139 @@ class ConversationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(_conversationsProvider);
+    final team = ref.watch(careTeamProvider).valueOrNull ?? const [];
+    final me = ref.watch(currentUserProvider)?.id;
+    final theme = Theme.of(context);
 
     return FriendPageScaffold(
-      eyebrow: 'Direct Care',
-      title: 'Therapist Messages',
-      subtitle:
-          'Continuous 24/7 asynchronous counseling room with your licensed therapist.',
-      showBack: true,
-      onRefresh: () async => ref.invalidate(_conversationsProvider),
+      eyebrow: tr('Messages'),
+      title: tr('Your conversations'),
+      subtitle: tr('Message the professionals you have booked. Replies come during their working hours — this is not for emergencies.'),
+      onRefresh: () async {
+        ref.invalidate(_conversationsProvider);
+        ref.invalidate(careTeamProvider);
+      },
       body: async.when(
-        loading: () => const Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 32),
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(40),
+          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
         ),
-        error: (e, _) => _buildList(context, _getFallbackList()),
+        error: (_, _) => FriendEmptyState(
+          icon: Icons.cloud_off_outlined,
+          title: "Couldn't load messages",
+          ctaLabel: tr('Try again'),
+          onCta: () => ref.invalidate(_conversationsProvider),
+        ),
         data: (list) {
-          final effectiveList = list.isEmpty ? _getFallbackList() : list;
-          return _buildList(context, effectiveList);
+          final withThread = <int>{
+            for (final c in list)
+              for (final p in (c['participants'] as List? ?? const []))
+                if ((p['id'] as num?)?.toInt() != me) (p['id'] as num).toInt(),
+          };
+          final startable = team.where((t) => !withThread.contains(t['user_id'])).toList();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (list.isEmpty && team.isEmpty)
+                FriendEmptyState(
+                  icon: Icons.forum_outlined,
+                  title: tr('No conversations yet'),
+                  message: tr('Once you book a session you can message that professional here.'),
+                  ctaLabel: tr('Find someone'),
+                  onCta: () => context.go('/'),
+                ),
+              for (final c in list) _ThreadTile(conversation: c, me: me),
+              if (startable.isNotEmpty) ...[
+                const SizedBox(height: 18),
+                Text(tr('Start a conversation'), style: theme.textTheme.titleSmall),
+                const SizedBox(height: 8),
+                for (final t in startable)
+                  Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: FriendAvatar(initials: personInitial(t['name'] as String?), size: 40),
+                      title: Text('${t['name']}'),
+                      trailing: const Icon(Icons.edit_outlined),
+                      onTap: () => openConversationWith(context, ref, t['user_id'] as int),
+                    ),
+                  ),
+              ],
+            ],
+          );
         },
       ),
     );
   }
-
-  List<Map<String, dynamic>> _getFallbackList() {
-    return [
-      {
-        'id': 'conv-dr-maya-lin',
-        'other_user': {
-          'id': 'pro-maya-lin',
-          'name': 'Dr. Maya Lin, Psy.D.',
-          'role': 'Primary Assigned Counselor',
-          'is_primary': true,
-        },
-        'last_message': {
-          'body':
-              'Our next live video session is scheduled for today at 3:00 PM. Looking forward to connecting!',
-          'created_at': DateTime.now().subtract(const Duration(minutes: 45)).toIso8601String(),
-        },
-        'unread_count': 1,
-        'updated_at': DateTime.now().subtract(const Duration(minutes: 45)).toIso8601String(),
-      },
-    ];
-  }
-
-  Widget _buildList(BuildContext context, List<Map<String, dynamic>> list) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Primary Counselor Active Callout
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: FriendColors.primaryLight,
-            borderRadius: BorderRadius.circular(FriendRadii.card),
-            border: Border.all(color: FriendColors.border),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.shield_outlined, color: FriendColors.primaryDeep, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Messages with your therapist are private, HIPAA-compliant, and encrypted end-to-end.',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: FriendColors.primaryDeep,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        for (final c in list) ...[
-          _ConversationCard(
-            conv: c,
-            onTap: () => context.push('/messages/${c['id']}'),
-          ),
-          const SizedBox(height: 12),
-        ],
-      ],
-    );
-  }
 }
 
-class _ConversationCard extends StatelessWidget {
-  const _ConversationCard({required this.conv, required this.onTap});
-  final Map<String, dynamic> conv;
-  final VoidCallback onTap;
+class _ThreadTile extends StatelessWidget {
+  const _ThreadTile({required this.conversation, required this.me});
+  final Map<String, dynamic> conversation;
+  final int? me;
 
   @override
   Widget build(BuildContext context) {
-    final other = conv['other_user'] as Map<String, dynamic>?;
-    final name = other?['name'] as String? ?? 'Dr. Maya Lin, Psy.D.';
-    final role = other?['role'] as String? ?? 'Licensed Counselor';
-    final isPrimary = other?['is_primary'] == true;
-    final lastMsg = conv['last_message'] as Map<String, dynamic>?;
-    final body = lastMsg?['body'] as String? ?? 'Tap to chat with your therapist';
-    final unread = (conv['unread_count'] as num?)?.toInt() ?? 0;
+    final theme = Theme.of(context);
+    final others = (conversation['participants'] as List? ?? const [])
+        .where((p) => (p['id'] as num?)?.toInt() != me)
+        .map((p) => (p['name'] ?? '').toString())
+        .toList();
+    final name = (conversation['title'] as String?)?.isNotEmpty == true
+        ? conversation['title'] as String
+        : (others.isEmpty ? 'Conversation' : others.join(', '));
+    final last = conversation['last_message'] as Map?;
+    final unread = (conversation['unread_count'] as num?)?.toInt() ?? 0;
+    final at = DateTime.tryParse('${last?['created_at'] ?? conversation['last_message_at']}')?.toLocal();
 
-    return CandyCard(
-      tint: isPrimary ? FriendColors.primary : null,
-      accentStripe: isPrimary,
-      onTap: onTap,
-      child: Row(
-        children: [
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 26,
-                backgroundColor: FriendColors.primaryLight,
-                child: Text(
-                  name.isNotEmpty ? name[0] : 'T',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: FriendColors.primaryDeep,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: FriendColors.green,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        name,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: FriendColors.textPrimary,
-                        ),
-                      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: CandyCard(
+        onTap: () => context.push('/messages/${conversation['id']}'),
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            FriendAvatar(initials: personInitial(name), size: 44),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 2),
+                  Text(
+                    (last?['preview'] ?? tr('Say hello')).toString(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: unread > 0 ? FriendColors.textPrimary : FriendColors.textSecondary,
+                      fontWeight: unread > 0 ? FontWeight.w600 : null,
                     ),
-                    if (isPrimary)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: FriendColors.primaryLight,
-                          borderRadius: BorderRadius.circular(FriendRadii.pill),
-                        ),
-                        child: Text(
-                          'YOUR COUNSELOR',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
-                            color: FriendColors.primaryDeep,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  role,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: FriendColors.primaryDeep,
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  body,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 13,
-                    fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w500,
-                    color: unread > 0 ? FriendColors.textPrimary : FriendColors.textSecondary,
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (at != null)
+                  Text(
+                    DateTime.now().difference(at).inHours < 24 ? trDate('h:mm a', at) : trDate('MMM d', at),
+                    style: theme.textTheme.labelSmall?.copyWith(color: FriendColors.textMuted),
                   ),
-                ),
+                if (unread > 0) ...[
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(color: FriendColors.primary, borderRadius: BorderRadius.circular(10)),
+                    child: Text('$unread', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  ),
+                ],
               ],
             ),
-          ),
-          if (unread > 0) ...[
-            const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: FriendColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                '$unread',
-                style: GoogleFonts.urbanist(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ],
-        ],
+        ),
       ),
     );
   }

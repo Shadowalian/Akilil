@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,7 +58,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
     if (_secret == null) return;
     final code = _codeController.text.trim();
     if (code.length != 6) {
-      setState(() => _codeError = 'Enter the 6-digit code.');
+      setState(() => _codeError = tr('Enter the 6-digit code.'));
       return;
     }
     setState(() {
@@ -104,9 +105,9 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
     final theme = Theme.of(context);
 
     if (_busy && _secret == null) {
-      return const FriendPageScaffold(
-        eyebrow: 'Security',
-        title: 'Two-factor authentication',
+      return FriendPageScaffold(
+        eyebrow: tr('Security'),
+        title: tr('Two-factor authentication'),
         body: Center(
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 48),
@@ -117,9 +118,9 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
     }
 
     return FriendPageScaffold(
-      eyebrow: 'Security',
-      title: 'Secure your account',
-      subtitle: 'Scan the QR code with your authenticator app, then enter the 6-digit code.',
+      eyebrow: tr('Security'),
+      title: tr('Secure your account'),
+      subtitle: tr('Scan the QR code with your authenticator app, then enter the 6-digit code.'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -144,7 +145,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
           if (_secret != null) ...[
             const SizedBox(height: 16),
             Text(
-              'Or enter this secret manually:',
+              tr('Or enter this secret manually:'),
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 4),
@@ -152,7 +153,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
               onTap: () {
                 Clipboard.setData(ClipboardData(text: _secret!));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Secret copied to clipboard')),
+                  SnackBar(content: Text(tr('Secret copied to clipboard'))),
                 );
               },
               child: Container(
@@ -174,8 +175,8 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
             controller: _codeController,
             keyboardType: TextInputType.number,
             maxLength: 6,
-            decoration: const InputDecoration(
-              labelText: '6-digit code',
+            decoration: InputDecoration(
+              labelText: tr('6-digit code'),
               counterText: '',
             ),
             onSubmitted: (_) => _confirm(),
@@ -192,7 +193,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
             ),
           const SizedBox(height: 16),
           FriendGlowButton(
-            label: 'Confirm and enable',
+            label: tr('Confirm and enable'),
             expanded: true,
             onPressed: _busy ? null : _confirm,
           ),
@@ -209,7 +210,7 @@ class _RecoveryCodesDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Save your recovery codes'),
+      title: Text(tr('Save your recovery codes')),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -236,7 +237,7 @@ class _RecoveryCodesDialog extends StatelessWidget {
             Clipboard.setData(ClipboardData(text: codes.join('\n')));
             Navigator.of(context).pop();
           },
-          child: const Text('Copy & close'),
+          child: Text(tr('Copy & close')),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),

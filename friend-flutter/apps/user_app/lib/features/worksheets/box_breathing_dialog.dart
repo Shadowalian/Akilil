@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,7 +26,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
   late AnimationController _controller;
   int _cycleCount = 0;
   String _phaseLabel = 'Inhale';
-  String _phaseHint = 'Breathe in slowly through the nose';
+  String _phaseHint = tr('Breathe in slowly through the nose');
   Timer? _tickTimer;
   int _secondsInPhase = 4;
 
@@ -62,16 +63,16 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
 
     if (val < 0.25) {
       newPhase = 'Inhale';
-      newHint = 'Fill your lungs with cool, gentle air';
+      newHint = tr('Fill your lungs with cool, gentle air');
     } else if (val < 0.50) {
       newPhase = 'Hold';
-      newHint = 'Rest in stillness. Keep shoulders soft';
+      newHint = tr('Rest in stillness. Keep shoulders soft');
     } else if (val < 0.75) {
       newPhase = 'Exhale';
-      newHint = 'Release slowly through parted lips';
+      newHint = tr('Release slowly through parted lips');
     } else {
       newPhase = 'Hold';
-      newHint = 'Wait peacefully for the natural breath';
+      newHint = tr('Wait peacefully for the natural breath');
     }
 
     if (newPhase != _phaseLabel) {
@@ -131,7 +132,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Box Breathing',
+                        tr('Box Breathing'),
                         style: GoogleFonts.urbanist(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -139,7 +140,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
                         ),
                       ),
                       Text(
-                        'Parasympathetic Nervous Regulation',
+                        tr('Slows your heart and calms your body'),
                         style: GoogleFonts.urbanist(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -282,7 +283,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
                 border: Border.all(color: FriendColors.border),
               ),
               child: Text(
-                'Completed Cycles: $_cycleCount',
+                trx('Completed cycles: $_cycleCount', 'የተጠናቀቁ ዙሮች፦ $_cycleCount'),
                 style: GoogleFonts.urbanist(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -293,7 +294,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
             const SizedBox(height: 24),
 
             FriendGlowButton(
-              label: 'Done Breathing',
+              label: tr('Done Breathing'),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],

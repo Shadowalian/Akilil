@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 
 import '../../l10n/app_locale.dart';
-import '../../l10n/language_toggle.dart';
 
 /// Authenticated shell — cream canvas + floating capsule dock only.
 /// No Scaffold bottom chrome (that was painting the full-width block).
@@ -23,10 +22,13 @@ class MainShell extends ConsumerWidget {
     return 1;
   }
 
-  bool _hideDock(String location) =>
-      location.contains('/room') || RegExp(r'^/live/\d+').hasMatch(location) || location.contains('/meetings/');
+  /// The dock belongs to the five tab roots. Pushed pages (a profile, a
+  /// booking, a recipe, a live room) own the bottom of the screen.
+  static final _fullScreen = RegExp(
+    r'^/(pros/|recipes/|live|family|wallet|groups/\d|groups/meetings|messages/\d|journal/|community/\d|worksheets/\d|settings|notifications|crisis|appointments/\d)',
+  );
 
-  bool _hideLanguage(String location) => _hideDock(location);
+  bool _hideDock(String location) => _fullScreen.hasMatch(location);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,9 +36,7 @@ class MainShell extends ConsumerWidget {
     final location = GoRouterState.of(context).matchedLocation;
     final index = _indexFor(location);
     final hideDock = _hideDock(location);
-    final hideLanguage = _hideLanguage(location);
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final topInset = MediaQuery.paddingOf(context).top;
 
     final tabs = <FriendDockItem>[
       FriendDockItem(
@@ -71,7 +71,9 @@ class MainShell extends ConsumerWidget {
       ),
     ];
 
-    return ColoredBox(
+    // Material ancestor: without it every Text in the shell falls back to
+    // the debug style (yellow double underline).
+    return Material(
       color: FriendColors.background,
       child: Stack(
         fit: StackFit.expand,
@@ -88,13 +90,6 @@ class MainShell extends ConsumerWidget {
               ),
             ),
           ),
-          // Persistent language switch — visible on every tab.
-          if (!hideLanguage)
-            Positioned(
-              top: topInset + 6,
-              right: 16,
-              child: const LanguageToggle(compact: true),
-            ),
           if (!hideDock)
             Positioned(
               left: 20,
