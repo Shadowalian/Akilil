@@ -84,5 +84,15 @@
   "This action is unauthorized.": "ይህን ለማድረግ ፈቃድ የለዎትም።",
   "Too Many Attempts.": "ብዙ ጊዜ ሞክረዋል። ትንሽ ቆይተው እንደገና ይሞክሩ።",
   "Server Error": "የአገልጋይ ስህተት ተፈጥሯል። እባክዎ ቆይተው ይሞክሩ።",
-  "Not Found": "አልተገኘም።"
+  "Not Found": "አልተገኘም።",
+  "That is more than your available balance.": "ይህ ካለዎት ቀሪ ገንዘብ ይበልጣል።",
+  "Only professionals can request payouts.": "ክፍያ መጠየቅ የሚችሉት ባለሙያዎች ብቻ ናቸው።",
+  "Only professionals can broadcast.": "ማሰራጨት የሚችሉት ባለሙያዎች ብቻ ናቸው።",
+  "Appointment cancelled.": "ቀጠሮው ተሰርዟል።",
+  "Confirm you have the ingredients before joining.": "ከመግባትዎ በፊት ግብዓቶቹ እንዳሉዎት ያረጋግጡ።",
+  "Free test call ready — both sides can Join now.": "የሙከራ ጥሪው ዝግጁ ነው — ሁለታችሁም አሁን መግባት ትችላላችሁ።",
+  "Teen login created.": "የታዳጊው መግቢያ ተፈጥሯል።",
+  "Top up your wallet to send this gift.": "ይህን ስጦታ ለመላክ ቦርሳዎን ይሙሉ።",
+  "Two-factor authentication enabled.": "ባለሁለት ደረጃ መግቢያ በርቷል።",
+  "Two-factor authentication must be set up before using admin features.": "የአስተዳዳሪ ገጾችን ከመጠቀምዎ በፊት ባለሁለት ደረጃ መግቢያን ማብራት አለብዎት።"
 }

@@ -91,231 +91,127 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
   @override
   Widget build(BuildContext context) {
     final lock = ref.read(appLockProvider.notifier);
+    final theme = Theme.of(context);
     final user = ref.watch(currentUserProvider);
-    final name = user?.name.trim().split(' ').first ?? tr('Counselor');
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'P';
+    final name = user?.name.trim().split(' ').first ?? '';
+    final showPassword = _showPassword || !lock.biometricsAvailable;
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      body: Stack(
-        children: [
-          const Positioned.fill(child: FriendAtmosphere()),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 24),
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: FriendColors.primary.withValues(alpha: 0.15),
-                      child: Text(
-                        initial,
-                        style: friendFont(
-                          fontSize: 34,
-                          fontWeight: FontWeight.w600,
-                          color: FriendColors.primaryDeep,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 380),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Center(child: AkililMark(size: 44)),
+                  const SizedBox(height: 24),
+                  Text(
+                    name.isEmpty ? tr('Welcome back') : trx('Welcome back, $name', 'እንኳን ደህና ተመለሱ፣ $name'),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    tr("Verify it's you to continue"),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
+                  ),
+                  const SizedBox(height: 40),
+                  if (!showPassword) ...[
+                    Center(
+                      child: ScaleTransition(
+                        scale: _scale,
+                        child: Semantics(
+                          button: true,
+                          label: tr('Tap to use Face ID or Fingerprint'),
+                          child: Material(
+                            color: FriendColors.surface,
+                            shape: const CircleBorder(side: BorderSide(color: FriendColors.border)),
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: _busy ? null : _tryBiometrics,
+                              child: SizedBox(
+                                width: 88,
+                                height: 88,
+                                child: _busy
+                                    ? const Center(
+                                        child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)),
+                                      )
+                                    : const Icon(Icons.fingerprint_rounded, size: 44, color: FriendColors.primary),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Welcome back, Dr. $name',
+                      tr('Tap to use Face ID or Fingerprint'),
                       textAlign: TextAlign.center,
-                      style: friendFont(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.6,
-                        color: FriendColors.textPrimary,
-                      ),
+                      style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textMuted),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      tr('Clinical workspace is locked for patient privacy'),
-                      textAlign: TextAlign.center,
-                      style: friendFont(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: FriendColors.textSecondary,
-                      ),
+                    const SizedBox(height: 24),
+                    TextButton(
+                      onPressed: () => setState(() {
+                        _showPassword = true;
+                        _error = null;
+                      }),
+                      child: Text(tr('Use password instead')),
                     ),
-                    const SizedBox(height: 44),
-
-                    // Biometric button (if available)
-                    if (lock.biometricsAvailable && !_showPassword) ...[
-                      ScaleTransition(
-                        scale: _scale,
-                        child: GestureDetector(
-                          onTap: _busy ? null : _tryBiometrics,
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [Color(0xFF2AADCF), FriendColors.primary],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: FriendColors.primary.withValues(alpha: 0.35),
-                                  blurRadius: 28,
-                                  spreadRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: _busy
-                                ? const Center(
-                                    child: SizedBox(
-                                      width: 28,
-                                      height: 28,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                : const Icon(
-                                    Icons.fingerprint_rounded,
-                                    size: 52,
-                                    color: Colors.white,
-                                  ),
-                          ),
+                  ] else ...[
+                    TextField(
+                      controller: _passCtrl,
+                      obscureText: _obscure,
+                      autofocus: true,
+                      onSubmitted: (_) => _submitPassword(),
+                      decoration: InputDecoration(
+                        labelText: tr('Enter your password'),
+                        suffixIcon: IconButton(
+                          tooltip: _obscure ? tr('Show password') : tr('Hide password'),
+                          icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 20),
+                          onPressed: () => setState(() => _obscure = !_obscure),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Text(
-                        tr('Tap to scan Face ID or Fingerprint'),
-                        textAlign: TextAlign.center,
-                        style: friendFont(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: FriendColors.textMuted,
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      TextButton(
+                    ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 12),
+                      Text(_error!, style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.error)),
+                    ],
+                    const SizedBox(height: 16),
+                    FriendGlowButton(label: tr('Unlock'), expanded: true, busy: _busy, onPressed: _submitPassword),
+                    if (lock.biometricsAvailable) ...[
+                      const SizedBox(height: 8),
+                      TextButton.icon(
                         onPressed: () => setState(() {
-                          _showPassword = true;
+                          _showPassword = false;
                           _error = null;
                         }),
-                        child: Text(
-                          tr('Use password instead'),
-                          style: friendFont(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: FriendColors.primary,
-                            decoration: TextDecoration.underline,
-                            decorationColor: FriendColors.primary,
-                          ),
-                        ),
+                        icon: const Icon(Icons.fingerprint_rounded, size: 18),
+                        label: Text(tr('Use biometrics')),
                       ),
                     ],
-
-                    // Password field fallback
-                    if (_showPassword || !lock.biometricsAvailable) ...[
-                      CandyCard(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              tr('Enter counselor password'),
-                              style: friendFont(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                                color: FriendColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _passCtrl,
-                              obscureText: _obscure,
-                              autofocus: true,
-                              onSubmitted: (_) => _submitPassword(),
-                              decoration: InputDecoration(
-                                hintText: '••••••••',
-                                prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscure
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off_outlined,
-                                    size: 20,
-                                    color: FriendColors.textMuted,
-                                  ),
-                                  onPressed: () =>
-                                      setState(() => _obscure = !_obscure),
-                                ),
-                              ),
-                            ),
-                            if (_error != null) ...[
-                              const SizedBox(height: 12),
-                              Text(
-                                _error!,
-                                style: friendFont(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: FriendColors.error,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 20),
-                            FriendGlowButton(
-                              label: _busy ? 'Verifying…' : tr('Unlock Workspace'),
-                              icon: Icons.lock_open_rounded,
-                              expanded: true,
-                              onPressed: _busy ? null : _submitPassword,
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (lock.biometricsAvailable) ...[
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () => setState(() {
-                            _showPassword = false;
-                            _error = null;
-                          }),
-                          icon: const Icon(Icons.fingerprint_rounded, size: 18),
-                          label: Text(
-                            tr('Use biometrics'),
-                            style: friendFont(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-
-                    const SizedBox(height: 40),
-                    TextButton(
-                      onPressed: () async {
-                        await ref.read(authControllerProvider).logout();
-                        if (!context.mounted) return;
-                        ref.read(appLockProvider.notifier).unlockWithPassword();
-                        context.go('/login');
-                      },
-                      child: Text(
-                        tr('Sign in with a different counselor account'),
-                        style: friendFont(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: FriendColors.textMuted,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
                   ],
-                ),
+                  const SizedBox(height: 40),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: FriendColors.textSecondary),
+                    onPressed: () async {
+                      await ref.read(authControllerProvider).logout();
+                      if (!context.mounted) return;
+                      ref.read(appLockProvider.notifier).unlockWithPassword();
+                      context.go('/login');
+                    },
+                    child: Text(tr('Sign in with a different account')),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

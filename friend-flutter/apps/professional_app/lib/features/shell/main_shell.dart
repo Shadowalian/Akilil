@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'pro_stitch_chrome.dart';
 
-/// Bottom-nav shell — Stitch glass dock + clinical canvas.
+/// Tab shell: content above, docked tab bar below.
 class MainShell extends StatelessWidget {
   MainShell({super.key, required this.child});
   final Widget child;
@@ -40,20 +40,13 @@ class MainShell extends StatelessWidget {
         location.contains('/room');
     return Material(
       color: FriendColors.background,
-      child: Stack(
-        fit: StackFit.expand,
+      child: Column(
         children: [
-          const FriendAtmosphere(),
-          Positioned.fill(child: child),
+          Expanded(child: child),
           if (!hideNav)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: ProStitchBottomNav(
-                selectedIndex: index,
-                onSelected: (i) => context.go(_tabs[i].path),
-              ),
+            ProStitchBottomNav(
+              selectedIndex: index,
+              onSelected: (i) => context.go(_tabs[i].path),
             ),
         ],
       ),

@@ -1,5 +1,4 @@
 import 'package:friend_user/l10n/tr.dart';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -11,14 +10,7 @@ class BrandAssets {
 
   /// The Akilil mark: an open teal ring around a clay core.
   static Widget mark({double size = 56, Color color = FriendColors.primary, Color core = FriendColors.accent}) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: _AkililMarkPainter(color: color, coreColor: core),
-        size: Size(size, size),
-      ),
-    );
+    return AkililMark(size: size, ring: color, core: core);
   }
 
   /// Mark plus wordmark, for the top of auth screens.
@@ -43,39 +35,3 @@ class BrandAssets {
   }
 }
 
-class _AkililMarkPainter extends CustomPainter {
-  _AkililMarkPainter({this.color = FriendColors.primary, this.coreColor = FriendColors.accent});
-
-  final Color color;
-  final Color coreColor;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final stroke = size.width * (5.4 / 40);
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width / 2) - stroke / 2;
-
-    final arcPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..strokeCap = StrokeCap.round
-      ..color = color;
-
-    // Open arc — same silhouette as website #i-mark
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi * 0.15,
-      math.pi * 1.55,
-      false,
-      arcPaint,
-    );
-
-    final coreRadius = size.width * (5.4 / 40);
-    final corePaint = Paint()..color = coreColor;
-
-    canvas.drawCircle(center, coreRadius, corePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _AkililMarkPainter old) => old.color != color || old.coreColor != coreColor;
-}

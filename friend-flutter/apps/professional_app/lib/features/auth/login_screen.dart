@@ -1,4 +1,6 @@
 import 'package:core/core.dart';
+import '../shell/pro_stitch_chrome.dart';
+import '../../l10n/language.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:friend_professional/l10n/tr.dart';
@@ -107,212 +109,144 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const FriendAtmosphere(),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        proBrandMark(size: 72),
-                        const SizedBox(height: 24),
-                        Text(
-                          tr('Welcome back'),
-                          style: friendFont(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
-                            color: FriendColors.textPrimary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          tr('Sign in to your Akilil Pro workspace'),
-                          style: friendFont(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: FriendColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 32),
-                        TextFormField(
-                          controller: _emailCtrl,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            labelText: tr('Email'),
-                            labelStyle: friendFont(),
-                            prefixIcon: const Icon(Icons.alternate_email),
-                          ),
-                          validator: (v) =>
-                              (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _passCtrl,
-                          obscureText: _obscure,
-                          onFieldSubmitted: (_) => _submit(),
-                          decoration: InputDecoration(
-                            labelText: tr('Password'),
-                            labelStyle: friendFont(),
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            suffixIcon: IconButton(
-                              icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
-                              onPressed: () => setState(() => _obscure = !_obscure),
-                            ),
-                          ),
-                          validator: (v) =>
-                              (v == null || v.length < 6) ? 'Min 6 characters' : null,
-                        ),
-                        if (_error != null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            _error!,
-                            style: friendFont(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: FriendColors.error,
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 24),
-                        FilledButton(
-                          onPressed: _busy ? null : _submit,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: FriendColors.primary,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: _busy
-                              ? const SizedBox(
-                                  height: 20, width: 20,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2.5, color: Colors.white))
-                              : Text(
-                                  tr('Sign in with password'),
-                                  style: friendFont(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                        ),
+    final theme = Theme.of(context);
+    final lock = ref.read(appLockProvider.notifier);
 
-                        // ── Biometric quick-login ───────────────
-                        Builder(builder: (context) {
-                          final lock = ref.read(appLockProvider.notifier);
-                          if (!lock.biometricsAvailable) {
-                            return const SizedBox.shrink();
-                          }
-                          return Column(
-                            children: [
-                              const SizedBox(height: 18),
-                              Row(
-                                children: [
-                                  const Expanded(child: Divider()),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    child: Text(
-                                      'or',
-                                      style: friendFont(
-                                        fontSize: 13,
-                                        color: FriendColors.textMuted,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+    Widget label(String text, {Widget? trailing}) => Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            children: [
+              Expanded(child: Text(text, style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textPrimary))),
+              if (trailing != null) trailing,
+            ],
+          ),
+        );
+
+    return Scaffold(
+      backgroundColor: FriendColors.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 12, FriendLayout.horizontal, 0),
+              child: Row(
+                children: [
+                  proBrandMark(size: 26),
+                  const SizedBox(width: 8),
+                  const ProWordmark(),
+                  const Spacer(),
+                  const ProLanguageSwitch(),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 40, 24, 32),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: AutofillGroup(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Semantics(header: true, child: Text(tr('Welcome back'), style: theme.textTheme.headlineLarge)),
+                            const SizedBox(height: 8),
+                            Text(
+                              tr('Sign in to your Akilil Pro workspace'),
+                              style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
+                            ),
+                            const SizedBox(height: 32),
+                            label(tr('Email')),
+                            TextFormField(
+                              controller: _emailCtrl,
+                              keyboardType: TextInputType.emailAddress,
+                              autofillHints: const [AutofillHints.email],
+                              textInputAction: TextInputAction.next,
+                              decoration: const InputDecoration(hintText: 'you@example.com'),
+                              validator: (v) => (v == null || !v.contains('@')) ? tr('Enter a valid email') : null,
+                            ),
+                            const SizedBox(height: 20),
+                            label(
+                              tr('Password'),
+                              trailing: GestureDetector(
+                                onTap: () => showForgotPasswordFlow(
+                                  context,
+                                  ref.read(dioProvider),
+                                  initialEmail: _emailCtrl.text.trim(),
+                                ),
+                                child: Text(
+                                  tr('Forgot password?'),
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    color: FriendColors.primary,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                  const Expanded(child: Divider()),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              GestureDetector(
-                                onTap: _bioBusy ? null : _tryBiometric,
-                                child: Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: const LinearGradient(
-                                      colors: [Color(0xFF2AADCF), FriendColors.primary],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: FriendColors.primary.withValues(alpha: 0.35),
-                                        blurRadius: 18,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
-                                  child: _bioBusy
-                                      ? const Center(
-                                          child: SizedBox(
-                                            width: 22,
-                                            height: 22,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.5,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        )
-                                      : const Icon(
-                                          Icons.fingerprint_rounded,
-                                          size: 32,
-                                          color: Colors.white,
-                                        ),
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                tr('Sign in with Face ID / Fingerprint'),
-                                style: friendFont(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: FriendColors.textMuted,
+                            ),
+                            TextFormField(
+                              controller: _passCtrl,
+                              obscureText: _obscure,
+                              autofillHints: const [AutofillHints.password],
+                              onFieldSubmitted: (_) => _submit(),
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  tooltip: _obscure ? tr('Show password') : tr('Hide password'),
+                                  icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 20),
+                                  onPressed: () => setState(() => _obscure = !_obscure),
+                                ),
+                              ),
+                              validator: (v) => (v == null || v.length < 6) ? tr('At least 6 characters') : null,
+                            ),
+                            if (_error != null) ...[
+                              const SizedBox(height: 20),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: FriendColors.errorContainer,
+                                  borderRadius: BorderRadius.circular(FriendRadii.medium),
+                                ),
+                                child: Text(
+                                  _error!,
+                                  style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.onErrorContainer),
                                 ),
                               ),
                             ],
-                          );
-                        }),
-
-                        const SizedBox(height: 20),
-                        TextButton(
-                          onPressed: () => showForgotPasswordFlow(
-                            context,
-                            ref.read(dioProvider),
-                            initialEmail: _emailCtrl.text.trim(),
-                          ),
-                          child: Text(tr('Forgot password?')),
+                            const SizedBox(height: 28),
+                            FriendGlowButton(label: tr('Sign in'), busy: _busy, expanded: true, onPressed: _submit),
+                            if (lock.biometricsAvailable) ...[
+                              const SizedBox(height: 12),
+                              FriendGlowButton(
+                                label: tr('Sign in with Face ID / Fingerprint'),
+                                icon: Icons.fingerprint_rounded,
+                                secondary: true,
+                                expanded: true,
+                                busy: _bioBusy,
+                                onPressed: _tryBiometric,
+                              ),
+                            ],
+                          ],
                         ),
-                        TextButton(
-                          // go_router app: Navigator.pushNamed has no route table and threw.
-                          onPressed: () => context.go('/register'),
-                          child: Text(
-                            tr('New here? Apply to join Akilil Pro'),
-                            style: friendFont(
-                              fontWeight: FontWeight.w600,
-                              color: FriendColors.primary,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(tr('New to Akilil Pro?'), style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary)),
+                  TextButton(onPressed: () => context.go('/register'), child: Text(tr('Apply to join'))),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

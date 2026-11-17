@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:core/core.dart';
 
+import '../studio/studio_screens.dart';
+
 /// Availability management. Two halves: weekly rules (the recurring
 /// "I'm free Mondays 9–5") and one-off blocks (vacations, sick days).
 /// Both are list views with FABs to add new entries.
@@ -20,35 +22,19 @@ final _blocksProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((
   return ((res.data?['data'] as List?) ?? const []).cast<Map<String, dynamic>>();
 });
 
+/// The professional's own session length, so slots match bookings.
+Future<int> _sessionMinutes(WidgetRef ref) async {
+  try {
+    final profile = await ref.read(myProfileProvider.future);
+    final data = (profile['data'] as Map?) ?? profile;
+    return (data['session_duration_minutes'] as num?)?.toInt() ?? 50;
+  } catch (_) {
+    return 50;
+  }
+}
+
 class AvailabilityScreen extends ConsumerWidget {
   const AvailabilityScreen({super.key});
-
-  Future<void> _setEveryDayEveryTime(BuildContext context, WidgetRef ref) async {
-    final dio = ref.read(dioProvider);
-    try {
-      for (var day = 1; day <= 7; day++) {
-        await dio.post('/professional/availability/rules', data: {
-          'weekday': day,
-          'start_time': '00:00',
-          'end_time': '23:59',
-          'slot_duration_minutes': 45,
-          'buffer_minutes': 0,
-          'timezone': 'Africa/Addis_Ababa',
-          'is_active': true,
-        });
-      }
-      ref.invalidate(_rulesProvider);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr('Open every day, all day.'))),
-      );
-    } on DioException catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_saveError(e))),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -67,21 +53,6 @@ class AvailabilityScreen extends ConsumerWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-              child: FilledButton.icon(
-                onPressed: () => _setEveryDayEveryTime(context, ref),
-                icon: const Icon(Icons.all_inclusive),
-                label: Text(tr('Every day, every time')),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Text(
-                tr('Opens Mon–Sun, 00:00–23:59 for bookings.'),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
             Expanded(
               child: TabBarView(children: [
                 _RulesList(
@@ -114,40 +85,55 @@ class _RulesList extends ConsumerWidget {
     return Scaffold(
       body: provider.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text("Couldn't load hours.")),
+        error: (e, _) => FriendEmptyState(
+          icon: Icons.cloud_off_outlined,
+          title: tr("Couldn't load hours."),
+          ctaLabel: tr('Try again'),
+          onCta: onChanged,
+        ),
         data: (list) => list.isEmpty
-            ? Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text(
-                    tr('No weekly hours yet. Tap “Every day, every time” above, or Add hours.'),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+            ? FriendEmptyState(
+                icon: Icons.calendar_month_outlined,
+                title: tr('No weekly hours yet'),
+                message: tr('Clients can only book the hours you open here.'),
+                ctaLabel: tr('Use typical hours (Mon–Sat, 9:00–18:00)'),
+                onCta: () => _setTypicalHours(context, ref, onChanged),
               )
-            : ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-                itemCount: list.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (_, i) {
-                  final r = list[i];
-                  return Card(
-                    child: ListTile(
-                      title: Text(_weekdayName(r['weekday'] as int?)),
-                      subtitle: Text('${r['start_time']} – ${r['end_time']}'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () async {
-                          final dio = ref.read(dioProvider);
-                          await dio.delete(
-                            '/professional/availability/rules/${r['id']}',
-                          );
-                          onChanged();
-                        },
-                      ),
-                    ),
-                  );
-                },
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 16, FriendLayout.horizontal, 100),
+                children: [
+                  FriendListGroup(
+                    dividerIndent: 16,
+                    children: [
+                      for (final r in list)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 4, 8),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 56,
+                                child: Text(_weekdayName(r['weekday'] as int?), style: Theme.of(context).textTheme.titleSmall),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  '${_hhmm(r['start_time'])} – ${_hhmm(r['end_time'])}',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontFeatures: friendTabular),
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: tr('Remove'),
+                                icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                                onPressed: () async {
+                                  await ref.read(dioProvider).delete('/professional/availability/rules/${r['id']}');
+                                  onChanged();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
               ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -156,6 +142,35 @@ class _RulesList extends ConsumerWidget {
         label: Text(tr('Add hours')),
       ),
     );
+  }
+
+  static String _hhmm(Object? t) {
+    final v = '$t';
+    return v.length >= 5 ? v.substring(0, 5) : v;
+  }
+
+  /// Opens Monday to Saturday, 9:00–18:00, using the professional's own
+  /// session length so back-to-back bookings never overlap.
+  Future<void> _setTypicalHours(BuildContext context, WidgetRef ref, VoidCallback onSaved) async {
+    final dio = ref.read(dioProvider);
+    final minutes = await _sessionMinutes(ref);
+    try {
+      for (var day = 1; day <= 6; day++) {
+        await dio.post('/professional/availability/rules', data: {
+          'weekday': day,
+          'start_time': '09:00',
+          'end_time': '18:00',
+          'slot_duration_minutes': minutes,
+          'buffer_minutes': 10,
+          'timezone': 'Africa/Addis_Ababa',
+          'is_active': true,
+        });
+      }
+      onSaved();
+    } on DioException catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_saveError(e))));
+    }
   }
 
   String _weekdayName(int? w) =>
@@ -199,7 +214,7 @@ class _RulesList extends ConsumerWidget {
                           final t = await showTimePicker(context: ctx, initialTime: start);
                           if (t != null) setState(() => start = t);
                         },
-                        child: Text('Start: ${_fmt(start)}'),
+                        child: Text(trx('Start ${_fmt(start)}', 'መጀመሪያ ${_fmt(start)}')),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -209,7 +224,7 @@ class _RulesList extends ConsumerWidget {
                           final t = await showTimePicker(context: ctx, initialTime: end);
                           if (t != null) setState(() => end = t);
                         },
-                        child: Text('End: ${_fmt(end)}'),
+                        child: Text(trx('End ${_fmt(end)}', 'መጨረሻ ${_fmt(end)}')),
                       ),
                     ),
                   ],
@@ -218,13 +233,14 @@ class _RulesList extends ConsumerWidget {
                 FilledButton(
                   onPressed: () async {
                     final dio = ref.read(dioProvider);
+                    final minutes = await _sessionMinutes(ref);
                     try {
                       await dio.post('/professional/availability/rules', data: {
                         'weekday': weekday,
                         'start_time': _fmt(start),
                         'end_time': _fmt(end),
-                        'slot_duration_minutes': 45,
-                        'buffer_minutes': 0,
+                        'slot_duration_minutes': minutes,
+                        'buffer_minutes': 10,
                         'timezone': 'Africa/Addis_Ababa',
                         'is_active': true,
                       });

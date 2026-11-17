@@ -43,7 +43,8 @@ return [
     /* ---- Money ------------------------------------------------------ */
 
     // Single platform currency. Wallets, prices, gifts and payouts all use it.
-    'currency' => env('AKILIL_CURRENCY', 'USD'),
+    // Ethiopian birr unless the deployment says otherwise.
+    'currency' => env('AKILIL_CURRENCY', 'ETB'),
 
     'fees' => [
         // Platform commission kept from each completed session / group seat.

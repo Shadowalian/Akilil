@@ -1,12 +1,15 @@
 /// Formats minor units as money: `formatMoney(2500, 'ETB')` → `ETB 25`,
-/// `formatMoney(2550, 'USD')` → `USD 25.50`.
+/// `formatMoney(255000, 'ETB')` → `2,550 ETB`.
+/// "5,760 ETB" — amount first, grouped thousands, then the currency, the
+/// way prices are written across both apps.
 String formatMoney(num? cents, [String? currency]) {
   final value = (cents ?? 0) / 100;
-  final text = value == value.roundToDouble()
-      ? value.toStringAsFixed(0)
-      : value.toStringAsFixed(2);
+  final whole = value.truncate().abs();
+  final grouped = whole.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => ',');
+  final fraction = value == value.roundToDouble() ? '' : (value.abs() - whole).toStringAsFixed(2).substring(1);
+  final text = '${value < 0 ? '-' : ''}$grouped$fraction';
   final code = (currency ?? '').trim();
-  return code.isEmpty ? text : '$code $text';
+  return code.isEmpty ? text : '$text $code';
 }
 
 /// Best human-readable message from an API error body.

@@ -18,6 +18,7 @@ export 'src/theme/design_system_preview.dart';
 export 'src/ui/candy_widgets.dart';
 export 'src/ui/akilil_stitch_widgets.dart';
 export 'src/ui/language_switch.dart';
+export 'src/ui/brand_mark.dart';
 export 'src/networking/api_client.dart';
 export 'src/auth/token_storage.dart';
 export 'src/jitsi/jitsi_session_view.dart';

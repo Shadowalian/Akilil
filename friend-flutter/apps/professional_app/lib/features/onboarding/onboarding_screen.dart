@@ -205,8 +205,8 @@ class _S extends ConsumerState<OnboardingScreen> {
             controller: _rate,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              labelText: tr('Hourly rate (USD)'),
-              prefixIcon: Icon(Icons.attach_money),
+              labelText: tr('Price per session (ETB)'),
+              prefixIcon: Icon(Icons.payments_outlined),
             ),
           ),
         ]),

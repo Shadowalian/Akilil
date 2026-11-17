@@ -291,7 +291,12 @@ class FriendAppTheme {
               color: s.contains(WidgetState.selected) ? FriendColors.ink : FriendColors.borderStrong,
             )),
         shape: const StadiumBorder(),
-        labelStyle: text.labelMedium?.copyWith(color: FriendColors.textPrimary),
+        // Selected chips are ink, so their label must flip to white.
+        labelStyle: text.labelMedium?.copyWith(
+          color: WidgetStateColor.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? Colors.white : FriendColors.textPrimary,
+          ),
+        ),
         secondaryLabelStyle: text.labelMedium?.copyWith(color: Colors.white),
         labelPadding: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),

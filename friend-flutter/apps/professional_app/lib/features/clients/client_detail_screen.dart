@@ -230,9 +230,15 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
     final formats = {for (final a in appts) (a['care_format'] as String? ?? 'individual')};
     final recipes = {for (final a in appts) if (a['recipe'] is Map) (a['recipe'] as Map)['title']};
     final parts = [
-      formats.map((f) => f[0].toUpperCase() + f.substring(1)).join(', '),
-      if (recipes.isNotEmpty) 'cooked: ${recipes.join(', ')}',
-      '${appts.length} booked',
+      formats.map((f) => switch (f) {
+            'couples' => tr('Couples'),
+            'family' => tr('Family'),
+            'child' => tr('Children'),
+            'teen' => tr('Teens'),
+            _ => tr('Individual'),
+          }).join(', '),
+      if (recipes.isNotEmpty) trx('cooked: ${recipes.join(', ')}', 'ያበሰሉት፦ ${recipes.join('፣ ')}'),
+      trx('${appts.length} booked', '${appts.length} ቀጠሮዎች'),
     ];
     return parts.join(' · ');
   }
@@ -390,7 +396,7 @@ class _DiagnosticCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  tr('SESSIONS SO FAR'),
+                  tr('Sessions so far'),
                   style: friendFont(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -455,7 +461,7 @@ class _SoapHistorySection extends StatelessWidget {
             const Icon(Icons.history_edu, size: 18, color: FriendColors.primary),
             const SizedBox(width: 6),
             Text(
-              tr('SOAP Session History'),
+              tr('Session notes'),
               style: friendFont(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const Spacer(),
@@ -567,7 +573,7 @@ class _SoapCard extends StatelessWidget {
             TextButton.icon(
               onPressed: onToggle,
               icon: Icon(expanded ? Icons.expand_less : Icons.expand_more),
-              label: Text(expanded ? 'Collapse Detailed SOAP' : tr('Expand Detailed SOAP')),
+              label: Text(expanded ? tr('Show less') : tr('Show full note')),
             ),
         ],
       ),
@@ -626,8 +632,8 @@ class _SoapBlock extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                label.toUpperCase(),
-                style: friendFont(fontSize: 10, fontWeight: FontWeight.w600),
+                label,
+                style: friendFont(fontSize: 12, fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -664,7 +670,7 @@ class _WorksheetsSection extends StatelessWidget {
               const Icon(Icons.task_alt, size: 18, color: FriendColors.primary),
               const SizedBox(width: 6),
               Text(
-                tr('Assigned Worksheets & Somatics'),
+                tr('Action items'),
                 style: friendFont(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const Spacer(),
@@ -780,7 +786,7 @@ class _DossierActionBar extends StatelessWidget {
                 Icon(Icons.lock_outline, size: 14, color: FriendColors.accent),
                 const SizedBox(width: 6),
                 Text(
-                  tr('VISIBLE ONLY TO YOU'),
+                  tr('Visible only to you'),
                   style: friendFont(
                     fontSize: 9,
                     fontWeight: FontWeight.w600,
