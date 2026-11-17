@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -53,6 +54,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           await ref.read(authControllerProvider).login(
                 email: creds.email,
                 password: creds.password,
+                askTwoFactorCode: () => showTwoFactorPrompt(context),
               );
           return;
         } catch (_) {
@@ -74,6 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref.read(authControllerProvider).login(
             email: email,
             password: password,
+            askTwoFactorCode: () => showTwoFactorPrompt(context),
           );
       await ref.read(appLockProvider.notifier).saveBiometricCredentials(
             email: email,
@@ -148,7 +151,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           controller: _emailCtrl,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            labelText: 'Counselor Email',
+                            labelText: 'Email',
                             labelStyle: GoogleFonts.urbanist(),
                             prefixIcon: const Icon(Icons.alternate_email),
                           ),
@@ -287,9 +290,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         const SizedBox(height: 20),
                         TextButton(
-                          onPressed: () => Navigator.of(context).pushNamed('/register'),
+                          onPressed: () => showForgotPasswordFlow(
+                            context,
+                            ref.read(dioProvider),
+                            initialEmail: _emailCtrl.text.trim(),
+                          ),
+                          child: const Text('Forgot password?'),
+                        ),
+                        TextButton(
+                          // go_router app: Navigator.pushNamed has no route table and threw.
+                          onPressed: () => context.go('/register'),
                           child: Text(
-                            'New therapist? Apply to join Akilil Care',
+                            'New here? Apply to join Akilil Pro',
                             style: GoogleFonts.urbanist(
                               fontWeight: FontWeight.w600,
                               color: FriendColors.primary,

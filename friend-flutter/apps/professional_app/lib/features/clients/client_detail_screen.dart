@@ -10,6 +10,12 @@ import 'package:core/core.dart';
 import '../auth/auth_controller.dart';
 import '../shell/pro_stitch_chrome.dart';
 
+/// The client's safety plan (empty lists when they have not written one).
+final _safetyPlanProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, int>((ref, userId) async {
+  final res = await ref.read(dioProvider).get<Map<String, dynamic>>('/professional/clients/$userId/safety-plan');
+  return res.data ?? const {};
+});
+
 final _clientDossierProvider = FutureProvider.autoDispose
     .family<Map<String, dynamic>, int>((ref, clientUserId) async {
   final dio = ref.read(dioProvider);
@@ -182,6 +188,8 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
                   ),
                   const SizedBox(height: 16),
                   _WorksheetsSection(actionItems: latestNote?['action_items']),
+                  const SizedBox(height: 16),
+                  _SafetyPlanCard(plan: ref.watch(_safetyPlanProvider(clientId)).valueOrNull),
                   const SizedBox(height: 16),
                   OutlinedButton.icon(
                     onPressed: _busy ? null : _message,
@@ -805,3 +813,64 @@ String _statusLabel(String? status) => switch (status) {
       'no_show' => 'No-show',
       _ => 'Booked',
     };
+
+
+/// Read-only view of the client's own safety plan.
+class _SafetyPlanCard extends StatelessWidget {
+  const _SafetyPlanCard({required this.plan});
+  final Map<String, dynamic>? plan;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final p = plan;
+    List<String> list(String key) => ((p?[key] as List?) ?? const []).map((e) => '$e').toList();
+    final people = ((p?['people'] as List?) ?? const [])
+        .map((e) => '${(e as Map)['name']}${(e['phone'] ?? '').toString().isEmpty ? '' : ' · ${e['phone']}'}')
+        .toList();
+    final empty = p == null ||
+        [list('warning_signs'), list('coping'), people, list('environment')].every((l) => l.isEmpty);
+
+    Widget part(String title, List<String> items) => items.isEmpty
+        ? const SizedBox.shrink()
+        : Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: theme.textTheme.labelLarge),
+                for (final i in items) Text('• $i', style: theme.textTheme.bodyMedium),
+              ],
+            ),
+          );
+
+    return ProStitchCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.health_and_safety_outlined, size: 18, color: FriendColors.primary),
+              SizedBox(width: 6),
+              ProStitchMicroLabel('Their safety plan'),
+            ],
+          ),
+          if (empty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                'They have not written one yet. If it fits your work together, you could build it with them in a session.',
+                style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
+              ),
+            )
+          else ...[
+            part('Warning signs', list('warning_signs')),
+            part('Things that help', list('coping')),
+            part('People they can call', people),
+            part('Making things safer', list('environment')),
+          ],
+        ],
+      ),
+    );
+  }
+}

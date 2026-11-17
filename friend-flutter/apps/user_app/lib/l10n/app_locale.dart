@@ -60,6 +60,13 @@ class S {
   S._(this._am);
   final bool _am;
 
+  bool get isAmharic => _am;
+
+  /// Inline copy for one screen: `s.t('English', 'አማርኛ')`. Keeps the
+  /// Amharic beside the English it replaces, so it is written for that
+  /// context rather than translated word by word from a key.
+  String t(String en, String am) => _am ? am : en;
+
   factory S.of(AppLanguage lang) => S._(lang == AppLanguage.am);
 
   String get appName => 'Akilil';

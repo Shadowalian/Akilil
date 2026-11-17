@@ -125,6 +125,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(Dependent::class, 'linked_user_id');
     }
 
+    public function safetyPlan(): HasOne
+    {
+        return $this->hasOne(SafetyPlan::class);
+    }
+
     public function recipes(): HasMany
     {
         return $this->hasMany(Recipe::class, 'professional_user_id');

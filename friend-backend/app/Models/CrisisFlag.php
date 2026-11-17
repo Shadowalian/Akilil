@@ -17,7 +17,8 @@ class CrisisFlag extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'source_type', 'source_id',
+        'user_id', 'kind', 'source_type', 'source_id',
+        'contact_phone', 'contact_method', 'user_message', 'contacted_at',
         'severity', 'matched_signals', 'status',
         'handled_by', 'handled_at', 'handling_notes',
     ];
@@ -28,10 +29,14 @@ class CrisisFlag extends Model
             'severity'        => 'decimal:3',
             'matched_signals' => 'array',
             'handled_at'      => 'datetime',
+            'contacted_at'    => 'datetime',
+            'user_message'    => 'encrypted',
         ];
     }
 
     public function user(): BelongsTo        { return $this->belongsTo(User::class); }
     public function handler(): BelongsTo     { return $this->belongsTo(User::class, 'handled_by'); }
+    /** Alias used by the admin table. */
+    public function handledBy(): BelongsTo   { return $this->handler(); }
     public function source(): MorphTo        { return $this->morphTo(); }
 }

@@ -43,10 +43,40 @@ class CrisisFlagResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+            Forms\Components\Section::make('Reach this person')
+                ->description('If they may be in immediate danger, call emergency services (907 ambulance, 991 police) as well.')
+                ->schema([
+                    Forms\Components\Placeholder::make('who')->label('Name')
+                        ->content(fn (?CrisisFlag $r) => $r?->user?->name),
+                    Forms\Components\Placeholder::make('phone')->label('Phone')
+                        ->content(fn (?CrisisFlag $r) => $r?->contact_phone ?: $r?->user?->phone ?: 'Not given — use email or in-app message'),
+                    Forms\Components\Placeholder::make('email')->label('Email')
+                        ->content(fn (?CrisisFlag $r) => $r?->user?->email),
+                    Forms\Components\Placeholder::make('method')->label('Prefers')
+                        ->content(fn (?CrisisFlag $r) => $r?->contact_method === 'message' ? 'A message' : 'A phone call'),
+                    Forms\Components\Placeholder::make('said')->label('What they wrote')
+                        ->content(fn (?CrisisFlag $r) => $r?->user_message ?: '—')
+                        ->columnSpanFull(),
+                    Forms\Components\Placeholder::make('plan')->label('Their safety plan')
+                        ->content(function (?CrisisFlag $r) {
+                            $p = $r?->user?->safetyPlan?->plan;
+                            if (! $p) {
+                                return 'They have not written one.';
+                            }
+                            $people = collect($p['people'] ?? [])->map(fn ($x) => $x['name'].(! empty($x['phone']) ? ' ('.$x['phone'].')' : ''))->join(', ');
+
+                            return new \Illuminate\Support\HtmlString(
+                                '<b>Warning signs:</b> '.e(implode('; ', $p['warning_signs'] ?? []) ?: '—').'<br>'.
+                                '<b>What helps:</b> '.e(implode('; ', $p['coping'] ?? []) ?: '—').'<br>'.
+                                '<b>People to call:</b> '.e($people ?: '—').'<br>'.
+                                '<b>Making things safer:</b> '.e(implode('; ', $p['environment'] ?? []) ?: '—')
+                            );
+                        })
+                        ->columnSpanFull(),
+                ])
+                ->columns(2),
             Forms\Components\Section::make('Flag')
                 ->schema([
-                    Forms\Components\TextInput::make('user.name')->label('User')->disabled(),
-                    Forms\Components\TextInput::make('user.email')->label('Email')->disabled(),
                     Forms\Components\TextInput::make('severity')->numeric()->step('0.001')->disabled(),
                     Forms\Components\TextInput::make('source_type')->label('Source')->disabled(),
                     Forms\Components\TextInput::make('status')->disabled(),
@@ -64,10 +94,24 @@ class CrisisFlagResource extends Resource
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            // People asking for help come before automatic content scans.
+            ->modifyQueryUsing(fn ($query) => $query->with('user.safetyPlan')->orderByRaw("CASE WHEN status IN ('open','in_review') AND kind IN ('help_request','screener') THEN 0 ELSE 1 END"))
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->label('Flagged'),
+                Tables\Columns\TextColumn::make('kind')->label('Type')->badge()
+                    ->formatStateUsing(fn (string $state) => match ($state) {
+                        'help_request' => 'Asked for help',
+                        'screener'     => 'Screener: self-harm',
+                        default        => 'Content scan',
+                    })
+                    ->color(fn (string $state) => $state === 'content' ? 'warning' : 'danger'),
                 Tables\Columns\TextColumn::make('user.name')->label('User')->searchable(),
+                Tables\Columns\TextColumn::make('contact_phone')->label('Phone')
+                    ->state(fn (CrisisFlag $r) => $r->contact_phone ?: $r->user?->phone)
+                    ->placeholder('—')
+                    ->url(fn (CrisisFlag $r) => ($p = $r->contact_phone ?: $r->user?->phone) ? 'tel:'.preg_replace('/[^\d+]/', '', $p) : null),
+                Tables\Columns\TextColumn::make('contacted_at')->label('Contacted')->since()->placeholder('Not yet'),
                 Tables\Columns\TextColumn::make('severity')
                     ->formatStateUsing(fn ($state) => number_format((float) $state, 3))
                     ->badge()
@@ -122,6 +166,19 @@ class CrisisFlagResource extends Resource
                             'handling_notes'=> $data['handling_notes'],
                         ]);
                         Notification::make()->title('Flag marked false positive')->info()->send();
+                    }),
+                Tables\Actions\Action::make('contacting')
+                    ->label('I am contacting them')
+                    ->icon('heroicon-o-phone-arrow-up-right')
+                    ->color('danger')
+                    ->visible(fn (CrisisFlag $r) => $r->contacted_at === null && in_array($r->status, ['open', 'in_review']))
+                    ->action(function (CrisisFlag $record) {
+                        $record->update([
+                            'handled_by'   => $record->handled_by ?? Auth::id(),
+                            'status'       => 'in_review',
+                            'contacted_at' => now(),
+                        ]);
+                        Notification::make()->title('Logged. Record the outcome when you are done.')->success()->send();
                     }),
                 Tables\Actions\Action::make('assign_to_me')
                     ->icon('heroicon-o-user-plus')

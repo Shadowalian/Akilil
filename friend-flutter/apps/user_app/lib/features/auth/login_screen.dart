@@ -61,6 +61,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           await ref.read(authControllerProvider).login(
                 email: creds.email,
                 password: creds.password,
+                askTwoFactorCode: () => showTwoFactorPrompt(context),
               );
           return;
         } catch (_) {
@@ -85,6 +86,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref.read(authControllerProvider).login(
             email: email,
             password: password,
+            askTwoFactorCode: () => showTwoFactorPrompt(context),
           );
       // Save credentials for future biometric 1-tap sign-ins
       await ref.read(appLockProvider.notifier).saveBiometricCredentials(
@@ -278,8 +280,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               );
                             }),
                             const SizedBox(height: 26),
-                            const FreudSocialRow(),
-                            const SizedBox(height: 26),
                             FreudLink(
                               leading: s.dontHaveAccount,
                               label: s.signUp,
@@ -288,13 +288,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             const SizedBox(height: 14),
                             Center(
                               child: GestureDetector(
-                                onTap: () => ScaffoldMessenger.of(context)
-                                    .showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Password reset is coming soon — reach out to support for now.',
-                                    ),
-                                  ),
+                                onTap: () => showForgotPasswordFlow(
+                                  context,
+                                  ref.read(dioProvider),
+                                  initialEmail: _emailCtrl.text.trim(),
                                 ),
                                 child: Text(
                                   s.forgotPassword,

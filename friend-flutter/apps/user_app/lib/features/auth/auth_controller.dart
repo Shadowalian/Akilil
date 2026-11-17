@@ -94,14 +94,22 @@ class AuthController extends ChangeNotifier {
 
   /// `POST /api/auth/login` — server returns token + user; use that so we
   /// don't depend on a slow/wrapping `/me` round-trip to finish sign-in.
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({
+    required String email,
+    required String password,
+    Future<String?> Function()? askTwoFactorCode,
+  }) async {
     final res = await _dio.post<Map<String, dynamic>>(
       '/auth/login',
       data: {'email': email, 'password': password},
     );
-    final data = res.data ?? const {};
+    var data = res.data ?? const <String, dynamic>{};
     if (data['requires_2fa'] == true) {
-      throw StateError('Two-factor login is not supported in this build yet.');
+      final code = await askTwoFactorCode?.call();
+      if (code == null || code.isEmpty) {
+        throw StateError('Sign-in cancelled.');
+      }
+      data = await completeTwoFactor(_dio, data['challenge_token'] as String, code);
     }
     final token = data['token'] as String?;
     if (token == null || token.isEmpty) {

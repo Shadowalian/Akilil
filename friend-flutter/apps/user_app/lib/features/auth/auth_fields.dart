@@ -201,38 +201,3 @@ class FreudAuthError extends StatelessWidget {
   }
 }
 
-/// Decorative social row — Akilil has no OAuth yet, so these are inert
-/// placeholders that keep the Freud composition without faking a sign-in.
-class FreudSocialRow extends StatelessWidget {
-  const FreudSocialRow({super.key});
-
-  static const _icons = [
-    Icons.facebook_rounded,
-    Icons.g_mobiledata_rounded,
-    Icons.camera_alt_rounded,
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (final icon in _icons)
-          Container(
-            width: 52,
-            height: 52,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: const BoxDecoration(
-              color: FriendColors.primaryLight,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              size: 24,
-              color: FriendColors.wood.withValues(alpha: 0.55),
-            ),
-          ),
-      ],
-    );
-  }
-}

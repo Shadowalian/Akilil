@@ -7,6 +7,7 @@ import 'package:core/core.dart';
 
 import '../../l10n/app_locale.dart';
 import '../../router.dart';
+import 'help_request.dart';
 import 'safety_plan_store.dart';
 import '../worksheets/box_breathing_dialog.dart';
 
@@ -96,6 +97,8 @@ class CrisisScreen extends ConsumerWidget {
             subtitle: s.listenersAvailableFree,
             onTap: () => context.push(AppRoutes.home),
           ),
+          const SizedBox(height: 14),
+          _HelpRequestCard(),
           const SizedBox(height: 14),
           _EmergencyCard(
             title: s.emergencyServices,
@@ -524,6 +527,53 @@ class _CrisisResourceCard extends StatelessWidget {
               size: 20,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Ask our team to reach out", or the status of a request already sent.
+class _HelpRequestCard extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(stringsProvider);
+    final alert = ref.watch(helpRequestProvider).valueOrNull;
+    final state = alert?['state'] as String?;
+    final active = state == 'waiting' || state == 'in_progress';
+    final theme = Theme.of(context);
+
+    return CandyCard(
+      tint: FriendColors.primary,
+      accentStripe: true,
+      onTap: () => showHelpRequestSheet(context, ref),
+      child: Row(
+        children: [
+          Icon(active ? Icons.mark_chat_read_rounded : Icons.support_agent_rounded, color: FriendColors.primary, size: 28),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  !active
+                      ? s.t('Ask our team to reach out', 'ቡድናችን እንዲያገኝዎት ይጠይቁ')
+                      : state == 'in_progress'
+                          ? s.t('Our team is contacting you', 'ቡድናችን እያገኘዎት ነው')
+                          : s.t('Our team has been told', 'ለቡድናችን ተነግሯል'),
+                  style: theme.textTheme.titleSmall,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  active
+                      ? s.t('Keep your phone near you. Tap to add details.', 'ስልክዎን አጠገብዎ ያድርጉ። ተጨማሪ ለመንገር ይንኩ።')
+                      : s.t('A real person from Akilil will call or message you', 'ከአኪሊል አንድ ሰው ይደውልልዎታል ወይም መልዕክት ይልክልዎታል'),
+                  style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded),
         ],
       ),
     );

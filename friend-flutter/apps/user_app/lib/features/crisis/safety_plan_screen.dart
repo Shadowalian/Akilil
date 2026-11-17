@@ -116,7 +116,7 @@ class SafetyPlanScreen extends ConsumerWidget {
         children: [
           Text(
             'Fill this in on a calmer day. When things get hard, you will not have to think — just follow it. '
-            'It stays on this phone and is never shared.',
+            'The professionals you book and the Akilil safety team can read it, so they can help you if you reach out.',
             style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
           ),
           const SizedBox(height: 6),

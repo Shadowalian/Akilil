@@ -3,16 +3,19 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:core/core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../crisis/help_request.dart';
 import '../core_data/seed_data.dart';
 
-class SymptomTrackerScreen extends StatefulWidget {
+class SymptomTrackerScreen extends ConsumerStatefulWidget {
   const SymptomTrackerScreen({super.key});
 
   @override
-  State<SymptomTrackerScreen> createState() => _SymptomTrackerScreenState();
+  ConsumerState<SymptomTrackerScreen> createState() => _SymptomTrackerScreenState();
 }
 
-class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
+class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
+  bool _teamAlerted = false;
   String _activeAssessment = 'gad7';
   // Nothing is pre-answered: a screener only means something if you fill it in.
   final Map<int, int> _gad7Answers = {};
@@ -135,16 +138,33 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
                   const SizedBox(height: 6),
                   Text(
                     'If you might act on these thoughts, call 907 for an ambulance now, or go to the nearest hospital. '
-                    'Otherwise, please talk to someone today.',
+                    'Otherwise, please talk to someone today. When you save this check-in, our safety team is told so someone can check on you.',
                     style: GoogleFonts.urbanist(fontSize: 13, height: 1.4, color: FriendColors.onErrorContainer),
                   ),
                   const SizedBox(height: 12),
-                  FilledButton.icon(
-                    onPressed: () => context.push('/crisis'),
-                    style: FilledButton.styleFrom(backgroundColor: FriendColors.error),
-                    icon: const Icon(Icons.support_rounded),
-                    label: const Text('Get support now'),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      FilledButton.icon(
+                        onPressed: () => showHelpRequestSheet(context, ref, reason: 'screener_self_harm'),
+                        style: FilledButton.styleFrom(backgroundColor: FriendColors.error),
+                        icon: const Icon(Icons.support_agent_rounded),
+                        label: const Text('Ask our team to call me'),
+                      ),
+                      OutlinedButton(
+                        onPressed: () => context.push('/crisis'),
+                        child: const Text('Emergency numbers'),
+                      ),
+                    ],
                   ),
+                  if (_teamAlerted) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      'Our safety team has been told and will contact you.',
+                      style: GoogleFonts.urbanist(fontSize: 13, fontWeight: FontWeight.w700, color: FriendColors.onErrorContainer),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -295,6 +315,11 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
                 ? null
                 : () async {
                     await _saveResult(score, severityTitle);
+                    // A self-harm answer is never just stored: the safety team is told.
+                    if (selfHarmFlag && !_teamAlerted) {
+                      final ok = await sendHelpRequest(ref, reason: 'screener_self_harm');
+                      if (mounted) setState(() => _teamAlerted = ok);
+                    }
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Saved on this phone. Check in again in two weeks to see the trend.')),
