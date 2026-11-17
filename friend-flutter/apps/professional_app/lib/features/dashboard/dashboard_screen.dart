@@ -665,9 +665,13 @@ class _ActiveQueueCard extends StatelessWidget {
     final name = guest['name'] as String? ?? 'Client';
     final id = '${appt['id']}';
     final mins = startsAt.difference(DateTime.now()).inMinutes;
-    final startsLabel = mins > 0 && mins < 24 * 60
-        ? 'Starts in $mins min'
-        : DateFormat('h:mm a').format(startsAt);
+    final startsLabel = mins <= 0
+        ? 'Now'
+        : mins < 60
+            ? 'In $mins min'
+            : mins < 24 * 60
+                ? 'In ${mins ~/ 60}h ${mins % 60}m'
+                : DateFormat('EEE').format(startsAt);
     final note = appt['client_note'] as String?;
 
     return ProStitchCard(
@@ -679,14 +683,17 @@ class _ActiveQueueCard extends StatelessWidget {
             children: [
               ProStitchLivePill(label: startsLabel),
               const SizedBox(width: 8),
-              Text(
-                '${DateFormat('h:mm a').format(startsAt)} (50m)',
-                style: GoogleFonts.inter(fontSize: 12, color: FriendColors.textSecondary),
+              Expanded(
+                child: Text(
+                  '${DateFormat('h:mm a').format(startsAt)} · ${appt['duration_minutes'] ?? 50} min',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(fontSize: 12, color: FriendColors.textSecondary),
+                ),
               ),
-              const Spacer(),
               const Icon(Icons.lock_outline, size: 16, color: FriendColors.primary),
               const SizedBox(width: 4),
-              const ProStitchMicroLabel('Private video'),
+              const ProStitchMicroLabel('Private'),
             ],
           ),
           const SizedBox(height: 14),

@@ -162,11 +162,9 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
                   _DiagnosticCard(
                     presentation: intake?.isNotEmpty == true
                         ? intake!
-                        : 'Active care — intake narrative pending.',
-                    modality: 'Cognitive Behavioral Therapy & clinical sync',
+                        : 'They have not left a note when booking.',
+                    modality: _formatSummary(appts),
                   ),
-                  const SizedBox(height: 16),
-                  _PsychometricSection(sessionCount: widget.sessionCount),
                   const SizedBox(height: 16),
                   _SoapHistorySection(
                     appointments: appts.take(6).toList(),
@@ -209,9 +207,7 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
                 final latest = appts.isNotEmpty ? appts.first : null;
                 return _DossierActionBar(
                   onAddNote: () => _addClinicalNote(latest),
-                  onCarePlan: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Care plan editor — coming soon.')),
-                  ),
+                  onCarePlan: _busy ? null : _message,
                 );
               },
               orElse: () => const SizedBox.shrink(),
@@ -220,6 +216,18 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
         ],
       ),
     );
+  }
+
+  /// "Couples · cooking: Doro wot · 6 sessions" — from the real bookings.
+  String _formatSummary(List<Map<String, dynamic>> appts) {
+    final formats = {for (final a in appts) (a['care_format'] as String? ?? 'individual')};
+    final recipes = {for (final a in appts) if (a['recipe'] is Map) (a['recipe'] as Map)['title']};
+    final parts = [
+      formats.map((f) => f[0].toUpperCase() + f.substring(1)).join(', '),
+      if (recipes.isNotEmpty) 'cooked: ${recipes.join(', ')}',
+      '${appts.length} booked',
+    ];
+    return parts.join(' · ');
   }
 
   Map<String, dynamic>? _latestNote(
@@ -266,7 +274,7 @@ class _ProfileRibbon extends StatelessWidget {
                 children: [
                   FriendAvatar(
                     size: 56,
-                    initials: name.isNotEmpty ? name[0] : '?',
+                    initials: personInitial(name),
                   ),
                   Positioned(
                     right: 0,
@@ -288,33 +296,17 @@ class _ProfileRibbon extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            name,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: FriendColors.recessed,
-                            borderRadius: BorderRadius.circular(FriendRadii.pill),
-                          ),
-                          child: Text(
-                            'ID #${name.hashCode.abs().toString().substring(0, 3)}',
-                            style: GoogleFonts.inter(fontSize: 10, color: FriendColors.accent),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     Text(
-                      '$sessionCount sessions • Hybrid care',
+                      '$sessionCount ${sessionCount == 1 ? 'session' : 'sessions'}',
                       style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
                     ),
                     Text(
@@ -324,118 +316,10 @@ class _ProfileRibbon extends StatelessWidget {
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: FriendColors.secondaryFixed.withValues(alpha: 0.35),
-                      borderRadius: BorderRadius.circular(FriendRadii.pill),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.event_available, size: 14, color: FriendColors.accentDeep),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$sessionCount Sessions',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: FriendColors.accentDeep,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const ProStitchMicroLabel('Bi-weekly cadence'),
-                ],
-              ),
             ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: FriendColors.recessed.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _BadgeRow(
-                    icon: Icons.psychology_outlined,
-                    label: 'Primary axis',
-                    value: intakeFocus?.isNotEmpty == true
-                        ? (intakeFocus!.length > 28
-                            ? '${intakeFocus!.substring(0, 28)}…'
-                            : intakeFocus!)
-                        : 'General wellness',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: _BadgeRow(
-                    icon: Icons.monitor_heart_outlined,
-                    label: 'Engagement',
-                    value: 'Active in care',
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BadgeRow extends StatelessWidget {
-  const _BadgeRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: FriendColors.surfaceLowest,
-            shape: BoxShape.circle,
-            boxShadow: FriendElevation.card,
-          ),
-          child: Icon(icon, size: 16, color: FriendColors.primary),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ProStitchMicroLabel(label),
-              Text(
-                value,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -459,7 +343,7 @@ class _DiagnosticCard extends StatelessWidget {
             children: [
               const Icon(Icons.psychology, size: 18, color: FriendColors.primary),
               const SizedBox(width: 6),
-              const ProStitchMicroLabel('Clinical diagnostic overview'),
+              const ProStitchMicroLabel('Overview'),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -468,7 +352,7 @@ class _DiagnosticCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(FriendRadii.small),
                 ),
                 child: Text(
-                  'Active Care Protocol',
+                  'Active',
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -479,7 +363,7 @@ class _DiagnosticCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const ProStitchMicroLabel('Primary diagnostic presentation'),
+          const ProStitchMicroLabel('What they shared when booking'),
           Text(
             presentation,
             style: GoogleFonts.plusJakartaSans(
@@ -499,7 +383,7 @@ class _DiagnosticCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'PRESCRIBED THERAPEUTIC MODALITY',
+                  'SESSIONS SO FAR',
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -524,127 +408,6 @@ class _DiagnosticCard extends StatelessWidget {
                   ],
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PsychometricSection extends StatelessWidget {
-  const _PsychometricSection({required this.sessionCount});
-
-  final int sessionCount;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProStitchCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const ProStitchMicroLabel('Longitudinal trajectory'),
-                    Text(
-                      'Psychometric indices',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: FriendColors.secondaryFixed.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(FriendRadii.pill),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.trending_down, size: 14, color: FriendColors.accent),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$sessionCount sessions logged',
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: FriendColors.accent,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(child: _IndexCard(title: 'PHQ-9', tag: 'Depression', score: '—')),
-              const SizedBox(width: 12),
-              Expanded(child: _IndexCard(title: 'GAD-7', tag: 'Anxiety', score: '—')),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Structured assessments sync when your clinic enables scoring.',
-            style: GoogleFonts.inter(fontSize: 12, color: FriendColors.textMuted),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IndexCard extends StatelessWidget {
-  const _IndexCard({
-    required this.title,
-    required this.tag,
-    required this.score,
-  });
-
-  final String title;
-  final String tag;
-  final String score;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: FriendColors.recessed,
-        borderRadius: BorderRadius.circular(FriendRadii.card),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: FriendColors.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(tag, style: GoogleFonts.inter(fontSize: 10)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            score,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -762,7 +525,7 @@ class _SoapCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(FriendRadii.pill),
                           ),
                           child: Text(
-                            appointment['status'] as String? ?? 'sync',
+                            _statusLabel(appointment['status'] as String?),
                             style: GoogleFonts.inter(fontSize: 10),
                           ),
                         ),
@@ -770,24 +533,13 @@ class _SoapCard extends StatelessWidget {
                     ),
                     if (when != null)
                       Text(
-                        DateFormat('MMM d, yyyy • 50 mins').format(when),
+                        // Literal text must stay outside the pattern: 'mins' would be read as minute/second codes.
+                        '${DateFormat('MMM d, yyyy').format(when.toLocal())} • ${appointment['duration_minutes'] ?? 50} min',
                         style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
                       ),
                   ],
                 ),
               ),
-              if (index > 0)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: FriendColors.secondaryFixed.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(FriendRadii.small),
-                  ),
-                  child: Text(
-                    'Archived',
-                    style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600),
-                  ),
-                ),
             ],
           ),
           if (expanded && subjective?.isNotEmpty == true) ...[
@@ -977,7 +729,7 @@ class _DossierActionBar extends StatelessWidget {
   });
 
   final VoidCallback onAddNote;
-  final VoidCallback onCarePlan;
+  final VoidCallback? onCarePlan;
 
   @override
   Widget build(BuildContext context) {
@@ -994,7 +746,7 @@ class _DossierActionBar extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onAddNote,
                     icon: const Icon(Icons.add),
-                    label: const Text('Add Clinical Note'),
+                    label: const Text('Add note'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(0, 48),
                       shape: RoundedRectangleBorder(
@@ -1007,8 +759,8 @@ class _DossierActionBar extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: onCarePlan,
-                    icon: const Icon(Icons.edit_calendar_outlined),
-                    label: const Text('Update Care Plan'),
+                    icon: const Icon(Icons.chat_bubble_outline_rounded),
+                    label: const Text('Message'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(0, 48),
                       backgroundColor: FriendColors.surfaceContainer,
@@ -1044,3 +796,12 @@ class _DossierActionBar extends StatelessWidget {
     );
   }
 }
+
+String _statusLabel(String? status) => switch (status) {
+      'completed' => 'Completed',
+      'confirmed' => 'Upcoming',
+      'in_progress' => 'In progress',
+      'cancelled' => 'Cancelled',
+      'no_show' => 'No-show',
+      _ => 'Booked',
+    };

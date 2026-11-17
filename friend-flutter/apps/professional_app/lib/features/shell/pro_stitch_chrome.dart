@@ -218,7 +218,7 @@ class ProStitchDossierHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'AKILIL SANCTUARY',
+                      'CLIENT',
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -227,7 +227,7 @@ class ProStitchDossierHeader extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Clinical Dossier',
+                      'Client record',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,

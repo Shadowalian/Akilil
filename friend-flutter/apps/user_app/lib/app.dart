@@ -67,8 +67,10 @@ class FriendApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: router,
-      builder: (context, child) =>
-          _AppLockWrapper(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => ColoredBox(
+        color: FriendColors.background,
+        child: _AppLockWrapper(child: child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }

@@ -205,14 +205,19 @@ class FriendPageScaffold extends StatelessWidget {
       ],
     );
 
-    if (onRefresh != null) {
-      return RefreshIndicator(
-        color: FriendColors.primary,
-        onRefresh: onRefresh!,
-        child: SingleChildScrollView(child: header),
-      );
-    }
-    return SingleChildScrollView(child: header);
+    final page = onRefresh != null
+        ? RefreshIndicator(
+            color: FriendColors.primary,
+            onRefresh: onRefresh!,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: header,
+            ),
+          )
+        : SingleChildScrollView(child: header);
+    // Pages pushed outside the tab shell have no Material above them; without
+    // one, text renders in Flutter's red debug style.
+    return Material(type: MaterialType.transparency, child: SafeArea(bottom: false, child: page));
   }
 }
 

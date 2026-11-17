@@ -30,8 +30,11 @@ class FriendProApp extends ConsumerWidget {
       theme: urbanistTheme,
       themeMode: ThemeMode.light,
       routerConfig: router,
-      builder: (context, child) =>
-          _AppLockWrapper(child: child ?? const SizedBox.shrink()),
+      // Scaffolds are transparent by design; give every page the brand canvas.
+      builder: (context, child) => ColoredBox(
+        color: FriendColors.background,
+        child: _AppLockWrapper(child: child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }

@@ -38,7 +38,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               padding: const EdgeInsets.fromLTRB(4, 24, 4, 10),
               child: Text(title, style: theme.textTheme.titleSmall),
             ),
-            CandyCard(padding: EdgeInsets.zero, child: Column(children: children)),
+            CandyCard(padding: const EdgeInsets.symmetric(vertical: 6), child: Column(children: children)),
           ],
         );
     const divider = Divider(height: 1, indent: 18, endIndent: 18);
