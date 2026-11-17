@@ -76,7 +76,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         _error = _readableError(e) ?? tr('Registration failed. Please try again.');
       });
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : tr('Something went wrong. Please try again.'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

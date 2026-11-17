@@ -56,7 +56,7 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
         _error = apiErrorMessage(e.response?.data, tr('Sign-up failed.'));
       });
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : tr('Something went wrong. Please try again.'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

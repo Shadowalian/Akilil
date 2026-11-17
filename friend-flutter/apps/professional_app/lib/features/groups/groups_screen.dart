@@ -195,7 +195,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Schedule failed: $e')),
+        SnackBar(content: Text(tr("Couldn't schedule. Check your connection and try again."))),
       );
     }
   }
@@ -214,7 +214,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Archive failed: $e')),
+        SnackBar(content: Text(tr("Couldn't archive. Check your connection and try again."))),
       );
     }
   }

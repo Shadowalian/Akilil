@@ -299,7 +299,7 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
                       Expanded(
                         child: TextField(
                           controller: _ingredients[i].name,
-                          decoration: InputDecoration(labelText: 'Ingredient ${i + 1}'),
+                          decoration: InputDecoration(labelText: trx('Ingredient ${i + 1}', 'ግብዓት ${i + 1}')),
                         ),
                       ),
                       IconButton(
@@ -360,7 +360,7 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
                 controller: _steps[i],
                 maxLines: null,
                 decoration: InputDecoration(
-                  labelText: 'Step ${i + 1}',
+                  labelText: trx('Step ${i + 1}', 'ደረጃ ${i + 1}'),
                   suffixIcon: IconButton(
                     tooltip: tr('Remove'),
                     icon: const Icon(Icons.close_rounded),
@@ -780,7 +780,7 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
           TextField(
             controller: _rate,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Price per session ($_currency)'),
+            decoration: InputDecoration(labelText: trx('Price per session ($_currency)', 'የአንድ ቆይታ ዋጋ ($_currency)')),
           ),
           SizedBox(height: 20),
           Text(tr('Session formats'), style: theme.textTheme.titleMedium),
@@ -805,13 +805,13 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
           TextField(
             controller: _couples,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Couples session price ($_currency)', hintText: tr('Same as individual')),
+            decoration: InputDecoration(labelText: trx('Couples session price ($_currency)', 'የጥንዶች ቆይታ ዋጋ ($_currency)'), hintText: tr('Same as individual')),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _family,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Family session price ($_currency)', hintText: tr('Same as individual')),
+            decoration: InputDecoration(labelText: trx('Family session price ($_currency)', 'የቤተሰብ ቆይታ ዋጋ ($_currency)'), hintText: tr('Same as individual')),
           ),
           const SizedBox(height: 24),
           FilledButton(onPressed: _formats.isEmpty || _ages.isEmpty ? null : _save, child: Text(tr('Save'))),

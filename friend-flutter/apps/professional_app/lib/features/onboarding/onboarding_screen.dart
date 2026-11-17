@@ -71,7 +71,7 @@ class _S extends ConsumerState<OnboardingScreen> {
             : tr('Save failed.');
       });
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : tr('Something went wrong. Please try again.'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -100,7 +100,7 @@ class _S extends ConsumerState<OnboardingScreen> {
             : tr('Upload failed.');
       });
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : tr('Something went wrong. Please try again.'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

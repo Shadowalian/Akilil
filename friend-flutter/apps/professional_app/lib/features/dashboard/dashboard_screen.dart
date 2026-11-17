@@ -113,7 +113,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               final onboarding = data['onboarding'] as Map<String, dynamic>;
               final profile = data['profile'] as Map<String, dynamic>;
               final offersWalkIn = profile['offers_free_listening'] == true;
-              final firstName = (user?.name ?? '').trim();
+              final firstName = _shortName(user?.name ?? '');
               final queue = _consultationQueue(upcoming);
               final rating = (profile['rating_avg'] as num?)?.toDouble() ?? 0;
               final ratingCount = (profile['rating_count'] as num?)?.toInt() ?? 0;
@@ -181,6 +181,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ],
     );
   }
+}
+
+/// "Dr. Hanna Tesfaye" → "Dr. Hanna"; "Selam Bekele" → "Selam".
+String _shortName(String full) {
+  final parts = full.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+  if (parts.isEmpty) return '';
+  const titles = {'dr', 'dr.', 'abba', 'aba', 'chef', 'w/ro', 'ato', 'pastor', 'sheikh', 'prof', 'prof.'};
+  if (parts.length > 1 && titles.contains(parts.first.toLowerCase())) return '${parts[0]} ${parts[1]}';
+  return parts.first;
 }
 
 String _greeting() {
@@ -403,13 +412,17 @@ class _ActiveQueueCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (soon) const FriendLivePulse(size: 7) else Text(startsLabel, style: theme.textTheme.labelMedium),
+              if (soon) const FriendLivePulse(size: 7),
             ],
           ),
-          if (soon) ...[
-            const SizedBox(height: 8),
-            Text(startsLabel, style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.live, fontWeight: FontWeight.w600)),
-          ],
+          const SizedBox(height: 10),
+          Text(
+            startsLabel,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: soon ? FriendColors.live : FriendColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           if (note != null && note.isNotEmpty) ...[
             const SizedBox(height: 12),
             Container(
@@ -434,7 +447,7 @@ class _ActiveQueueCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: FriendGlowButton(
-                  label: tr('Start session'),
+                  label: tr('Start'),
                   icon: Icons.videocam_rounded,
                   expanded: true,
                   onPressed: () => onLaunchMeet(id),

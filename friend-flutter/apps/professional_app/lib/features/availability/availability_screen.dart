@@ -389,7 +389,7 @@ class _BlocksList extends ConsumerWidget {
                           );
                           if (d != null) setState(() => from = d);
                         },
-                        child: Text('From: ${trDate('MMM d', from)}'),
+                        child: Text(trx('From ${trDate('d MMM', from)}', 'ከ${trDate('d MMM', from)}')),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -404,7 +404,7 @@ class _BlocksList extends ConsumerWidget {
                           );
                           if (d != null) setState(() => to = d);
                         },
-                        child: Text('To: ${trDate('MMM d', to)}'),
+                        child: Text(trx('To ${trDate('d MMM', to)}', 'እስከ ${trDate('d MMM', to)}')),
                       ),
                     ),
                   ],
