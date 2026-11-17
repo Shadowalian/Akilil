@@ -68,6 +68,18 @@ class ProfessionalController extends Controller
                 if ($intake->dependent_id && ($d = Dependent::find($intake->dependent_id))) {
                     $ageGroup = $d->ageGroup();
                 }
+                $prefs = $intake->answers ?? [];
+                $preferred = clone $q;
+                if (in_array($prefs['gender_preference'] ?? null, ['female', 'male'], true)) {
+                    $preferred->whereHas('user', fn ($u) => $u->where('gender', $prefs['gender_preference']));
+                }
+                if (! empty($prefs['languages']) && is_array($prefs['languages'])) {
+                    $preferred->whereHas('languages', fn ($l) => $l->whereIn('languages.code', $prefs['languages']));
+                }
+                // Preferences narrow the list, but never down to nobody.
+                if ((clone $preferred)->exists()) {
+                    $q = $preferred;
+                }
             }
         }
         if ($careFormat) {

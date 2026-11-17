@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -399,7 +400,7 @@ class _TransactionRow extends StatelessWidget {
         tx['title'] as String? ??
         _label(type);
     final subtitle = tx['subtitle'] as String? ??
-        (created != null ? DateFormat('d MMM').format(created) : '');
+        (created != null ? trDate('d MMM', created) : '');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

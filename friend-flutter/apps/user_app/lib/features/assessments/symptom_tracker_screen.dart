@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,11 +45,11 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
     if (mounted) setState(() => _lastResult = line);
   }
 
-  static const List<String> _scaleLabels = [
-    'Not at all (0)',
-    'Several days (1)',
-    'More than half the days (2)',
-    'Nearly every day (3)',
+  static List<String> get _scaleLabels => [
+    tr('Not at all (0)'),
+    tr('Several days (1)'),
+    tr('More than half the days (2)'),
+    tr('Nearly every day (3)'),
   ];
 
   int _calculateScore(Map<int, int> answers) {
@@ -57,38 +58,38 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
 
   (String, String, Color) _interpretScore(String type, int score) {
     if (type == 'gad7') {
-      if (score <= 4) return ('Minimal Anxiety', 'Your symptoms reflect minimal nervous tension.', FriendColors.green);
-      if (score <= 9) return ('Mild Anxiety', 'Mild anxiety. Breathing exercises and thought records can help.', FriendColors.primaryDeep);
-      if (score <= 14) return ('Moderate Anxiety', 'Moderate anxiety. Talking with a professional regularly is likely to help.', FriendColors.accent);
-      return ('Severe Anxiety', 'Severe anxiety. Please book a session with a licensed professional soon.', FriendColors.error);
+      if (score <= 4) return (tr('Minimal Anxiety'), tr('Your symptoms reflect minimal nervous tension.'), FriendColors.green);
+      if (score <= 9) return (tr('Mild Anxiety'), tr('Mild anxiety. Breathing exercises and thought records can help.'), FriendColors.primaryDeep);
+      if (score <= 14) return (tr('Moderate Anxiety'), tr('Moderate anxiety. Talking with a professional regularly is likely to help.'), FriendColors.accent);
+      return (tr('Severe Anxiety'), tr('Severe anxiety. Please book a session with a licensed professional soon.'), FriendColors.error);
     } else {
-      if (score <= 4) return ('Minimal Depression', 'No significant depressive patterns indicated.', FriendColors.green);
-      if (score <= 9) return ('Mild Depression', 'Mild low mood. Daily physical movement and gratitude logging can help lift energy.', FriendColors.primaryDeep);
-      if (score <= 14) return ('Moderate Depression', 'Moderate depression symptoms. Continued regular counseling sessions recommended.', FriendColors.accent);
-      if (score <= 19) return ('Moderately Severe', 'Moderately severe. Please book a session with a licensed professional.', FriendColors.accentDeep);
-      return ('Severe Depression', 'Severe. Please speak with a licensed professional as soon as you can.', FriendColors.error);
+      if (score <= 4) return (tr('Minimal Depression'), tr('No significant depressive patterns indicated.'), FriendColors.green);
+      if (score <= 9) return (tr('Mild Depression'), tr('Mild low mood. Daily physical movement and gratitude logging can help lift energy.'), FriendColors.primaryDeep);
+      if (score <= 14) return (tr('Moderate Depression'), tr('Moderate depression symptoms. Continued regular counseling sessions recommended.'), FriendColors.accent);
+      if (score <= 19) return (tr('Moderately Severe'), tr('Moderately severe. Please book a session with a licensed professional.'), FriendColors.accentDeep);
+      return (tr('Severe Depression'), tr('Severe. Please speak with a licensed professional as soon as you can.'), FriendColors.error);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final meta = SeedData.assessments[_activeAssessment] as Map<String, dynamic>;
-    final questions = (meta['questions'] as List).cast<String>();
+    final questions = (meta['questions'] as List).cast<String>().map(tr).toList();
     final answers = _activeAssessment == 'gad7' ? _gad7Answers : _phq9Answers;
     final score = _calculateScore(answers);
     final complete = answers.length == questions.length;
     final (severityTitle, severityDesc, severityColor) = complete
         ? _interpretScore(_activeAssessment, score)
-        : ('${answers.length} of ${questions.length} answered', 'Answer every question to see your result.', FriendColors.textMuted);
+        : (trx('${answers.length} of ${questions.length} answered', 'ከ${questions.length} ጥያቄዎች ${answers.length} ተመልሰዋል'), tr('Answer every question to see your result.'), FriendColors.textMuted);
     // PHQ-9 item 9 asks about self-harm. Any answer above "not at all"
     // means we stop and offer help, whatever the total score.
     final selfHarmFlag = _activeAssessment == 'phq9' && (answers[8] ?? 0) > 0;
 
     return FriendPageScaffold(
-      eyebrow: 'Check-ins',
-      title: 'How have you been?',
+      eyebrow: tr('Check-ins'),
+      title: tr('How have you been?'),
       subtitle:
-          'Two short, widely used questionnaires (GAD-7 and PHQ-9) to track anxiety and low mood over time.',
+          tr('Two short, widely used questionnaires (GAD-7 and PHQ-9) to track anxiety and low mood over time.'),
       showBack: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -98,7 +99,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
             children: [
               Expanded(
                 child: _TabButton(
-                  title: 'GAD-7 (Anxiety)',
+                  title: tr('GAD-7 (Anxiety)'),
                   isSelected: _activeAssessment == 'gad7',
                   onTap: () {
                     setState(() => _activeAssessment = 'gad7');
@@ -109,7 +110,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _TabButton(
-                  title: 'PHQ-9 (Depression)',
+                  title: tr('PHQ-9 (Depression)'),
                   isSelected: _activeAssessment == 'phq9',
                   onTap: () {
                     setState(() => _activeAssessment = 'phq9');
@@ -137,8 +138,8 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'If you might act on these thoughts, call 907 for an ambulance now, or go to the nearest hospital. '
-                    'Otherwise, please talk to someone today. When you save this check-in, our safety team is told so someone can check on you.',
+                    tr('If you might act on these thoughts, call 907 for an ambulance now, or go to the nearest hospital. '
+                    'Otherwise, please talk to someone today. When you save this check-in, our safety team is told so someone can check on you.'),
                     style: GoogleFonts.urbanist(fontSize: 13, height: 1.4, color: FriendColors.onErrorContainer),
                   ),
                   const SizedBox(height: 12),
@@ -150,18 +151,18 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                         onPressed: () => showHelpRequestSheet(context, ref, reason: 'screener_self_harm'),
                         style: FilledButton.styleFrom(backgroundColor: FriendColors.error),
                         icon: const Icon(Icons.support_agent_rounded),
-                        label: const Text('Ask our team to call me'),
+                        label: Text(tr('Ask our team to call me')),
                       ),
                       OutlinedButton(
                         onPressed: () => context.push('/crisis'),
-                        child: const Text('Emergency numbers'),
+                        child: Text(tr('Emergency numbers')),
                       ),
                     ],
                   ),
                   if (_teamAlerted) ...[
                     const SizedBox(height: 10),
                     Text(
-                      'Our safety team has been told and will contact you.',
+                      tr('Our safety team has been told and will contact you.'),
                       style: GoogleFonts.urbanist(fontSize: 13, fontWeight: FontWeight.w700, color: FriendColors.onErrorContainer),
                     ),
                   ],
@@ -231,7 +232,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
           const SizedBox(height: 24),
 
           Text(
-            meta['subtitle'] as String? ?? '',
+            tr(meta['subtitle'] as String? ?? ''),
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -301,14 +302,14 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
 
           if (_lastResult != null) ...[
             Text(
-              'Last time: $_lastResult',
+              trx('Last time: $_lastResult', 'ባለፈው ጊዜ፦ $_lastResult'),
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
             ),
             const SizedBox(height: 10),
           ],
           FriendGlowButton(
-            label: 'Save result',
+            label: tr('Save result'),
             icon: Icons.check_circle_rounded,
             expanded: true,
             onPressed: !complete
@@ -322,13 +323,13 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                     }
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Saved on this phone. Check in again in two weeks to see the trend.')),
+                      SnackBar(content: Text(tr('Saved on this phone. Check in again in two weeks to see the trend.'))),
                     );
                   },
           ),
           const SizedBox(height: 8),
           Text(
-            'This is a screening tool, not a diagnosis.',
+            tr('This is a screening tool, not a diagnosis.'),
             textAlign: TextAlign.center,
             style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textMuted),
           ),

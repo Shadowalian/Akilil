@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -129,7 +130,7 @@ class _HelpRequestSheetState extends ConsumerState<_HelpRequestSheet> {
             TextField(
               controller: _phone,
               keyboardType: TextInputType.phone,
-              decoration: InputDecoration(labelText: s.t('Phone number', 'የስልክ ቁጥር')),
+              decoration: InputDecoration(labelText: s.t(tr('Phone number'), 'የስልክ ቁጥር')),
             ),
             const SizedBox(height: 12),
             Wrap(

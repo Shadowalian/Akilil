@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +82,7 @@ class _RecipeScreenState extends ConsumerState<RecipeScreen> {
     if (recipe == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const FriendEmptyState(icon: Icons.restaurant_menu_rounded, title: 'Recipe not available'),
+        body: FriendEmptyState(icon: Icons.restaurant_menu_rounded, title: tr('Recipe not available')),
       );
     }
     final steps = ((recipe['steps'] as List?) ?? const []).cast<Map<String, dynamic>>();
@@ -90,7 +91,7 @@ class _RecipeScreenState extends ConsumerState<RecipeScreen> {
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      appBar: AppBar(title: const Text('Recipe')),
+      appBar: AppBar(title: Text(tr('Recipe'))),
       bottomNavigationBar: !_canConfirm
           ? null
           : SafeArea(
@@ -119,19 +120,19 @@ class _RecipeScreenState extends ConsumerState<RecipeScreen> {
             Text(recipe['description'].toString(), style: theme.textTheme.bodyMedium),
           ],
           const SizedBox(height: 20),
-          Text('Shopping list', style: theme.textTheme.titleMedium),
+          Text(tr('Shopping list'), style: theme.textTheme.titleMedium),
           Text(
-            'Tick things off as you get them. Have everything out before the session starts.',
+            tr('Tick things off as you get them. Have everything out before the session starts.'),
             style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
           ),
           RecipeIngredientList(ingredients: _ingredients, checkedIds: _checked, onToggle: _toggle),
           if (equipment.isNotEmpty) ...[
             const SizedBox(height: 16),
-            Text('You will also need', style: theme.textTheme.titleMedium),
+            Text(tr('You will also need'), style: theme.textTheme.titleMedium),
             Text(equipment, style: theme.textTheme.bodyMedium),
           ],
           const SizedBox(height: 20),
-          Text('Method', style: theme.textTheme.titleMedium),
+          Text(tr('Method'), style: theme.textTheme.titleMedium),
           RecipeStepList(steps: steps),
         ],
       ),

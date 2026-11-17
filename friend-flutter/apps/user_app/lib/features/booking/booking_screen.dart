@@ -1,8 +1,8 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -131,8 +131,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         _proDetail = pro;
         _pro = _ProSummary(
           userId: userId,
-          displayName: pro['display_name'] as String? ?? 'Listener',
-          categoryName: category?['name'] as String? ?? 'Listener',
+          displayName: pro['display_name'] as String? ?? tr('Listener'),
+          categoryName: tr(category?['name'] as String? ?? 'Listener'),
           sessionMinutes: minutes,
           avatarUrl: pro['avatar_url'] as String?,
           hourlyRateCents: hourly,
@@ -161,7 +161,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     });
     try {
       final dio = ref.read(dioProvider);
-      final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
+      final dateStr = trDate('yyyy-MM-dd', _selectedDate);
       final duration = _pro?.sessionMinutes ?? 50;
       final res = await dio.get<Map<String, dynamic>>(
         '/professionals/${widget.proId}/available-slots',
@@ -271,7 +271,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       if (!mounted) return;
       if (e.response?.statusCode == 402) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Add funds to your wallet')),
+          SnackBar(content: Text(tr('Add funds to your wallet'))),
         );
         context.push(AppRoutes.wallet);
         return;
@@ -279,13 +279,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       final data = e.response?.data;
       if (data is Map && data['code'] == 'date_of_birth_required') {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Add your date of birth to book a session')),
+          SnackBar(content: Text(tr('Add your date of birth to book a session'))),
         );
         context.push(AppRoutes.family);
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(apiErrorMessage(data, 'Booking failed.'))),
+        SnackBar(content: Text(apiErrorMessage(data, tr('Booking failed.')))),
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -296,9 +296,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final s = ref.read(stringsProvider);
     final when = _localStart;
     final end = when.add(Duration(minutes: _durationMinutes));
-    final dateLabel = DateFormat('EEEE, MMM d').format(when);
+    final dateLabel = trDate('EEEE, MMM d', when);
     final timeLabel =
-        '${DateFormat('h:mm a').format(when)} – ${DateFormat('h:mm a').format(end)}';
+        '${trDate('h:mm a', when)} – ${trDate('h:mm a', end)}';
 
     return showModalBottomSheet<void>(
       context: context,
@@ -332,7 +332,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   color: FriendColors.primary, size: 56),
               const SizedBox(height: 16),
               Text(
-                'Session scheduled',
+                tr('Session scheduled'),
                 style: _geist(ctx, fontSize: 22, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 20),
@@ -475,7 +475,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'No open times on this day. Try another date.',
+                      tr('No open times on this day. Try another date.'),
                       style: _geist(context, color: FriendColors.textSecondary),
                     ),
                   ),
@@ -566,7 +566,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         ? '…'
                         : canConfirm
                             ? s.confirmAndPay(totalMajor)
-                            : _care.problem ?? (_selectedSlotUtc == null ? 'Pick a time' : s.unavailable),
+                            : _care.problem ?? (_selectedSlotUtc == null ? tr('Pick a time') : s.unavailable),
                     style: _geist(
                       context,
                       fontSize: 16,
@@ -617,7 +617,7 @@ class _ProHeader extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                '${pro.categoryName} · $minutes min',
+                trx('${pro.categoryName} · $minutes min', '${pro.categoryName} · $minutes ደቂቃ'),
                 style: _geist(
                   context,
                   fontSize: 14,
@@ -768,7 +768,7 @@ class _MonthHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      DateFormat('MMMM yyyy').format(date),
+      trDate('MMMM yyyy', date),
       style: _geist(
         context,
         fontSize: 18,
@@ -818,7 +818,7 @@ class _WeekStrip extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    DateFormat('E').format(d).toUpperCase(),
+                    trDate('E', d).toUpperCase(),
                     style: _geist(
                       context,
                       fontSize: 11,
@@ -891,13 +891,13 @@ class _TimeChips extends StatelessWidget {
 
   String _slotLabel(Map<String, dynamic> slot) {
     final local = DateTime.tryParse(slot['start_local']?.toString() ?? '');
-    if (local != null) return DateFormat('h:mm a').format(local);
+    if (local != null) return trDate('h:mm a', local);
     return '—';
   }
 
   String _fmt(TimeOfDay t) {
     final dt = DateTime(2000, 1, 1, t.hour, t.minute);
-    return DateFormat('h:mm a').format(dt);
+    return trDate('h:mm a', dt);
   }
 }
 
@@ -978,7 +978,7 @@ class _SummaryBlock extends StatelessWidget {
     };
     final dt = DateTime(date.year, date.month, date.day, start.hour, start.minute);
     final whenLabel =
-        '${DateFormat('EEE, MMM d').format(dt)} · ${DateFormat('h:mm a').format(dt)}';
+        '${trDate('EEE, MMM d', dt)} · ${trDate('h:mm a', dt)}';
 
     return Container(
       padding: const EdgeInsets.all(16),

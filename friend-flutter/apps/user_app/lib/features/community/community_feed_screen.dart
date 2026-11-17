@@ -1,8 +1,8 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -76,10 +76,10 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
               ),
             ),
           ),
-          const FriendPageHeader(
-            eyebrow: 'Community',
-            title: 'Circle',
-            subtitle: 'Say something — one tap away.',
+          FriendPageHeader(
+            eyebrow: tr('Community'),
+            title: tr('Circle'),
+            subtitle: tr('Say something — one tap away.'),
           ),
           Expanded(
             child: RefreshIndicator(
@@ -95,8 +95,8 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
                     FriendEmptyState(
                       icon: Icons.cloud_off_outlined,
                       title: "Couldn't load posts",
-                      message: 'Check your connection and try again.',
-                      ctaLabel: 'Retry',
+                      message: tr('Check your connection and try again.'),
+                      ctaLabel: tr('Retry'),
                       onCta: () =>
                           ref.invalidate(_postsProvider(widget.channelId)),
                     ),
@@ -105,11 +105,11 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
                 data: (posts) {
                   if (posts.isEmpty) {
                     return ListView(
-                      children: const [
+                      children: [
                         FriendEmptyState(
                           icon: Icons.chat_bubble_outline,
-                          title: 'Quiet in here',
-                          message: 'Be the first to say something.',
+                          title: tr('Quiet in here'),
+                          message: tr('Be the first to say something.'),
                         ),
                       ],
                     );
@@ -178,7 +178,7 @@ class _PostCard extends StatelessWidget {
                     ),
                     if (created != null)
                       Text(
-                        DateFormat('MMM d · h:mm a').format(created),
+                        trDate('MMM d · h:mm a', created),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: FriendColors.textSecondary,
                         ),
@@ -261,7 +261,7 @@ class _Composer extends StatelessWidget {
                 maxLines: 4,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                  hintText: 'Share something…',
+                  hintText: tr('Share something…'),
                   filled: true,
                   fillColor: FriendColors.surface,
                   border: OutlineInputBorder(

@@ -1,10 +1,10 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:intl/intl.dart';
 
 
 
@@ -122,11 +122,11 @@ class _VentsScreenState extends ConsumerState<VentsScreen> {
 
     return FriendPageScaffold(
 
-      eyebrow: 'Release',
+      eyebrow: tr('Release'),
 
-      title: 'Let it out',
+      title: tr('Let it out'),
 
-      subtitle: 'Only you can see this. No replies, no fixing.',
+      subtitle: tr('Only you can see this. No replies, no fixing.'),
 
       onRefresh: () async => ref.invalidate(_ventsProvider),
 
@@ -168,7 +168,7 @@ class _VentsScreenState extends ConsumerState<VentsScreen> {
 
                 FriendGlowButton(
 
-                  label: 'Release',
+                  label: tr('Release'),
 
                   icon: Icons.send,
 
@@ -200,7 +200,7 @@ class _VentsScreenState extends ConsumerState<VentsScreen> {
 
               title: "Couldn't load your vents",
 
-              message: 'Check your connection and try again.',
+              message: tr('Check your connection and try again.'),
 
             ),
 
@@ -208,13 +208,13 @@ class _VentsScreenState extends ConsumerState<VentsScreen> {
 
               if (vents.isEmpty) {
 
-                return const FriendEmptyState(
+                return FriendEmptyState(
 
                   icon: Icons.air,
 
-                  title: 'Nothing here yet',
+                  title: tr('Nothing here yet'),
 
-                  message: 'Whatever you write stays between you and you.',
+                  message: tr('Whatever you write stays between you and you.'),
 
                 );
 
@@ -288,7 +288,7 @@ class _VentCard extends StatelessWidget {
 
             Text(
 
-              DateFormat('MMM d • h:mm a').format(created),
+              trDate('MMM d • h:mm a', created),
 
               style: theme.textTheme.bodySmall,
 

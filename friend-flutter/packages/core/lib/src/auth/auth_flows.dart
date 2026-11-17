@@ -1,3 +1,4 @@
+import '../util/i18n.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -14,14 +15,14 @@ Future<String?> showTwoFactorPrompt(BuildContext context) {
     barrierDismissible: false,
     builder: (d) => StatefulBuilder(
       builder: (context, set) => AlertDialog(
-        title: Text(recovery ? 'Use a recovery code' : 'Two-step sign-in'),
+        title: Text(recovery ? coreTr('Use a recovery code') : coreTr('Two-step sign-in')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(recovery
-                ? 'Enter one of the recovery codes you saved when you turned on two-step sign-in. Each works once.'
-                : 'Open your authenticator app and enter the 6-digit code for Akilil.'),
+                ? coreTr('Enter one of the recovery codes you saved when you turned on two-step sign-in. Each works once.')
+                : coreTr('Open your authenticator app and enter the 6-digit code for Akilil.')),
             const SizedBox(height: 14),
             TextField(
               controller: code,
@@ -29,7 +30,7 @@ Future<String?> showTwoFactorPrompt(BuildContext context) {
               keyboardType: recovery ? TextInputType.text : TextInputType.number,
               textCapitalization: TextCapitalization.characters,
               maxLength: recovery ? 20 : 6,
-              decoration: InputDecoration(labelText: recovery ? 'Recovery code' : '6-digit code', counterText: ''),
+              decoration: InputDecoration(labelText: recovery ? coreTr('Recovery code') : '6-digit code', counterText: ''),
               onSubmitted: (v) => Navigator.pop(d, v.trim()),
             ),
             TextButton(
@@ -38,13 +39,13 @@ Future<String?> showTwoFactorPrompt(BuildContext context) {
                 recovery = !recovery;
                 code.clear();
               }),
-              child: Text(recovery ? 'Use my authenticator app instead' : "I can't use my authenticator app"),
+              child: Text(recovery ? coreTr('Use my authenticator app instead') : coreTr("I can't use my authenticator app")),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(d), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(d, code.text.trim()), child: const Text('Verify')),
+          TextButton(onPressed: () => Navigator.pop(d), child: Text(coreTr('Cancel'))),
+          FilledButton(onPressed: () => Navigator.pop(d, code.text.trim()), child: Text(coreTr('Verify'))),
         ],
       ),
     ),
@@ -107,7 +108,7 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
     } on DioException catch (e) {
       if (mounted) {
         setState(() => _error = e.type == DioExceptionType.connectionError
-            ? "Can't reach Akilil. Check your connection."
+            ? coreTr("Can't reach Akilil. Check your connection.")
             : apiErrorMessage(e.response?.data, 'Something went wrong. Try again.'));
       }
     } finally {
@@ -130,7 +131,7 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
         if (!mounted) return;
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password changed. Sign in with your new password.')),
+          SnackBar(content: Text(coreTr('Password changed. Sign in with your new password.'))),
         );
       });
 
@@ -143,12 +144,12 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(_codeSent ? 'Check your email' : 'Reset your password', style: theme.textTheme.titleLarge),
+          Text(_codeSent ? coreTr('Check your email') : coreTr('Reset your password'), style: theme.textTheme.titleLarge),
           const SizedBox(height: 6),
           Text(
             _codeSent
-                ? 'If ${_email.text.trim()} has an account, we sent it a 6-digit code. It expires in 15 minutes.'
-                : "Enter your account's email and we'll send you a code.",
+                ? coreTr('If {email} has an account, we sent it a 6-digit code. It expires in 15 minutes.').replaceAll('{email}', _email.text.trim())
+                : coreTr("Enter your account's email and we'll send you a code."),
             style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
           ),
           const SizedBox(height: 18),
@@ -157,7 +158,7 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
               controller: _email,
               autofocus: true,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(labelText: coreTr('Email')),
               onSubmitted: (_) => _sendCode(),
             )
           else ...[
@@ -166,15 +167,15 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
               autofocus: true,
               keyboardType: TextInputType.number,
               maxLength: 6,
-              decoration: const InputDecoration(labelText: '6-digit code', counterText: ''),
+              decoration: InputDecoration(labelText: coreTr('6-digit code'), counterText: ''),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _pass,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'New password',
-                helperText: 'At least 8 characters, with upper and lower case and a number',
+              decoration: InputDecoration(
+                labelText: coreTr('New password'),
+                helperText: coreTr('At least 8 characters, with upper and lower case and a number'),
               ),
             ),
           ],
@@ -186,10 +187,10 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
           FilledButton(
             onPressed: _busy ? null : (_codeSent ? _reset : _sendCode),
             style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-            child: Text(_busy ? 'Please wait…' : (_codeSent ? 'Change password' : 'Send code')),
+            child: Text(_busy ? coreTr('Please wait…') : (_codeSent ? coreTr('Change password') : coreTr('Send code'))),
           ),
           if (_codeSent)
-            TextButton(onPressed: _busy ? null : _sendCode, child: const Text('Send a new code')),
+            TextButton(onPressed: _busy ? null : _sendCode, child: Text(coreTr('Send a new code'))),
         ],
       ),
     );

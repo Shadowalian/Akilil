@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -16,7 +17,7 @@ class FreudAuthBrand extends StatelessWidget {
         const FreudLogoBadge(size: 36),
         const SizedBox(width: 10),
         Text(
-          'Akilil',
+          tr('Akilil'),
           style: GoogleFonts.urbanist(
             fontSize: 17,
             fontWeight: FontWeight.w800,

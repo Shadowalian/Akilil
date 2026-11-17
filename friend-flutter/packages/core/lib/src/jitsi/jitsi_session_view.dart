@@ -1,3 +1,4 @@
+import '../util/i18n.dart';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -383,7 +384,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          widget.title ?? 'Akilil Meet',
+                          widget.title ?? coreTr('Akilil Meet'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.plusJakartaSans(
@@ -405,7 +406,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              widget.mode == JitsiRoomMode.group ? 'PRIVATE GROUP' : 'PRIVATE SESSION',
+                              widget.mode == JitsiRoomMode.group ? coreTr('PRIVATE GROUP') : coreTr('PRIVATE SESSION'),
                               style: GoogleFonts.inter(
                                 color: Colors.white.withValues(alpha: 0.85),
                                 fontWeight: FontWeight.w700,
@@ -430,7 +431,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                       backgroundColor: Colors.white.withValues(alpha: 0.14),
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     ),
-                    child: const Text('Leave'),
+                    child: Text(coreTr('Leave')),
                   ),
                 ],
               ),
@@ -438,7 +439,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
           ),
 
           if (_loading)
-            const ColoredBox(
+            ColoredBox(
               color: Color(0xCC0A1A20),
               child: Center(
                 child: Column(
@@ -447,7 +448,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                     CircularProgressIndicator(color: FriendColors.primary),
                     SizedBox(height: 16),
                     Text(
-                      'Opening Akilil Meet…',
+                      coreTr('Opening Akilil Meet…'),
                       style: TextStyle(
                         color: Colors.white70,
                         fontWeight: FontWeight.w600,
@@ -483,15 +484,15 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                           });
                           _controller?.reload();
                         },
-                        child: const Text('Retry'),
+                        child: Text(coreTr('Retry')),
                       ),
                       TextButton(
                         onPressed: _openExternalFallback,
-                        child: const Text('Open in browser'),
+                        child: Text(coreTr('Open in browser')),
                       ),
                       TextButton(
                         onPressed: _signalLeave,
-                        child: const Text('Leave'),
+                        child: Text(coreTr('Leave')),
                       ),
                     ],
                   ),

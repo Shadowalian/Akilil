@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,11 +24,11 @@ class CommunityScreen extends ConsumerWidget {
     final async = ref.watch(_channelsProvider);
 
     return FriendPageScaffold(
-      eyebrow: 'Community',
-      title: 'Circles',
-      subtitle: 'Rooms where nobody has to explain themselves.',
+      eyebrow: tr('Community'),
+      title: tr('Circles'),
+      subtitle: tr('Rooms where nobody has to explain themselves.'),
       trailing: FriendGlowButton(
-        label: 'Vent',
+        label: tr('Vent'),
         icon: Icons.weekend_outlined,
         onPressed: () => context.push(AppRoutes.vents),
       ),
@@ -42,17 +43,17 @@ class CommunityScreen extends ConsumerWidget {
         error: (_, __) => FriendEmptyState(
           icon: Icons.cloud_off_outlined,
           title: "Couldn't load circles",
-          message: 'Check your connection and try again.',
-          ctaLabel: 'Retry',
+          message: tr('Check your connection and try again.'),
+          ctaLabel: tr('Retry'),
           onCta: () => ref.invalidate(_channelsProvider),
         ),
         data: (channels) {
           if (channels.isEmpty) {
-            return const FriendEmptyState(
+            return FriendEmptyState(
               icon: Icons.groups_outlined,
-              title: 'No circles yet',
+              title: tr('No circles yet'),
               message:
-                  'Shared spaces open up soon. Your journal is a good place to put it down until then.',
+                  tr('There are no circles right now. Your journal is a good place to write it down in the meantime.'),
             );
           }
           return Column(
@@ -76,7 +77,7 @@ class _ChannelTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final name = channel['name'] as String? ?? 'Circle';
+    final name = channel['name'] as String? ?? tr('Circle');
     final description = channel['description'] as String?;
     final members = (channel['member_count'] as num?)?.toInt();
     final isPrivate = channel['is_private'] == true;

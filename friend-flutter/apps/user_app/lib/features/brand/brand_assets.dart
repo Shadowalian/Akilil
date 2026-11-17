@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -26,7 +27,7 @@ class BrandAssets {
         mark(size: 32),
         const SizedBox(width: 10),
         Text(
-          'Akilil',
+          tr('Akilil'),
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 20,

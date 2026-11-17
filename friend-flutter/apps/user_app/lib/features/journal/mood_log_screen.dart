@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +38,7 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
         if (_note.text.trim().isNotEmpty) 'note': _note.text.trim(),
       });
       setState(() {
-        _feedback = 'Logged. See you tomorrow.';
+        _feedback = tr('Logged. See you tomorrow.');
         _mood = null;
         _note.clear();
       });
@@ -53,12 +54,12 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
     final theme = Theme.of(context);
 
     return FriendPageScaffold(
-      eyebrow: 'Check in',
-      title: 'How are you?',
-      subtitle: 'A quiet moment. Just for you.',
+      eyebrow: tr('Check in'),
+      title: tr('How are you?'),
+      subtitle: tr('A quiet moment. Just for you.'),
       trailing: FriendIconChip(
         icon: Icons.insights_outlined,
-        tooltip: 'Analytics',
+        tooltip: tr('Analytics'),
         onPressed: () => context.go('/mood/analytics'),
       ),
       body: Column(
@@ -70,7 +71,7 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
             child: Column(
               children: [
                 Text(
-                  _mood == null ? 'Tap a face' : _labelFor(_mood!),
+                  _mood == null ? tr('Tap a face') : _labelFor(_mood!),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -97,8 +98,8 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
             minLines: 2,
             maxLines: 4,
             decoration: InputDecoration(
-              labelText: 'Optional note',
-              hintText: 'Anything else you want to capture?',
+              labelText: tr('Optional note'),
+              hintText: tr('Anything else you want to capture?'),
               filled: true,
               fillColor: FriendColors.surface,
               border: OutlineInputBorder(
@@ -117,7 +118,7 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
           ),
           const SizedBox(height: 28),
           FriendGlowButton(
-            label: 'Save mood',
+            label: tr('Save mood'),
             expanded: true,
             onPressed: _mood == null || _busy ? null : _log,
           ),
@@ -138,13 +139,13 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
   }
 
   String _labelFor(int mood) => switch (mood) {
-        1 => 'Very low',
-        2 => 'Low',
+        1 => tr('Very low'),
+        2 => tr('Low'),
         3 => 'A bit down',
-        4 => 'Okay',
-        5 => 'Good',
+        4 => tr('Okay'),
+        5 => tr('Good'),
         6 => 'Great',
-        _ => 'Excellent',
+        _ => tr('Excellent'),
       };
 }
 

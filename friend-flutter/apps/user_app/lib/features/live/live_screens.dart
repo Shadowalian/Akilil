@@ -1,9 +1,9 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 final _liveListProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final res = await ref.read(dioProvider).get<Map<String, dynamic>>('/live-streams');
@@ -19,18 +19,18 @@ class LiveListScreen extends ConsumerWidget {
     final async = ref.watch(_liveListProvider);
     final theme = Theme.of(context);
     return FriendPageScaffold(
-      eyebrow: 'Live',
-      title: 'Watch together',
-      subtitle: 'Reflections with spiritual guides and cook-alongs with chefs.',
+      eyebrow: tr('Live'),
+      title: tr('Watch together'),
+      subtitle: tr('Reflections with spiritual guides and cook-alongs with chefs.'),
       onRefresh: () async => ref.invalidate(_liveListProvider),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         error: (_, _) => const FriendEmptyState(icon: Icons.cloud_off_outlined, title: "Couldn't load live broadcasts"),
         data: (list) => list.isEmpty
-            ? const FriendEmptyState(
+            ? FriendEmptyState(
                 icon: Icons.sensors_rounded,
-                title: 'Nobody is live right now',
-                message: 'Upcoming broadcasts will appear here.',
+                title: tr('Nobody is live right now'),
+                message: tr('Upcoming broadcasts will appear here.'),
               )
             : ListView.separated(
                 padding: EdgeInsets.zero,
@@ -51,18 +51,20 @@ class LiveListScreen extends ConsumerWidget {
                         Row(
                           children: [
                             FriendStatusChip(
-                              label: live ? 'LIVE · ${s['viewer_count']} watching' : 'Upcoming',
+                              label: live
+                                  ? trx('LIVE · ${s['viewer_count']} watching', 'በቀጥታ · ${s['viewer_count']} እየተመለከቱ')
+                                  : tr('Upcoming'),
                               color: live ? FriendColors.coral : FriendColors.primary,
                             ),
                             const Spacer(),
-                            Text((s['category'] as Map?)?['name']?.toString() ?? '', style: theme.textTheme.labelSmall),
+                            Text(tr((s['category'] as Map?)?['name']?.toString() ?? ''), style: theme.textTheme.labelSmall),
                           ],
                         ),
                         const SizedBox(height: 8),
                         Text((s['title'] ?? '').toString(), style: theme.textTheme.titleMedium),
                         Text(
                           '${(s['host'] as Map?)?['name'] ?? ''}'
-                          '${!live && when != null ? ' · ${DateFormat('EEE MMM d, h:mm a').format(when)}' : ''}',
+                          '${!live && when != null ? ' · ${trDate('EEE MMM d, h:mm a', when)}' : ''}',
                           style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                         ),
                         if (recipe != null) ...[
@@ -71,7 +73,7 @@ class LiveListScreen extends ConsumerWidget {
                             style: TextButton.styleFrom(padding: EdgeInsets.zero),
                             onPressed: () => context.push('/recipes/${recipe['id']}'),
                             icon: const Icon(Icons.shopping_basket_outlined, size: 18),
-                            label: Text('Get the ingredients: ${recipe['title']}'),
+                            label: Text(trx('Get the ingredients: ${recipe['title']}', 'ግብዓቶቹን ያዘጋጁ፦ ${recipe['title']}')),
                           ),
                         ],
                       ],
@@ -158,7 +160,7 @@ class _LiveViewerScreenState extends ConsumerState<LiveViewerScreen> {
           icon: Icons.sensors_off_rounded,
           title: "Can't watch right now",
           message: _error,
-          ctaLabel: 'Try again',
+          ctaLabel: tr('Try again'),
           onCta: _join,
         ),
       );
@@ -184,7 +186,7 @@ class _LiveViewerScreenState extends ConsumerState<LiveViewerScreen> {
         gifts: _gifts,
         currency: _currency,
         canSendGifts: _canGift,
-        giftsDisabledReason: 'Gifts are for adults with a wallet. Ask your guardian.',
+        giftsDisabledReason: tr('Gifts are for adults with a wallet. Ask your guardian.'),
         onClose: _close,
         onTopUp: () => context.push('/wallet'),
         recipeTitle: recipe?['title']?.toString(),

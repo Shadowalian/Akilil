@@ -19,6 +19,8 @@ class JournalEntry extends Model
     {
         return [
             'mood_tags'        => 'array',
+            // Private writing: encrypted at rest, as the app promises.
+            'content'          => 'encrypted',
             'is_private'       => 'boolean',
             'created_client_at'=> 'datetime',
         ];

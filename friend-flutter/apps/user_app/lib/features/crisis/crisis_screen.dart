@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -42,43 +43,43 @@ class CrisisScreen extends ConsumerWidget {
     } catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Contact: $target')),
+        SnackBar(content: Text(trx('Contact: $target', 'ይደውሉ፦ $target'))),
       );
     }
   }
 
   /// Numbers that work in Ethiopia. Deliberately short: in a crisis, fewer
   /// choices is kinder. Review with a local clinical advisor before launch.
-  static const _resources = <Map<String, dynamic>>[
+  static List<Map<String, dynamic>> get _resources => <Map<String, dynamic>>[
     {
-      'name': 'Ambulance',
-      'desc': 'Medical emergency, overdose or serious injury.',
+      'name': tr('Ambulance'),
+      'desc': tr('Medical emergency, overdose or serious injury.'),
       'action_type': 'call',
       'action_target': '907',
-      'badge': 'Call 907',
+      'badge': tr('Call 907'),
       'icon': 'phone_in_talk_rounded',
     },
     {
-      'name': 'Police',
-      'desc': 'If you or someone else is in immediate danger.',
+      'name': tr('Police'),
+      'desc': tr('If you or someone else is in immediate danger.'),
       'action_type': 'call',
       'action_target': '991',
-      'badge': 'Call 991',
+      'badge': tr('Call 991'),
       'icon': 'shield_rounded',
     },
     {
-      'name': 'Outside Ethiopia?',
-      'desc': 'Find a free, confidential helpline in your country.',
+      'name': tr('Outside Ethiopia?'),
+      'desc': tr('Find a free, confidential helpline in your country.'),
       'action_type': 'url',
       'action_target': 'https://findahelpline.com',
-      'badge': 'Worldwide',
+      'badge': tr('Worldwide'),
       'icon': 'public_rounded',
     },
   ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const resources = _resources;
+    final resources = _resources;
     final s = ref.watch(stringsProvider);
     final plan = ref.watch(safetyPlanProvider);
     final person = plan.people.isEmpty ? null : plan.people.first;
@@ -121,8 +122,8 @@ class CrisisScreen extends ConsumerWidget {
             )
           else
             _ToolkitCard(
-              title: 'Add someone you trust',
-              subtitle: 'So their number is one tap away when you need it',
+              title: tr('Add someone you trust'),
+              subtitle: tr('So their number is one tap away when you need it'),
               icon: Icons.person_add_alt_1_rounded,
               onTap: () => context.push(AppRoutes.safetyPlan),
             ),

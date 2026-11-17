@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,8 +26,8 @@ class SafetyPlanScreen extends ConsumerWidget {
           onSubmitted: (v) => Navigator.pop(d, v.trim()),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(d), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(d, c.text.trim()), child: const Text('Add')),
+          TextButton(onPressed: () => Navigator.pop(d), child: Text(tr('Cancel'))),
+          FilledButton(onPressed: () => Navigator.pop(d, c.text.trim()), child: Text(tr('Add'))),
         ],
       ),
     );
@@ -38,7 +39,7 @@ class SafetyPlanScreen extends ConsumerWidget {
     return showDialog<({String name, String phone})>(
       context: context,
       builder: (d) => AlertDialog(
-        title: const Text('Someone I can call'),
+        title: Text(tr('Someone I can call')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -46,21 +47,21 @@ class SafetyPlanScreen extends ConsumerWidget {
               controller: name,
               autofocus: true,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: tr('Name')),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: phone,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(labelText: 'Phone number'),
+              decoration: InputDecoration(labelText: tr('Phone number')),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(d), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(d), child: Text(tr('Cancel'))),
           FilledButton(
             onPressed: () => Navigator.pop(d, (name: name.text.trim(), phone: phone.text.trim())),
-            child: const Text('Add'),
+            child: Text(tr('Add')),
           ),
         ],
       ),
@@ -99,7 +100,7 @@ class SafetyPlanScreen extends ConsumerWidget {
                     if (t != null && t.isNotEmpty) save([...items, t]);
                   },
                   icon: const Icon(Icons.add_rounded, size: 18),
-                  label: Text(items.isEmpty ? 'Add the first one' : 'Add another'),
+                  label: Text(items.isEmpty ? tr('Add the first one') : tr('Add another')),
                 ),
               ),
             ],
@@ -110,36 +111,36 @@ class SafetyPlanScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      appBar: AppBar(title: const Text('My safety plan')),
+      appBar: AppBar(title: Text(tr('My safety plan'))),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 8, FriendLayout.horizontal, 32),
         children: [
           Text(
-            'Fill this in on a calmer day. When things get hard, you will not have to think — just follow it. '
-            'The professionals you book and the Akilil safety team can read it, so they can help you if you reach out.',
+            tr('Fill this in on a calmer day. When things get hard, you will not have to think — just follow it. '
+            'The professionals you book and the Akilil safety team can read it, so they can help you if you reach out.'),
             style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
           ),
           const SizedBox(height: 6),
           LinearProgressIndicator(value: plan.stepsDone / 4, minHeight: 4, borderRadius: BorderRadius.circular(2)),
           const SizedBox(height: 4),
-          Text('${plan.stepsDone} of 4 steps filled in', style: theme.textTheme.labelSmall),
+          Text(trx('${plan.stepsDone} of 4 steps filled in', 'ከ4 ደረጃዎች ${plan.stepsDone} ተሞልተዋል'), style: theme.textTheme.labelSmall),
           const SizedBox(height: 18),
           step(
             n: 1,
-            title: 'My warning signs',
-            hint: 'Thoughts, moods or situations that tell me a crisis may be coming.',
+            title: tr('My warning signs'),
+            hint: tr('Thoughts, moods or situations that tell me a crisis may be coming.'),
             items: plan.warningSigns,
-            addTitle: 'A warning sign',
-            addHint: 'e.g. I stop answering calls',
+            addTitle: tr('A warning sign'),
+            addHint: tr('e.g. I stop answering calls'),
             save: (l) => store.update(plan.copyWith(warningSigns: l)),
           ),
           step(
             n: 2,
-            title: 'Things I can do on my own',
-            hint: 'Ways to take my mind off things without contacting anyone.',
+            title: tr('Things I can do on my own'),
+            hint: tr('Ways to take my mind off things without contacting anyone.'),
             items: plan.coping,
-            addTitle: 'Something that helps',
-            addHint: 'e.g. A walk around the block',
+            addTitle: tr('Something that helps'),
+            addHint: tr('e.g. A walk around the block'),
             save: (l) => store.update(plan.copyWith(coping: l)),
           ),
           Padding(
@@ -148,7 +149,7 @@ class SafetyPlanScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const _StepHeader(n: 3, title: 'People I can reach', hint: 'Friends or family I can call when I need help.'),
+                  _StepHeader(n: 3, title: tr('People I can reach'), hint: tr('Friends or family I can call when I need help.')),
                   for (final (i, p) in plan.people.indexed)
                     ListTile(
                       contentPadding: EdgeInsets.zero,
@@ -160,12 +161,12 @@ class SafetyPlanScreen extends ConsumerWidget {
                         children: [
                           if (p.phone.isNotEmpty)
                             IconButton(
-                              tooltip: 'Call',
+                              tooltip: tr('Call'),
                               icon: const Icon(Icons.call_rounded, color: FriendColors.primary),
                               onPressed: () => launchUrl(Uri.parse('tel:${p.phone}')),
                             ),
                           IconButton(
-                            tooltip: 'Remove',
+                            tooltip: tr('Remove'),
                             icon: const Icon(Icons.close_rounded, size: 18),
                             onPressed: () => store.update(plan.copyWith(people: [...plan.people]..removeAt(i))),
                           ),
@@ -180,7 +181,7 @@ class SafetyPlanScreen extends ConsumerWidget {
                         if (p != null && p.name.isNotEmpty) store.update(plan.copyWith(people: [...plan.people, p]));
                       },
                       icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-                      label: const Text('Add a person'),
+                      label: Text(tr('Add a person')),
                     ),
                   ),
                 ],
@@ -189,15 +190,15 @@ class SafetyPlanScreen extends ConsumerWidget {
           ),
           step(
             n: 4,
-            title: 'Making things safer',
-            hint: 'Steps to put distance between me and anything I could use to hurt myself.',
+            title: tr('Making things safer'),
+            hint: tr('Steps to put distance between me and anything I could use to hurt myself.'),
             items: plan.environment,
-            addTitle: 'A step',
-            addHint: 'e.g. Give my medication to my sister to keep',
+            addTitle: tr('A step'),
+            addHint: tr('e.g. Give my medication to my sister to keep'),
             save: (l) => store.update(plan.copyWith(environment: l)),
           ),
           Text(
-            'If you are in danger right now, call 907 for an ambulance or 991 for police.',
+            tr('If you are in danger right now, call 907 for an ambulance or 991 for police.'),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.error, fontWeight: FontWeight.w600),
           ),
@@ -261,7 +262,7 @@ class _Item extends StatelessWidget {
         children: [
           Expanded(child: Text(text)),
           IconButton(
-            tooltip: 'Remove',
+            tooltip: tr('Remove'),
             icon: const Icon(Icons.close_rounded, size: 18),
             onPressed: onRemove,
           ),

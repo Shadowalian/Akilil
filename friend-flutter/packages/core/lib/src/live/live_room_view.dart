@@ -1,3 +1,4 @@
+import '../util/i18n.dart';
 import 'package:flutter/material.dart';
 
 import '../jitsi/jitsi_session_view.dart';
@@ -151,8 +152,8 @@ class _LiveRoomViewState extends State<LiveRoomView> {
   Future<void> _openGiftTray() async {
     if (!widget.canSendGifts || !_feed.state.allowGifts) {
       _toast(!_feed.state.allowGifts
-          ? 'The host has turned gifts off.'
-          : widget.giftsDisabledReason ?? 'Gifts are not available.');
+          ? coreTr('The host has turned gifts off.')
+          : widget.giftsDisabledReason ?? coreTr('Gifts are not available.'));
       return;
     }
     await showModalBottomSheet<void>(
@@ -178,12 +179,12 @@ class _LiveRoomViewState extends State<LiveRoomView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: Text(item.userName ?? 'Viewer'),
+              title: Text(item.userName ?? coreTr('Viewer')),
               subtitle: Text(item.body ?? '', maxLines: 2, overflow: TextOverflow.ellipsis),
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline_rounded),
-              title: const Text('Remove this comment'),
+              title: Text(coreTr('Remove this comment')),
               onTap: () {
                 Navigator.pop(sheet);
                 widget.onRemoveComment?.call(item);
@@ -191,7 +192,7 @@ class _LiveRoomViewState extends State<LiveRoomView> {
             ),
             ListTile(
               leading: const Icon(Icons.block_rounded, color: FriendColors.error),
-              title: const Text('Remove viewer from broadcast'),
+              title: Text(coreTr('Remove viewer from broadcast')),
               onTap: () {
                 Navigator.pop(sheet);
                 widget.onRemoveViewer?.call(item);
@@ -214,7 +215,7 @@ class _LiveRoomViewState extends State<LiveRoomView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SwitchListTile(
-                  title: const Text('Comments'),
+                  title: Text(coreTr('Comments')),
                   value: state.allowComments,
                   onChanged: (v) {
                     widget.onToggleComments?.call(v);
@@ -222,17 +223,17 @@ class _LiveRoomViewState extends State<LiveRoomView> {
                   },
                 ),
                 SwitchListTile(
-                  title: const Text('Gifts'),
+                  title: Text(coreTr('Gifts')),
                   value: state.allowGifts,
                   onChanged: (v) {
                     widget.onToggleGifts?.call(v);
                     Navigator.pop(sheet);
                   },
                 ),
-                const ListTile(
+                ListTile(
                   dense: true,
                   leading: Icon(Icons.info_outline_rounded),
-                  title: Text('Long-press a comment to remove it or its author.'),
+                  title: Text(coreTr('Long-press a comment to remove it or its author.')),
                 ),
               ],
             ),
@@ -328,7 +329,7 @@ class _LiveRoomViewState extends State<LiveRoomView> {
                   radius: 17,
                   backgroundColor: FriendColors.primary,
                   child: Text(
-                    widget.hostName.isEmpty ? 'A' : widget.hostName.characters.first.toUpperCase(),
+                    widget.hostName.isEmpty ? coreTr('A') : widget.hostName.characters.first.toUpperCase(),
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -361,7 +362,7 @@ class _LiveRoomViewState extends State<LiveRoomView> {
         const SizedBox(width: 8),
         _pill(
           color: const Color(0xFFE0563B),
-          child: const Text('LIVE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11, letterSpacing: 0.6)),
+          child: Text(coreTr('LIVE'), style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11, letterSpacing: 0.6)),
         ),
         const SizedBox(width: 6),
         _pill(
@@ -386,7 +387,7 @@ class _LiveRoomViewState extends State<LiveRoomView> {
         ],
         const SizedBox(width: 8),
         if (widget.isHost) ...[
-          _roundButton(Icons.tune_rounded, _showHostSettings, tooltip: 'Broadcast settings'),
+          _roundButton(Icons.tune_rounded, _showHostSettings, tooltip: coreTr('Broadcast settings')),
           const SizedBox(width: 6),
           FilledButton(
             onPressed: widget.onEnd,
@@ -395,10 +396,10 @@ class _LiveRoomViewState extends State<LiveRoomView> {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               minimumSize: const Size(0, 36),
             ),
-            child: const Text('End'),
+            child: Text(coreTr('End')),
           ),
         ] else
-          _roundButton(Icons.close_rounded, widget.onClose, tooltip: 'Leave'),
+          _roundButton(Icons.close_rounded, widget.onClose, tooltip: coreTr('Leave')),
       ],
     );
   }
@@ -466,7 +467,7 @@ class _LiveRoomViewState extends State<LiveRoomView> {
   }
 
   Widget _commentTile(LiveFeedItem item) {
-    final name = (item.userName ?? 'Someone').split(' ').first;
+    final name = (item.userName ?? coreTr('Someone')).split(' ').first;
     late final InlineSpan content;
     if (item.isComment) {
       content = TextSpan(children: [
@@ -476,13 +477,13 @@ class _LiveRoomViewState extends State<LiveRoomView> {
     } else if (item.isGift) {
       content = TextSpan(children: [
         TextSpan(text: '$name ', style: const TextStyle(color: Color(0xFFFFD9A8), fontWeight: FontWeight.w700)),
-        TextSpan(text: 'sent ${item.giftName} ${item.giftEmoji}${item.quantity > 1 ? ' ×${item.quantity}' : ''}'),
+        TextSpan(text: '${coreTr('sent')} ${item.giftName} ${item.giftEmoji}${item.quantity > 1 ? ' ×${item.quantity}' : ''}'),
       ]);
     } else if (item.isJoin) {
-      content = TextSpan(text: '$name joined', style: const TextStyle(color: Colors.white70));
+      content = TextSpan(text: coreTr('{name} joined').replaceAll('{name}', name), style: const TextStyle(color: Colors.white70));
     } else {
       content = TextSpan(
-        text: item.body == 'ended' ? 'The broadcast has ended' : 'You are live',
+        text: item.body == 'ended' ? coreTr('The broadcast has ended') : coreTr('You are live'),
         style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic),
       );
     }
@@ -530,13 +531,13 @@ class _LiveRoomViewState extends State<LiveRoomView> {
                       focusedBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
                       filled: false,
-                      hintText: state.allowComments ? 'Say something kind…' : 'Comments are off',
+                      hintText: state.allowComments ? coreTr('Say something kind…') : coreTr('Comments are off'),
                       hintStyle: const TextStyle(color: Colors.white60, fontSize: 14),
                     ),
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Send',
+                  tooltip: coreTr('Send'),
                   onPressed: state.allowComments && !_sending ? _send : null,
                   icon: const Icon(Icons.send_rounded, size: 20, color: Colors.white),
                 ),
@@ -545,9 +546,9 @@ class _LiveRoomViewState extends State<LiveRoomView> {
           ),
         ),
         const SizedBox(width: 8),
-        _roundButton(Icons.card_giftcard_rounded, _openGiftTray, tooltip: 'Send a gift', color: const Color(0xFFD9924A), size: 44),
+        _roundButton(Icons.card_giftcard_rounded, _openGiftTray, tooltip: coreTr('Send a gift'), color: const Color(0xFFD9924A), size: 44),
         const SizedBox(width: 8),
-        _roundButton(Icons.favorite_rounded, _like, tooltip: 'Like', color: const Color(0xFFE0563B), size: 44),
+        _roundButton(Icons.favorite_rounded, _like, tooltip: coreTr('Like'), color: const Color(0xFFE0563B), size: 44),
       ],
     );
   }
@@ -565,19 +566,19 @@ class _LiveRoomViewState extends State<LiveRoomView> {
               Icon(removed ? Icons.block_rounded : Icons.check_circle_outline_rounded, color: Colors.white, size: 48),
               const SizedBox(height: 16),
               Text(
-                removed ? 'You were removed from this broadcast' : 'This broadcast has ended',
+                removed ? coreTr('You were removed from this broadcast') : coreTr('This broadcast has ended'),
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
               ),
               if (!removed) ...[
                 const SizedBox(height: 8),
                 Text(
-                  '${_feed.likesCount} likes',
+                  coreTr('{n} likes').replaceAll('{n}', '${_feed.likesCount}'),
                   style: const TextStyle(color: Colors.white70),
                 ),
               ],
               const SizedBox(height: 20),
-              FilledButton(onPressed: widget.onClose, child: const Text('Close')),
+              FilledButton(onPressed: widget.onClose, child: Text(coreTr('Close'))),
             ],
           ),
         ),
@@ -687,25 +688,25 @@ class _GiftTrayState extends State<GiftTray> {
               Row(
                 children: [
                   Expanded(
-                    child: Text('Send ${widget.hostName.split(' ').first} a gift', style: theme.textTheme.titleMedium),
+                    child: Text(coreTr('Send {name} a gift').replaceAll('{name}', widget.hostName.split(' ').first), style: theme.textTheme.titleMedium),
                   ),
                   if (_balanceCents != null)
                     Text(
-                      'Wallet ${formatMoney(_balanceCents, widget.currency)}',
+                      coreTr('Wallet {amount}').replaceAll('{amount}', formatMoney(_balanceCents, widget.currency)),
                       style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                     ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
-                'Gifts are paid from your wallet and support the host. They cannot be refunded.',
+                coreTr('Gifts are paid from your wallet and support the host. They cannot be refunded.'),
                 style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
               ),
               const SizedBox(height: 12),
               if (widget.gifts.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(child: Text('No gifts available right now.')),
+                  child: Center(child: Text(coreTr('No gifts available right now.'))),
                 )
               else
                 GridView.builder(
@@ -774,7 +775,7 @@ class _GiftTrayState extends State<GiftTray> {
                         Navigator.of(context).pop();
                         widget.onTopUp!();
                       },
-                      child: const Text('Top up wallet'),
+                      child: Text(coreTr('Top up wallet')),
                     )
                   else
                     FilledButton(
@@ -782,10 +783,10 @@ class _GiftTrayState extends State<GiftTray> {
                       style: FilledButton.styleFrom(backgroundColor: FriendColors.accentDeep),
                       child: Text(
                         selected == null
-                            ? 'Choose a gift'
+                            ? coreTr('Choose a gift')
                             : _busy
-                                ? 'Sending…'
-                                : 'Send · ${formatMoney(selected.priceCents * _quantity, widget.currency)}',
+                                ? coreTr('Sending…')
+                                : coreTr('Send · {amount}').replaceAll('{amount}', formatMoney(selected.priceCents * _quantity, widget.currency)),
                       ),
                     ),
                 ],

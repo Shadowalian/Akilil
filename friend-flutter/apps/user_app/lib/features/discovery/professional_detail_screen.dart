@@ -1,8 +1,8 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -48,7 +48,7 @@ final _proNextSlotsProvider = FutureProvider.autoDispose
 
   for (var offset = 0; offset < 7 && found.length < 8; offset++) {
     final day = DateTime(now.year, now.month, now.day).add(Duration(days: offset));
-    final dateStr = DateFormat('yyyy-MM-dd').format(day);
+    final dateStr = trDate('yyyy-MM-dd', day);
     try {
       final res = await dio.get<Map<String, dynamic>>(
         '/professionals/$proId/available-slots',
@@ -61,13 +61,13 @@ final _proNextSlotsProvider = FutureProvider.autoDispose
         final local = DateTime.tryParse(raw['start_local']?.toString() ?? '');
         if (local == null) continue;
         final dayLabel = offset == 0
-            ? 'Today'
+            ? tr('Today')
             : offset == 1
-                ? 'Tomorrow'
-                : DateFormat('EEE').format(day);
+                ? tr('Tomorrow')
+                : trDate('EEE', day);
         found.add(_SlotChipLabel(
           dayLabel: dayLabel,
-          timeLabel: DateFormat('h:mm a').format(local),
+          timeLabel: trDate('h:mm a', local),
         ));
       }
     } on DioException {
@@ -75,14 +75,7 @@ final _proNextSlotsProvider = FutureProvider.autoDispose
     }
   }
 
-  if (found.isEmpty) {
-    return const [
-      _SlotChipLabel(dayLabel: 'Today', timeLabel: '2:00 PM'),
-      _SlotChipLabel(dayLabel: 'Today', timeLabel: '4:30 PM'),
-      _SlotChipLabel(dayLabel: 'Tomorrow', timeLabel: '10:00 AM'),
-      _SlotChipLabel(dayLabel: 'Wed', timeLabel: '11:00 AM'),
-    ];
-  }
+  // No open times: say so, never invent them.
   return found;
 });
 
@@ -155,7 +148,7 @@ class _ProfessionalDetailScreenState
           final name = data['display_name'] as String? ?? s.listenerFallback;
           final avatar = data['avatar_url'] as String?;
           final category = data['category'] as Map<String, dynamic>?;
-          final categoryName = category?['name'] as String? ?? s.listenerFallback;
+          final categoryName = category?['name'] is String ? tr(category!['name'] as String) : s.listenerFallback;
           final rateCents = data['hourly_rate_cents'] as int? ?? 0;
           final currency = data['currency'] as String? ?? 'ETB';
           final bio = (data['bio'] as String? ?? '').trim();
@@ -172,7 +165,7 @@ class _ProfessionalDetailScreenState
           final sessionCents = rateCents;
           final priceMajor = _moneyLabel(sessionCents, currency);
           final langLine = languages.isEmpty
-              ? 'English'
+              ? tr('English')
               : languages.take(3).join(', ');
           final city = (data['city'] as String?)?.trim();
           final metaLine = [categoryName, city?.isNotEmpty == true ? city! : s.cityFallback, langLine]
@@ -297,15 +290,16 @@ class _ProfessionalDetailScreenState
                                     ),
                                   ),
                                 ),
-                                error: (error, stackTrace) => _SlotStrip(
-                                  slots: const [
-                                    _SlotChipLabel(
-                                      dayLabel: 'Today',
-                                      timeLabel: '2:00 PM',
-                                    ),
-                                  ],
+                                error: (error, stackTrace) => Text(
+                                  tr("Couldn't load their times. Open booking to see them."),
+                                  style: _geist(context, color: FriendColors.textSecondary),
                                 ),
-                                data: (slots) => _SlotStrip(slots: slots),
+                                data: (slots) => slots.isEmpty
+                                    ? Text(
+                                        tr('No open times in the next two weeks.'),
+                                        style: _geist(context, color: FriendColors.textSecondary),
+                                      )
+                                    : _SlotStrip(slots: slots),
                               ),
                               const SizedBox(height: 88),
                             ],

@@ -1,8 +1,8 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -97,10 +97,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               ),
             ),
           ),
-          const FriendPageHeader(
-            eyebrow: 'Messages',
-            title: 'Conversation',
-            subtitle: 'Private chat with your listener.',
+          FriendPageHeader(
+            eyebrow: tr('Messages'),
+            title: tr('Conversation'),
+            subtitle: tr('Private chat with your listener.'),
           ),
           Expanded(
             child: RefreshIndicator(
@@ -108,11 +108,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               onRefresh: _refresh,
               child: _messages.isEmpty
                   ? ListView(
-                      children: const [
+                      children: [
                         FriendEmptyState(
                           icon: Icons.chat_bubble_outline,
-                          title: 'Say hi',
-                          message: 'Start the conversation.',
+                          title: tr('Say hi'),
+                          message: tr('Start the conversation.'),
                         ),
                       ],
                     )
@@ -137,8 +137,8 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                       controller: _input,
                       minLines: 1,
                       maxLines: 4,
-                      decoration: const InputDecoration(
-                        hintText: 'Type a message',
+                      decoration: InputDecoration(
+                        hintText: tr('Type a message'),
                         isDense: true,
                       ),
                       onSubmitted: (_) => _send(),
@@ -202,7 +202,7 @@ class _MessageBubble extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  DateFormat('h:mm a').format(createdAt),
+                  trDate('h:mm a', createdAt),
                   style: TextStyle(
                     fontSize: 10,
                     color: (fromMe ? Colors.white : FriendColors.textSecondary)

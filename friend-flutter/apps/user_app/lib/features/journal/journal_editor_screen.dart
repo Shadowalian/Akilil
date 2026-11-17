@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,7 +51,7 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
   Future<void> _save() async {
     if (_title.text.trim().isEmpty && _body.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add a title or some text first.')),
+        SnackBar(content: Text(tr('Add a title or some text first.'))),
       );
       return;
     }
@@ -72,8 +73,8 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
     } on DioException catch (e) {
       if (!mounted) return;
       final msg = e.response?.data is Map
-          ? ((e.response!.data['message'] ?? 'Save failed') as String)
-          : 'Save failed.';
+          ? ((e.response!.data['message'] ?? tr('Save failed')) as String)
+          : tr('Save failed.');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -85,14 +86,14 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete this entry?'),
-        content: const Text('This can\'t be undone.'),
+        title: Text(tr('Delete this entry?')),
+        content: Text(tr('This can\'t be undone.')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Keep')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(tr('Keep'))),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: FriendColors.error),
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Delete'),
+            child: Text(tr('Delete')),
           ),
         ],
       ),
@@ -127,22 +128,22 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
             ),
           ),
           FriendPageHeader(
-            eyebrow: 'Journal',
-            title: widget.entryId == null ? 'New entry' : 'Edit entry',
-            subtitle: 'Your entries are encrypted at rest.',
+            eyebrow: tr('Journal'),
+            title: widget.entryId == null ? 'New entry' : tr('Edit entry'),
+            subtitle: tr('Your entries are encrypted at rest.'),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (widget.entryId != null) ...[
                   FriendIconChip(
                     icon: Icons.delete_outline,
-                    tooltip: 'Delete',
+                    tooltip: tr('Delete'),
                     onPressed: _delete,
                   ),
                   const SizedBox(width: 8),
                 ],
                 FriendGlowButton(
-                  label: _busy ? 'Saving…' : 'Save',
+                  label: _busy ? 'Saving…' : tr('Save'),
                   onPressed: _busy ? null : _save,
                 ),
               ],
@@ -155,8 +156,8 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
                 children: [
                   TextField(
                     controller: _title,
-                    decoration: const InputDecoration(
-                      labelText: 'Title (optional)',
+                    decoration: InputDecoration(
+                      labelText: tr('Title (optional)'),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -166,8 +167,8 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
                       maxLines: null,
                       expands: true,
                       textAlignVertical: TextAlignVertical.top,
-                      decoration: const InputDecoration(
-                        labelText: 'What\'s on your mind?',
+                      decoration: InputDecoration(
+                        labelText: tr('What\'s on your mind?'),
                         alignLabelWithHint: true,
                       ),
                     ),

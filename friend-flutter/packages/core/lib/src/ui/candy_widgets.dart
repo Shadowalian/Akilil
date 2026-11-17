@@ -1,6 +1,7 @@
 /// Akilil Platform — shared UI kit (23.dev polish × Higgsfield structure).
 library;
 
+import '../util/i18n.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -315,7 +316,7 @@ class CandyGradientHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FriendPageHeader(
-      eyebrow: 'Akilil',
+      eyebrow: coreTr('Akilil'),
       title: title,
       subtitle: subtitle,
       trailing: action,

@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,12 +45,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     const divider = Divider(height: 1, indent: 18, endIndent: 18);
 
     return FriendPageScaffold(
-      eyebrow: 'Account',
-      title: 'Settings',
+      eyebrow: tr('Account'),
+      title: tr('Settings'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          section('Your care team', [
+          section(tr('Your care team'), [
             ...team.when(
               loading: () => const [Padding(padding: EdgeInsets.all(20), child: LinearProgressIndicator(minHeight: 2))],
               error: (_, _) => const [ListTile(title: Text("Couldn't load your care team"))],
@@ -57,8 +58,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ? [
                       ListTile(
                         leading: const Icon(Icons.person_search_rounded, color: FriendColors.primary),
-                        title: const Text('No one yet'),
-                        subtitle: const Text('Find a professional who fits you'),
+                        title: Text(tr('No one yet')),
+                        subtitle: Text(tr('Find a professional who fits you')),
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: () => context.go('/'),
                       ),
@@ -73,12 +74,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                tooltip: 'Message',
+                                tooltip: tr('Message'),
                                 icon: const Icon(Icons.chat_bubble_outline_rounded),
                                 onPressed: () => openConversationWith(context, ref, t['user_id'] as int),
                               ),
                               IconButton(
-                                tooltip: 'Book again',
+                                tooltip: tr('Book again'),
                                 icon: const Icon(Icons.event_repeat_rounded),
                                 onPressed: () => context.push('/pros/${t['profile_id']}/book'),
                               ),
@@ -89,55 +90,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       divider,
                       FriendMenuTile(
                         icon: Icons.swap_horiz_rounded,
-                        title: 'Switch professional',
-                        subtitle: 'Free, any time. They are not told why.',
+                        title: tr('Switch professional'),
+                        subtitle: tr('Free, any time. They are not told why.'),
                         onTap: () => context.push('/settings/switch-therapist'),
                       ),
                     ],
             ),
           ]),
-          section('Payments', [
+          section(tr('Payments'), [
             FriendMenuTile(
               icon: Icons.account_balance_wallet_outlined,
-              title: 'Wallet',
-              subtitle: 'Balance, top-ups and receipts',
+              title: tr('Wallet'),
+              subtitle: tr('Balance, top-ups and receipts'),
               onTap: () => context.push('/wallet'),
             ),
             divider,
             FriendMenuTile(
               icon: Icons.receipt_long_outlined,
-              title: 'Pricing & refunds',
-              subtitle: 'How sessions, classes and gifts are charged',
+              title: tr('Pricing & refunds'),
+              subtitle: tr('How sessions, classes and gifts are charged'),
               onTap: () => context.push('/settings/subscription'),
             ),
           ]),
-          section('Care & safety', [
+          section(tr('Care & safety'), [
             FriendMenuTile(
               icon: Icons.emergency_outlined,
-              title: 'Crisis support',
-              subtitle: 'Emergency numbers and your safety plan',
+              title: tr('Crisis support'),
+              subtitle: tr('Emergency numbers and your safety plan'),
               onTap: () => context.push('/crisis'),
             ),
             divider,
             FriendMenuTile(
               icon: Icons.edit_note_rounded,
-              title: 'Worksheets',
-              subtitle: 'Thought records and calming exercises',
+              title: tr('Worksheets'),
+              subtitle: tr('Thought records and calming exercises'),
               onTap: () => context.push('/worksheets'),
             ),
             divider,
             FriendMenuTile(
               icon: Icons.insights_rounded,
-              title: 'Check-ins (PHQ-9 & GAD-7)',
-              subtitle: 'Track low mood and anxiety over time',
+              title: tr('Check-ins (PHQ-9 & GAD-7)'),
+              subtitle: tr('Track low mood and anxiety over time'),
               onTap: () => context.push('/assessments'),
             ),
           ]),
-          section('Privacy & security', [
+          section(tr('Privacy & security'), [
             SwitchListTile(
               secondary: const Icon(Icons.fingerprint_rounded, color: FriendColors.primary),
-              title: const Text('App lock'),
-              subtitle: const Text('Ask for your fingerprint or face to open Akilil'),
+              title: Text(tr('App lock')),
+              subtitle: Text(tr('Ask for your fingerprint or face to open Akilil')),
               value: _biometricLock,
               onChanged: (v) {
                 setState(() => _biometricLock = v);
@@ -147,18 +148,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             divider,
             FriendMenuTile(
               icon: Icons.lock_outline_rounded,
-              title: 'Two-step sign-in',
-              subtitle: 'Add a code from an authenticator app',
+              title: tr('Two-step sign-in'),
+              subtitle: tr('Add a code from an authenticator app'),
               onTap: () => context.push('/2fa-setup'),
             ),
             divider,
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(18, 10, 12, 10),
               child: Row(
                 children: [
                   Icon(Icons.translate_rounded, color: FriendColors.primary),
                   SizedBox(width: 16),
-                  Expanded(child: Text('Language')),
+                  Expanded(child: Text(tr('Language'))),
                   LanguageToggle(compact: true),
                 ],
               ),
@@ -166,7 +167,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ]),
           const SizedBox(height: 24),
           Text(
-            'Akilil is not an emergency service. If you are in danger, call 907 or 991, or go to the nearest hospital.',
+            tr('Akilil is not an emergency service. If you are in danger, call 907 or 991, or go to the nearest hospital.'),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
           ),

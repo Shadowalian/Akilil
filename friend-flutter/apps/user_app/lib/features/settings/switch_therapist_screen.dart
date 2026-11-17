@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,9 +16,9 @@ class SwitchTherapistScreen extends ConsumerStatefulWidget {
 }
 
 class _SwitchTherapistScreenState extends ConsumerState<SwitchTherapistScreen> {
-  static const _reasons = {
-    'approach': 'I want a different way of working',
-    'expertise': 'I need someone with specific expertise',
+  static Map<String, String> get _reasons => {
+    'approach': tr('I want a different way of working'),
+    'expertise': tr('I need someone with specific expertise'),
     'time': "Their times don't work for me",
     'identity': "I'd be more comfortable with a different background or gender",
     'fit': "It just didn't feel right",
@@ -55,13 +56,13 @@ class _SwitchTherapistScreenState extends ConsumerState<SwitchTherapistScreen> {
     final theme = Theme.of(context);
     final matches = _matches;
     return FriendPageScaffold(
-      eyebrow: 'Your care team',
-      title: 'Switch professional',
+      eyebrow: tr('Your care team'),
+      title: tr('Switch professional'),
       subtitle: "It's free, and your current professional is not told why. Your past sessions and notes stay yours.",
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('What would help most?', style: theme.textTheme.titleSmall),
+          Text(tr('What would help most?'), style: theme.textTheme.titleSmall),
           const SizedBox(height: 8),
           for (final r in _reasons.entries)
             RadioListTile<String>(
@@ -73,13 +74,13 @@ class _SwitchTherapistScreenState extends ConsumerState<SwitchTherapistScreen> {
               title: Text(r.value),
             ),
           if (_reason == 'identity') ...[
-            const SizedBox(height: 8),
-            Text('I would prefer', style: theme.textTheme.titleSmall),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
+            Text(tr('I would prefer'), style: theme.textTheme.titleSmall),
+            SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
-                for (final g in const [(null, 'No preference'), ('female', 'A woman'), ('male', 'A man')])
+                for (final g in [(null, tr('No preference')), ('female', tr('A woman')), ('male', tr('A man'))])
                   ChoiceChip(
                     label: Text(g.$2),
                     showCheckmark: false,
@@ -91,17 +92,17 @@ class _SwitchTherapistScreenState extends ConsumerState<SwitchTherapistScreen> {
           ],
           const SizedBox(height: 16),
           FriendGlowButton(
-            label: _loading ? 'Finding people…' : 'Show me who is available',
+            label: _loading ? 'Finding people…' : tr('Show me who is available'),
             expanded: true,
             onPressed: _reason == null || _loading ? null : _search,
           ),
           if (matches != null) ...[
             const SizedBox(height: 20),
             if (matches.isEmpty)
-              const FriendEmptyState(
+              FriendEmptyState(
                 icon: Icons.person_search_rounded,
-                title: 'No one matches yet',
-                message: 'Try "No preference", or browse everyone in Explore.',
+                title: tr('No one matches yet'),
+                message: tr('Try "No preference", or browse everyone in Explore.'),
               ),
             for (final p in matches)
               Padding(

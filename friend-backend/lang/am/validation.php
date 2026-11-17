@@ -1,0 +1,61 @@
+<?php
+
+// Amharic validation messages. Written as a person would say them, not
+// word-for-word. Rules missing here fall back to English.
+return [
+    'accepted' => 'እባክዎ :attribute ይቀበሉ።',
+    'after' => ':attribute ከ:date በኋላ መሆን አለበት።',
+    'after_or_equal' => ':attribute :date ወይም ከዚያ በኋላ መሆን አለበት።',
+    'before' => ':attribute ከ:date በፊት መሆን አለበት።',
+    'before_or_equal' => ':attribute :date ወይም ከዚያ በፊት መሆን አለበት።',
+    'boolean' => ':attribute አዎ ወይም አይ መሆን አለበት።',
+    'confirmed' => 'የ:attribute ማረጋገጫው አይመሳሰልም።',
+    'date' => ':attribute ትክክለኛ ቀን አይደለም።',
+    'digits' => ':attribute :digits አሃዝ መሆን አለበት።',
+    'email' => 'ትክክለኛ ኢሜይል ያስገቡ።',
+    'exists' => 'የተመረጠው :attribute አልተገኘም።',
+    'in' => 'የተመረጠው :attribute ትክክል አይደለም።',
+    'integer' => ':attribute ሙሉ ቁጥር መሆን አለበት።',
+    'max' => [
+        'numeric' => ':attribute ከ:max መብለጥ የለበትም።',
+        'string' => ':attribute ከ:max ፊደላት መብለጥ የለበትም።',
+        'array' => ':attribute ከ:max በላይ መያዝ የለበትም።',
+        'file' => ':attribute ከ:max ኪሎባይት መብለጥ የለበትም።',
+    ],
+    'min' => [
+        'numeric' => ':attribute ቢያንስ :min መሆን አለበት።',
+        'string' => ':attribute ቢያንስ :min ፊደላት መሆን አለበት።',
+        'array' => ':attribute ቢያንስ :min መያዝ አለበት።',
+        'file' => ':attribute ቢያንስ :min ኪሎባይት መሆን አለበት።',
+    ],
+    'numeric' => ':attribute ቁጥር መሆን አለበት።',
+    'password' => [
+        'letters' => 'የይለፍ ቃሉ ቢያንስ አንድ ፊደል መያዝ አለበት።',
+        'mixed' => 'የይለፍ ቃሉ ትልቅና ትንሽ ፊደል መያዝ አለበት።',
+        'numbers' => 'የይለፍ ቃሉ ቢያንስ አንድ ቁጥር መያዝ አለበት።',
+        'symbols' => 'የይለፍ ቃሉ ቢያንስ አንድ ምልክት መያዝ አለበት።',
+        'uncompromised' => 'ይህ የይለፍ ቃል በመረጃ ፍንጣቂ ውስጥ ታይቷል። እባክዎ ሌላ ይምረጡ።',
+    ],
+    'required' => ':attribute ያስፈልጋል።',
+    'required_if' => ':attribute ያስፈልጋል።',
+    'required_with' => ':attribute ያስፈልጋል።',
+    'string' => ':attribute ጽሑፍ መሆን አለበት።',
+    'unique' => 'ይህ :attribute ቀድሞውኑ ተመዝግቧል።',
+    'url' => ':attribute ትክክለኛ ሊንክ አይደለም።',
+
+    'attributes' => [
+        'email' => 'ኢሜይል',
+        'password' => 'የይለፍ ቃል',
+        'name' => 'ስም',
+        'date_of_birth' => 'የትውልድ ቀን',
+        'phone' => 'ስልክ ቁጥር',
+        'code' => 'ኮድ',
+        'scheduled_at' => 'የቀጠሮ ሰዓት',
+        'title' => 'ርዕስ',
+        'content' => 'ይዘት',
+        'body' => 'መልእክት',
+        'relationship' => 'ዝምድና',
+        'terms' => 'ውሎቹን',
+        'amount_cents' => 'መጠን',
+    ],
+];

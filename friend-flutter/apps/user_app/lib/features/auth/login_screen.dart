@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,7 +36,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     super.initState();
     // If biometrics available, offer them immediately.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _tryBiometric());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _tryBiometric();
+    });
   }
 
   @override
@@ -49,6 +52,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final lock = ref.read(appLockProvider.notifier);
     await lock.ensureInitialized();
     final hasSaved = await lock.hasSavedBiometricCredentials();
+    if (!mounted) return;
     if (!lock.biometricsAvailable || !lock.biometricEnabled || !hasSaved) return;
 
     setState(() => _bioBusy = true);
@@ -66,7 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           return;
         } catch (_) {
           if (mounted) {
-            setState(() => _error = 'Biometric session expired. Please sign in with password.');
+            setState(() => _error = tr('Biometric session expired. Please sign in with password.'));
           }
         }
       }
@@ -269,7 +273,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Sign in with Face ID / Fingerprint',
+                                    tr('Sign in with Face ID / Fingerprint'),
                                     style: GoogleFonts.urbanist(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,

@@ -1,8 +1,8 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -64,7 +64,7 @@ class JournalListScreen extends ConsumerWidget {
     final promptIndex =
         DateTime.now().day % SeedData.journalPrompts.length;
     final tonightPrompt =
-        SeedData.journalPrompts[promptIndex]['prompt'] ?? s.journalDefaultPrompt;
+        tr(SeedData.journalPrompts[promptIndex]['prompt'] ?? s.journalDefaultPrompt);
 
     return FriendTabScaffold(
       onRefresh: () async {
@@ -200,7 +200,7 @@ class _JournalHeader extends StatelessWidget {
         ),
         FriendIconChip(
           icon: Icons.insights_outlined,
-          tooltip: 'Mood',
+          tooltip: tr('Mood'),
           onPressed: onInsights,
         ),
         const SizedBox(width: 8),
@@ -442,7 +442,7 @@ class _JournalEntryTile extends StatelessWidget {
     final created =
         DateTime.tryParse(entry['created_at'] as String? ?? '');
   final badge =
-        created != null ? DateFormat('EEE').format(created).toUpperCase() : '—';
+        created != null ? trDate('EEE', created).toUpperCase() : '—';
     final preview = (entry['body_md'] as String? ?? '')
         .split('\n')
         .first
@@ -482,7 +482,7 @@ class _JournalEntryTile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        entry['title'] as String? ?? 'Untitled',
+                        entry['title'] as String? ?? tr('Untitled'),
                         style: const TextStyle(
                           fontFamily: 'Geist',
                           fontSize: FriendTypeScale.bodyLarge,

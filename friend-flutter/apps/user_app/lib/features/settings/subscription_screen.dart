@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,9 +41,9 @@ class SubscriptionScreen extends ConsumerWidget {
         );
 
     return FriendPageScaffold(
-      eyebrow: 'Payments',
-      title: 'Pricing & refunds',
-      subtitle: 'No subscription and no contract. You pay for the sessions you book.',
+      eyebrow: tr('Payments'),
+      title: tr('Pricing & refunds'),
+      subtitle: tr('No subscription and no contract. You pay for the sessions you book.'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -54,7 +55,7 @@ class SubscriptionScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Wallet balance', style: theme.textTheme.labelLarge),
+                      Text(tr('Wallet balance'), style: theme.textTheme.labelLarge),
                       const SizedBox(height: 4),
                       Text(
                         wallet == null ? '—' : formatMoney(wallet['balance_cents'] as num?, wallet['currency'] as String?),
@@ -63,32 +64,32 @@ class SubscriptionScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                FilledButton(onPressed: () => context.push('/wallet'), child: const Text('Top up')),
+                FilledButton(onPressed: () => context.push('/wallet'), child: Text(tr('Top up'))),
               ],
             ),
           ),
           const SizedBox(height: 20),
-          Text('What you pay for', style: theme.textTheme.titleMedium),
-          rule(Icons.person_rounded, 'One-to-one sessions',
+          Text(tr('What you pay for'), style: theme.textTheme.titleMedium),
+          rule(Icons.person_rounded, tr('One-to-one sessions'),
               "Each professional sets their own price, shown on their profile before you book. It's paid from your wallet when you book."),
-          rule(Icons.favorite_rounded, 'Couples & family sessions',
-              'Can be priced differently from individual sessions. One person pays; everyone invited joins free.'),
-          rule(Icons.groups_rounded, 'Groups & cooking classes',
-              'You pay per meeting, when you reserve your seat.'),
-          rule(Icons.card_giftcard_rounded, 'Live gifts',
-              'Optional, adults only, and not refundable. Most of each gift goes to the host.'),
+          rule(Icons.favorite_rounded, tr('Couples & family sessions'),
+              tr('Can be priced differently from individual sessions. One person pays; everyone invited joins free.')),
+          rule(Icons.groups_rounded, tr('Groups & cooking classes'),
+              tr('You pay per meeting, when you reserve your seat.')),
+          rule(Icons.card_giftcard_rounded, tr('Live gifts'),
+              tr('Optional, adults only, and not refundable. Most of each gift goes to the host.')),
           const SizedBox(height: 12),
-          Text('Refunds', style: theme.textTheme.titleMedium),
-          rule(Icons.check_circle_outline_rounded, '24 hours or more before',
-              'Cancel and get everything back to your wallet.'),
-          rule(Icons.timelapse_rounded, 'Between 24 and 2 hours before', 'You get half back.'),
-          rule(Icons.block_rounded, 'Less than 2 hours before', 'No refund. The professional had kept that time for you.'),
-          rule(Icons.verified_user_outlined, 'If the professional cancels', 'You always get everything back.'),
-          rule(Icons.groups_2_outlined, 'Group seats',
-              'Full refund if you cancel 24 hours ahead, or if the host cancels the meeting.'),
+          Text(tr('Refunds'), style: theme.textTheme.titleMedium),
+          rule(Icons.check_circle_outline_rounded, tr('24 hours or more before'),
+              tr('Cancel and get everything back to your wallet.')),
+          rule(Icons.timelapse_rounded, tr('Between 24 and 2 hours before'), tr('You get half back.')),
+          rule(Icons.block_rounded, tr('Less than 2 hours before'), tr('No refund. The professional had kept that time for you.')),
+          rule(Icons.verified_user_outlined, tr('If the professional cancels'), tr('You always get everything back.')),
+          rule(Icons.groups_2_outlined, tr('Group seats'),
+              tr('Full refund if you cancel 24 hours ahead, or if the host cancels the meeting.')),
           const SizedBox(height: 12),
           Text(
-            'Children and teens never pay. A parent or guardian books and pays from their own account.',
+            tr('Children and teens never pay. A parent or guardian books and pays from their own account.'),
             style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
           ),
           const SizedBox(height: 24),

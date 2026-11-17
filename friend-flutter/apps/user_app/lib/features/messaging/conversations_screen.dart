@@ -1,9 +1,9 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../auth/auth_controller.dart';
 import 'care_team.dart';
@@ -39,9 +39,9 @@ class ConversationsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return FriendPageScaffold(
-      eyebrow: 'Messages',
-      title: 'Your conversations',
-      subtitle: 'Message the professionals you have booked. Replies come during their working hours — this is not for emergencies.',
+      eyebrow: tr('Messages'),
+      title: tr('Your conversations'),
+      subtitle: tr('Message the professionals you have booked. Replies come during their working hours — this is not for emergencies.'),
       onRefresh: () async {
         ref.invalidate(_conversationsProvider);
         ref.invalidate(careTeamProvider);
@@ -54,7 +54,7 @@ class ConversationsScreen extends ConsumerWidget {
         error: (_, _) => FriendEmptyState(
           icon: Icons.cloud_off_outlined,
           title: "Couldn't load messages",
-          ctaLabel: 'Try again',
+          ctaLabel: tr('Try again'),
           onCta: () => ref.invalidate(_conversationsProvider),
         ),
         data: (list) {
@@ -71,15 +71,15 @@ class ConversationsScreen extends ConsumerWidget {
               if (list.isEmpty && team.isEmpty)
                 FriendEmptyState(
                   icon: Icons.forum_outlined,
-                  title: 'No conversations yet',
-                  message: 'Once you book a session you can message that professional here.',
-                  ctaLabel: 'Find someone',
+                  title: tr('No conversations yet'),
+                  message: tr('Once you book a session you can message that professional here.'),
+                  ctaLabel: tr('Find someone'),
                   onCta: () => context.go('/'),
                 ),
               for (final c in list) _ThreadTile(conversation: c, me: me),
               if (startable.isNotEmpty) ...[
                 const SizedBox(height: 18),
-                Text('Start a conversation', style: theme.textTheme.titleSmall),
+                Text(tr('Start a conversation'), style: theme.textTheme.titleSmall),
                 const SizedBox(height: 8),
                 for (final t in startable)
                   Card(
@@ -135,7 +135,7 @@ class _ThreadTile extends StatelessWidget {
                   Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 2),
                   Text(
-                    (last?['preview'] ?? 'Say hello').toString(),
+                    (last?['preview'] ?? tr('Say hello')).toString(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -152,7 +152,7 @@ class _ThreadTile extends StatelessWidget {
               children: [
                 if (at != null)
                   Text(
-                    DateTime.now().difference(at).inHours < 24 ? DateFormat('h:mm a').format(at) : DateFormat('MMM d').format(at),
+                    DateTime.now().difference(at).inHours < 24 ? trDate('h:mm a', at) : trDate('MMM d', at),
                     style: theme.textTheme.labelSmall?.copyWith(color: FriendColors.textMuted),
                   ),
                 if (unread > 0) ...[

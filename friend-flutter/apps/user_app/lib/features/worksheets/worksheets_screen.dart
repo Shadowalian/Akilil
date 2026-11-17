@@ -1,3 +1,4 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,9 +16,10 @@ class WorksheetsScreen extends ConsumerStatefulWidget {
 }
 
 class _WorksheetsScreenState extends ConsumerState<WorksheetsScreen> {
+  // Internal values stay English (they match the data); labels are translated.
   String _selectedCategory = 'All';
 
-  final List<String> _categories = [
+  static const List<String> _categories = [
     'All',
     'CBT Tools',
     'Anxiety & Panic',
@@ -37,10 +39,10 @@ class _WorksheetsScreenState extends ConsumerState<WorksheetsScreen> {
         : allWorksheets.where((w) => w['category'] == _selectedCategory).toList();
 
     return FriendPageScaffold(
-      eyebrow: 'Tools',
-      title: 'Worksheets',
+      eyebrow: tr('Tools'),
+      title: tr('Worksheets'),
       subtitle:
-          'Short, well-tested exercises you can do on your own or alongside your sessions.',
+          tr('Short, well-tested exercises you can do on your own or alongside your sessions.'),
       showBack: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -84,7 +86,7 @@ class _WorksheetsScreenState extends ConsumerState<WorksheetsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Feeling Anxious Right Now?',
+                        tr('Feeling Anxious Right Now?'),
                         style: GoogleFonts.urbanist(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -93,7 +95,7 @@ class _WorksheetsScreenState extends ConsumerState<WorksheetsScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '1-minute guided visual box breathing to quiet your heart rate.',
+                        tr('1-minute guided visual box breathing to quiet your heart rate.'),
                         style: GoogleFonts.urbanist(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -116,7 +118,7 @@ class _WorksheetsScreenState extends ConsumerState<WorksheetsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   ),
                   child: Text(
-                    'Breathe',
+                    tr('Breathe'),
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
@@ -137,7 +139,7 @@ class _WorksheetsScreenState extends ConsumerState<WorksheetsScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
-                    label: Text(c),
+                    label: Text(tr(c)),
                     selected: isSel,
                     onSelected: (sel) {
                       if (sel) setState(() => _selectedCategory = c);
@@ -206,10 +208,10 @@ class _WorksheetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = worksheet['title'] as String? ?? '';
-    final category = worksheet['category'] as String? ?? '';
-    final tag = worksheet['tag'] as String? ?? '';
-    final desc = worksheet['description'] as String? ?? '';
+    final title = tr(worksheet['title'] as String? ?? '');
+    final category = tr(worksheet['category'] as String? ?? '');
+    final tag = tr(worksheet['tag'] as String? ?? '');
+    final desc = tr(worksheet['description'] as String? ?? '');
     final isCompleted = worksheet['is_completed'] == true;
     final icon = _getIcon(worksheet['icon'] as String?);
 
@@ -268,7 +270,7 @@ class _WorksheetCard extends StatelessWidget {
                       const Icon(Icons.check_rounded, size: 12, color: FriendColors.primaryDeep),
                       const SizedBox(width: 4),
                       Text(
-                        'Completed',
+                        tr('Completed'),
                         style: GoogleFonts.urbanist(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -312,7 +314,7 @@ class _WorksheetCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                isCompleted ? 'Review & Edit' : 'Open Exercise',
+                isCompleted ? 'Review & Edit' : tr('Open Exercise'),
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,

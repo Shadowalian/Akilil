@@ -1,7 +1,7 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -377,8 +377,8 @@ class _ExploreSupportSection extends ConsumerWidget {
               child: _QuickCard(
                 icon: Icons.sensors_rounded,
                 color: FriendColors.coral,
-                title: 'Live',
-                subtitle: 'Reflections & cook-alongs',
+                title: tr('Live'),
+                subtitle: tr('Reflections & cook-alongs'),
                 onTap: () => context.go(AppRoutes.live),
               ),
             ),
@@ -387,8 +387,8 @@ class _ExploreSupportSection extends ConsumerWidget {
               child: _QuickCard(
                 icon: Icons.family_restroom_rounded,
                 color: FriendColors.primary,
-                title: 'Family',
-                subtitle: 'Book for your child',
+                title: tr('Family'),
+                subtitle: tr('Book for your child'),
                 onTap: () => context.go(AppRoutes.family),
               ),
             ),
@@ -579,7 +579,7 @@ class _NextSessionHero extends ConsumerWidget {
         final proName =
             (appt['professional'] as Map<String, dynamic>?)?['name']
                     as String? ??
-                'Akilil';
+                tr('Akilil');
         final status = appt['status'] as String? ?? 'pending';
         final duration = appt['duration_minutes'] as int? ?? 45;
         final end = when.add(Duration(minutes: duration));
@@ -595,7 +595,7 @@ class _NextSessionHero extends ConsumerWidget {
                 (minsUntil <= 15 && minsUntil >= -(duration + 30)));
 
         final timeRange =
-            '${DateFormat('h:mm a').format(when)} – ${DateFormat('h:mm a').format(end)}';
+            '${trDate('h:mm a', when)} – ${trDate('h:mm a', end)}';
 
         return CandyCard(
           padding: const EdgeInsets.all(20),

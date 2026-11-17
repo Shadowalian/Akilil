@@ -1,7 +1,7 @@
+import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -24,10 +24,10 @@ class AppointmentsScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const FriendPageHeader(
-            eyebrow: 'Sessions',
-            title: 'Your sessions',
-            subtitle: 'Everything you have booked, in one place.',
+          FriendPageHeader(
+            eyebrow: tr('Sessions'),
+            title: tr('Your sessions'),
+            subtitle: tr('Everything you have booked, in one place.'),
           ),
           Expanded(
             child: apptsAsync.when(
@@ -37,15 +37,15 @@ class AppointmentsScreen extends ConsumerWidget {
               error: (e, _) => FriendEmptyState(
                 icon: Icons.cloud_off_outlined,
                 title: "Couldn't load sessions",
-                message: 'Pull to refresh or try again shortly.',
+                message: tr('Pull to refresh or try again shortly.'),
               ),
               data: (list) {
                 if (list.isEmpty) {
                   return FriendEmptyState(
                     icon: Icons.videocam_off_outlined,
-                    title: 'No sessions yet',
-                    message: 'Discover someone who feels right.',
-                    ctaLabel: 'Discover listeners',
+                    title: tr('No sessions yet'),
+                    message: tr('Discover someone who feels right.'),
+                    ctaLabel: tr('Find someone'),
                     onCta: () => context.go('/'),
                   );
                 }
@@ -112,7 +112,7 @@ class _NextUpHero extends StatelessWidget {
     final theme = Theme.of(context);
     final scheduledAt = DateTime.parse(appt['scheduled_at'] as String).toLocal();
     final pro = appt['professional'] as Map<String, dynamic>?;
-    final proName = pro?['name'] ?? 'Listener';
+    final proName = pro?['name'] ?? tr('Listener');
     final status = appt['status'] as String? ?? 'pending';
     final duration = (appt['duration_minutes'] as num?)?.toInt() ?? 45;
     final minsUntil = scheduledAt.difference(DateTime.now()).inMinutes;
@@ -130,7 +130,7 @@ class _NextUpHero extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const FriendSectionLabel('Next up'),
+        FriendSectionLabel(tr('Next up')),
         FriendHeroCard(
           tint: FriendColors.primary,
           onTap: canJoin
@@ -146,10 +146,10 @@ class _NextUpHero extends StatelessWidget {
                   ),
                   FriendStatusChip(
                     label: waitingAccept
-                        ? 'Awaiting listener'
+                        ? tr('Awaiting listener')
                         : status == 'confirmed'
-                            ? 'Confirmed'
-                            : 'Pending',
+                            ? tr('Confirmed')
+                            : tr('Pending'),
                     color: waitingAccept
                         ? FriendColors.accent
                         : status == 'confirmed'
@@ -160,7 +160,7 @@ class _NextUpHero extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                DateFormat('EEEE, MMM d · h:mm a').format(scheduledAt),
+                trDate('EEEE, MMM d · h:mm a', scheduledAt),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: FriendColors.textSecondary,
                 ),
@@ -170,7 +170,7 @@ class _NextUpHero extends StatelessWidget {
                 children: [
                   Expanded(
                     child: FriendGlowButton(
-                      label: canJoin ? 'Join session' : 'Open waiting room',
+                      label: canJoin ? 'Join session' : tr('Open waiting room'),
                       icon: Icons.videocam_rounded,
                       expanded: true,
                       onPressed: () =>
@@ -182,7 +182,7 @@ class _NextUpHero extends StatelessWidget {
                     onPressed: () =>
                         context.go('/appointments/${appt['id']}/room'),
                     icon: const Icon(Icons.tune_rounded, size: 16),
-                    label: const Text('Setup'),
+                    label: Text(tr('Setup')),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: FriendColors.primary,
                       side: const BorderSide(color: FriendColors.primary),
@@ -198,7 +198,7 @@ class _NextUpHero extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        const FriendSectionLabel('All sessions'),
+        FriendSectionLabel(tr('All sessions')),
       ],
     );
   }
@@ -212,16 +212,16 @@ class _AppointmentCard extends ConsumerWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Cancel this session?'),
-        content: const Text('Refund policy may apply.'),
+        title: Text(tr('Cancel this session?')),
+        content: Text(tr('Refund policy may apply.')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Keep'),
+            child: Text(tr('Keep')),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Cancel session'),
+            child: Text(tr('Cancel session')),
           ),
         ],
       ),
@@ -237,7 +237,7 @@ class _AppointmentCard extends ConsumerWidget {
     final scheduledAt = DateTime.parse(appt['scheduled_at'] as String).toLocal();
     final status = appt['status'] as String? ?? 'pending';
     final pro = appt['professional'] as Map<String, dynamic>?;
-    final proName = pro?['name'] ?? 'Listener';
+    final proName = pro?['name'] ?? tr('Listener');
     final minsUntil = scheduledAt.difference(DateTime.now()).inMinutes;
     final duration = (appt['duration_minutes'] as num?)?.toInt() ?? 45;
     final priceCents = (appt['price_cents'] as num?)?.toInt() ?? -1;
@@ -272,7 +272,7 @@ class _AppointmentCard extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            DateFormat('EEE, MMM d · h:mm a').format(scheduledAt),
+            trDate('EEE, MMM d · h:mm a', scheduledAt),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: FriendColors.textSecondary,
                 ),
@@ -291,14 +291,14 @@ class _AppointmentCard extends ConsumerWidget {
             children: [
               if (canJoin)
                 FriendGlowButton(
-                  label: 'Join session',
+                  label: tr('Join session'),
                   icon: Icons.videocam_rounded,
                   onPressed: () =>
                       context.go('/appointments/${appt['id']}/room'),
                 )
               else if (waitingAccept)
                 Text(
-                  'Awaiting listener',
+                  tr('Awaiting listener'),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: FriendColors.textMuted,
                       ),
@@ -306,8 +306,8 @@ class _AppointmentCard extends ConsumerWidget {
               else if (status == 'pending' || status == 'confirmed')
                 Text(
                   minsUntil > 15
-                      ? 'Opens 15 min before'
-                      : 'Join window closed',
+                      ? tr('Opens 15 min before')
+                      : tr('Join window closed'),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: FriendColors.textMuted,
                       ),
@@ -316,7 +316,7 @@ class _AppointmentCard extends ConsumerWidget {
               if (status == 'pending' || status == 'confirmed')
                 TextButton(
                   onPressed: () => _cancel(context, ref),
-                  child: const Text('Cancel'),
+                  child: Text(tr('Cancel')),
                 ),
             ],
           ),
@@ -333,13 +333,13 @@ String? _careLine(Map<String, dynamic> appt) {
   final dependent = appt['dependent'] as Map?;
   final others = ((appt['participants'] as List?) ?? const []).map((p) => (p as Map)['name']).join(', ');
   final label = switch (format) {
-    'couples' => 'Couples session',
-    'family' => 'Family session',
-    'child' || 'teen' => 'For ${dependent?['name'] ?? 'your child'}',
+    'couples' => tr('Couples session'),
+    'family' => tr('Family session'),
+    'child' || 'teen' => trx('For ${dependent?['name'] ?? 'your child'}', 'ለ${dependent?['name'] ?? 'ልጅዎ'}'),
     _ => null,
   };
   if (label == null) return null;
-  return others.isEmpty ? label : '$label · with $others';
+  return others.isEmpty ? label : trx('$label · with $others', '$label · ከ$others ጋር');
 }
 
 /// Cooking sessions: get the ingredients, then confirm.
@@ -369,7 +369,9 @@ class _RecipeNudge extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  ready ? 'Ingredients ready · ${recipe['title']}' : 'Get your ingredients · ${recipe['title']}',
+                  ready
+                      ? trx('Ingredients ready · ${recipe['title']}', 'ግብዓቶቹ ተዘጋጅተዋል · ${recipe['title']}')
+                      : trx('Get your ingredients · ${recipe['title']}', 'ግብዓቶቹን ያዘጋጁ · ${recipe['title']}'),
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
               ),
@@ -389,11 +391,11 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (status) {
-      'confirmed' => (FriendColors.primary, 'Confirmed'),
-      'pending' => (FriendColors.accent, 'Pending'),
-      'awaiting' => (FriendColors.accent, 'Awaiting listener'),
-      'cancelled' => (FriendColors.error, 'Cancelled'),
-      'completed' => (FriendColors.textSecondary, 'Done'),
+      'confirmed' => (FriendColors.primary, tr('Confirmed')),
+      'pending' => (FriendColors.accent, tr('Pending')),
+      'awaiting' => (FriendColors.accent, tr('Awaiting listener')),
+      'cancelled' => (FriendColors.error, tr('Cancelled')),
+      'completed' => (FriendColors.textSecondary, tr('Done')),
       _ => (FriendColors.textSecondary, status),
     };
     return FriendStatusChip(label: label, color: color);

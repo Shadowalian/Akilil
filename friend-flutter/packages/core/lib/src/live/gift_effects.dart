@@ -1,3 +1,4 @@
+import '../util/i18n.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -153,7 +154,7 @@ class _GiftEffectState extends State<_GiftEffect> with SingleTickerProviderState
     final slide = Curves.easeOutCubic.transform((t / 0.12).clamp(0.0, 1.0));
     final fade = t < 0.85 ? 1.0 : (1 - (t - 0.85) / 0.15).clamp(0.0, 1.0);
     final item = widget.item;
-    final name = (item.userName ?? 'Someone').split(' ').first;
+    final name = (item.userName ?? coreTr('Someone')).split(' ').first;
 
     return Positioned(
       left: 12 - (1 - slide) * 260,
@@ -191,7 +192,7 @@ class _GiftEffectState extends State<_GiftEffect> with SingleTickerProviderState
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
                     ),
                     Text(
-                      'sent ${item.giftName}',
+                      '${coreTr('sent')} ${item.giftName}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Colors.white, fontSize: 12),
