@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -40,7 +40,7 @@ class AvailabilityScreen extends ConsumerWidget {
       ref.invalidate(_rulesProvider);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Open every day, all day.')),
+        SnackBar(content: Text(tr('Open every day, all day.'))),
       );
     } on DioException catch (e) {
       if (!context.mounted) return;
@@ -58,10 +58,10 @@ class AvailabilityScreen extends ConsumerWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Schedule'),
-          bottom: const TabBar(tabs: [
-            Tab(text: 'Weekly hours'),
-            Tab(text: 'Time off'),
+          title: Text(tr('Schedule')),
+          bottom: TabBar(tabs: [
+            Tab(text: tr('Weekly hours')),
+            Tab(text: tr('Time off')),
           ]),
         ),
         body: Column(
@@ -72,13 +72,13 @@ class AvailabilityScreen extends ConsumerWidget {
               child: FilledButton.icon(
                 onPressed: () => _setEveryDayEveryTime(context, ref),
                 icon: const Icon(Icons.all_inclusive),
-                label: const Text('Every day, every time'),
+                label: Text(tr('Every day, every time')),
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: Text(
-                'Opens Mon–Sun, 00:00–23:59 for bookings.',
+                tr('Opens Mon–Sun, 00:00–23:59 for bookings.'),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
@@ -116,11 +116,11 @@ class _RulesList extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text("Couldn't load hours.")),
         data: (list) => list.isEmpty
-            ? const Center(
+            ? Center(
                 child: Padding(
                   padding: EdgeInsets.all(32),
                   child: Text(
-                    'No weekly hours yet. Tap “Every day, every time” above, or Add hours.',
+                    tr('No weekly hours yet. Tap “Every day, every time” above, or Add hours.'),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -153,13 +153,13 @@ class _RulesList extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddRule(context, ref, onSaved: onChanged),
         icon: const Icon(Icons.add),
-        label: const Text('Add hours'),
+        label: Text(tr('Add hours')),
       ),
     );
   }
 
   String _weekdayName(int? w) =>
-      ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][(w ?? 1).clamp(1, 7) - 1];
+      [tr('Mon'), tr('Tue'), tr('Wed'), tr('Thu'), tr('Fri'), tr('Sat'), tr('Sun')][(w ?? 1).clamp(1, 7) - 1];
 
   void _showAddRule(BuildContext context, WidgetRef ref, {required VoidCallback onSaved}) {
     int weekday = 1;
@@ -179,11 +179,11 @@ class _RulesList extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Add weekly hours', style: Theme.of(ctx).textTheme.titleLarge),
+                Text(tr('Add weekly hours'), style: Theme.of(ctx).textTheme.titleLarge),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
                   initialValue: weekday,
-                  decoration: const InputDecoration(labelText: 'Day'),
+                  decoration: InputDecoration(labelText: tr('Day')),
                   items: [
                     for (var i = 1; i <= 7; i++)
                       DropdownMenuItem(value: i, child: Text(_weekdayName(i))),
@@ -238,7 +238,7 @@ class _RulesList extends ConsumerWidget {
                       }
                     }
                   },
-                  child: const Text('Save'),
+                  child: Text(tr('Save')),
                 ),
               ],
             ),
@@ -270,7 +270,7 @@ String _saveError(DioException e) {
       e.type == DioExceptionType.receiveTimeout ||
       e.type == DioExceptionType.sendTimeout ||
       e.type == DioExceptionType.connectionError) {
-    return 'Network error — check connection and try again.';
+    return tr('Network error — check connection and try again.');
   }
   return "Couldn't save. Try again.";
 }
@@ -287,10 +287,10 @@ class _BlocksList extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text("Couldn't load blocks.")),
         data: (list) => list.isEmpty
-            ? const Center(
+            ? Center(
                 child: Padding(
                   padding: EdgeInsets.all(32),
-                  child: Text('No time off scheduled.'),
+                  child: Text(tr('No time off scheduled.')),
                 ),
               )
             : ListView.separated(
@@ -307,9 +307,9 @@ class _BlocksList extends ConsumerWidget {
                   );
                   return Card(
                     child: ListTile(
-                      title: Text(b['reason'] as String? ?? 'Blocked'),
+                      title: Text(b['reason'] as String? ?? tr('Blocked')),
                       subtitle: Text(
-                        '${DateFormat('MMM d').format(from)} → ${DateFormat('MMM d').format(to)}',
+                        '${trDate('MMM d', from)} → ${trDate('MMM d', to)}',
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete_outline),
@@ -327,7 +327,7 @@ class _BlocksList extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddBlock(context, ref, onSaved: onChanged),
         icon: const Icon(Icons.add),
-        label: const Text('Add time off'),
+        label: Text(tr('Add time off')),
       ),
     );
   }
@@ -350,13 +350,13 @@ class _BlocksList extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Block time off', style: Theme.of(ctx).textTheme.titleLarge),
+                Text(tr('Block time off'), style: Theme.of(ctx).textTheme.titleLarge),
                 const SizedBox(height: 16),
                 TextField(
                   controller: reasonCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Reason',
-                    hintText: 'Vacation, sick day, focus week...',
+                  decoration: InputDecoration(
+                    labelText: tr('Reason'),
+                    hintText: tr('Vacation, sick day, focus week...'),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -373,7 +373,7 @@ class _BlocksList extends ConsumerWidget {
                           );
                           if (d != null) setState(() => from = d);
                         },
-                        child: Text('From: ${DateFormat('MMM d').format(from)}'),
+                        child: Text('From: ${trDate('MMM d', from)}'),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -388,7 +388,7 @@ class _BlocksList extends ConsumerWidget {
                           );
                           if (d != null) setState(() => to = d);
                         },
-                        child: Text('To: ${DateFormat('MMM d').format(to)}'),
+                        child: Text('To: ${trDate('MMM d', to)}'),
                       ),
                     ),
                   ],
@@ -419,7 +419,7 @@ class _BlocksList extends ConsumerWidget {
                       }
                     }
                   },
-                  child: const Text('Save'),
+                  child: Text(tr('Save')),
                 ),
               ],
             ),

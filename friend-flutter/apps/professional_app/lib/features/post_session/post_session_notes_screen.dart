@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -40,7 +41,7 @@ class _S extends ConsumerState<PostSessionNotesScreen> {
   Future<void> _submit() async {
     final notes = _notes.text.trim();
     if (notes.isEmpty) {
-      setState(() => _error = 'Add a few notes before saving.');
+      setState(() => _error = tr('Add a few notes before saving.'));
       return;
     }
     setState(() { _busy = true; _error = null; });
@@ -59,7 +60,7 @@ class _S extends ConsumerState<PostSessionNotesScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Session notes saved.')),
+        SnackBar(content: Text(tr('Session notes saved.'))),
       );
       _leave();
     } on DioException catch (e) {
@@ -78,9 +79,9 @@ class _S extends ConsumerState<PostSessionNotesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Session notes'),
+        title: Text(tr('Session notes')),
         actions: [
-          TextButton(onPressed: _busy ? null : _leave, child: const Text('Skip')),
+          TextButton(onPressed: _busy ? null : _leave, child: Text(tr('Skip'))),
         ],
       ),
       body: ListView(
@@ -90,11 +91,11 @@ class _S extends ConsumerState<PostSessionNotesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('How did it go?',
+                Text(tr('How did it go?'),
                     style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 4),
-                const Text(
-                  'Private to you — clients never see these notes.',
+                Text(
+                  tr('Private to you — clients never see these notes.'),
                   style: TextStyle(color: FriendColors.textSecondary),
                 ),
                 const SizedBox(height: 16),
@@ -103,18 +104,18 @@ class _S extends ConsumerState<PostSessionNotesScreen> {
                   minLines: 5,
                   maxLines: 12,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Notes',
+                  decoration: InputDecoration(
+                    labelText: tr('Notes'),
                     alignLabelWithHint: true,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _actions,
-                  decoration: const InputDecoration(
-                    labelText: 'Action items (optional)',
-                    hintText: 'Breathing exercise, journal daily',
-                    helperText: 'Separate each item with a comma.',
+                  decoration: InputDecoration(
+                    labelText: tr('Action items (optional)'),
+                    hintText: tr('Breathing exercise, journal daily'),
+                    helperText: tr('Separate each item with a comma.'),
                   ),
                 ),
               ],
@@ -131,7 +132,7 @@ class _S extends ConsumerState<PostSessionNotesScreen> {
             child: _busy
                 ? const SizedBox(width: 18, height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
-                : const Text('Save notes'),
+                : Text(tr('Save notes')),
           ),
         ],
       ),

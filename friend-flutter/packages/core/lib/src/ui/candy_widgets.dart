@@ -1,32 +1,49 @@
-/// Akilil Platform — shared UI kit (23.dev polish × Higgsfield structure).
+/// Akilil shared UI kit — v2 "Calm".
+///
+/// Paper canvas, white surfaces with hairlines, one action colour, quiet
+/// type hierarchy. Class names from v1 are kept so screens keep compiling.
 library;
 
-import '../util/i18n.dart';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/design_tokens.dart';
+import '../util/i18n.dart';
 
-// ─── Atmosphere ─────────────────────────────────────────────────────────────
+// ─── Canvas ─────────────────────────────────────────────────────────────────
 
-/// Flat Freud canvas — no candy orbs.
 class FriendAtmosphere extends StatelessWidget {
   const FriendAtmosphere({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: FriendColors.background,
-      child: SizedBox.expand(),
+    return const ColoredBox(color: FriendColors.background, child: SizedBox.expand());
+  }
+}
+
+/// Centres content and caps its width on tablets and the web, so lines of
+/// text and cards never stretch across a wide window.
+class FriendContentWidth extends StatelessWidget {
+  const FriendContentWidth({super.key, required this.child, this.maxWidth = FriendLayout.maxContentWidth});
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth), child: child),
     );
   }
 }
 
 // ─── Page chrome ────────────────────────────────────────────────────────────
 
-/// Editorial page header — Freud quiet hierarchy.
+/// Large page title with an optional supporting line.
+///
+/// [eyebrow] is kept for compatibility (and screen readers) but not drawn:
+/// a label above every title repeats what the title already says.
 class FriendPageHeader extends StatelessWidget {
   const FriendPageHeader({
     super.key,
@@ -47,54 +64,34 @@ class FriendPageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        FriendLayout.horizontal,
-        8,
-        FriendLayout.horizontal,
-        16,
-      ),
+      padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 4, FriendLayout.horizontal, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      eyebrow,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: FriendColors.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Semantics(
+                      header: true,
+                      child: Text(title, style: theme.textTheme.headlineLarge),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      title,
-                      style: theme.textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.4,
-                        height: 1.15,
-                      ),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        subtitle!,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: FriendColors.textSecondary,
-                          height: 1.45,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
-              if (trailing != null) trailing!,
+              if (trailing != null) ...[const SizedBox(width: 12), trailing!],
             ],
           ),
+          if (subtitle != null && subtitle!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              subtitle!,
+              style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
+            ),
+          ],
           if (actions != null && actions!.isNotEmpty) ...[
             const SizedBox(height: 16),
             Wrap(spacing: 8, runSpacing: 8, children: actions!),
@@ -105,51 +102,82 @@ class FriendPageHeader extends StatelessWidget {
   }
 }
 
-/// Section label used between content blocks.
+/// Section heading between content blocks, with an optional trailing link.
 class FriendSectionLabel extends StatelessWidget {
-  const FriendSectionLabel(this.label, {super.key});
+  const FriendSectionLabel(this.label, {super.key, this.action, this.onAction});
+
   final String label;
+  final String? action;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: FriendColors.textPrimary,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
+          if (action != null && onAction != null)
+            GestureDetector(
+              onTap: onAction,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  action!,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: FriendColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
+        ],
       ),
     );
   }
 }
 
-/// Wraps tab content. Atmosphere + dock clearance live in [MainShell].
+/// Wraps tab content. Canvas and tab-bar clearance live in the shell.
 class FriendTabScaffold extends StatelessWidget {
-  const FriendTabScaffold({
-    super.key,
-    required this.body,
-    this.onRefresh,
-  });
+  const FriendTabScaffold({super.key, required this.body, this.onRefresh});
 
   final Widget body;
   final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    if (onRefresh != null) {
-      return RefreshIndicator(
-        color: FriendColors.primary,
-        onRefresh: onRefresh!,
-        child: body,
-      );
-    }
-    return body;
+    final content = FriendContentWidth(child: body);
+    if (onRefresh == null) return content;
+    return RefreshIndicator(
+      color: FriendColors.primary,
+      backgroundColor: FriendColors.surface,
+      strokeWidth: 2.2,
+      onRefresh: onRefresh!,
+      child: content,
+    );
   }
 }
 
-/// Pushed routes — back affordance + editorial header + scroll body.
+/// Back button used on every pushed page; matches the app bar's arrow.
+class FriendBackButton extends StatelessWidget {
+  const FriendBackButton({super.key, this.onPressed});
+
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+      onPressed: onPressed ?? () => Navigator.of(context).maybePop(),
+      icon: const Icon(Icons.arrow_back_rounded, size: 24, color: FriendColors.textPrimary),
+    );
+  }
+}
+
+/// Pushed routes — back button, large title, scrolling body.
 class FriendPageScaffold extends StatelessWidget {
   const FriendPageScaffold({
     super.key,
@@ -172,50 +200,42 @@ class FriendPageScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final header = ListView(
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: [
-        if (showBack)
+    final content = FriendContentWidth(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (showBack)
+            const Padding(
+              padding: EdgeInsets.fromLTRB(FriendLayout.horizontal - 12, 8, FriendLayout.horizontal, 8),
+              child: Align(alignment: Alignment.centerLeft, child: FriendBackButton()),
+            )
+          else
+            const SizedBox(height: 16),
+          FriendPageHeader(eyebrow: eyebrow, title: title, subtitle: subtitle, trailing: trailing),
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 8, FriendLayout.horizontal, 0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-                onPressed: () => Navigator.of(context).maybePop(),
-              ),
-            ),
+            padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 0, FriendLayout.horizontal, 40),
+            child: body,
           ),
-        FriendPageHeader(
-          eyebrow: eyebrow,
-          title: title,
-          subtitle: subtitle,
-          trailing: trailing,
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            FriendLayout.horizontal,
-            0,
-            FriendLayout.horizontal,
-            FriendLayout.horizontal,
-          ),
-          child: body,
-        ),
-      ],
+        ],
+      ),
+    );
+
+    final scroll = SingleChildScrollView(
+      physics: onRefresh != null
+          ? const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics())
+          : const BouncingScrollPhysics(),
+      child: content,
     );
 
     final page = onRefresh != null
         ? RefreshIndicator(
             color: FriendColors.primary,
+            backgroundColor: FriendColors.surface,
+            strokeWidth: 2.2,
             onRefresh: onRefresh!,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: header,
-            ),
+            child: scroll,
           )
-        : SingleChildScrollView(child: header);
+        : scroll;
     // Pages pushed outside the tab shell have no Material above them; without
     // one, text renders in Flutter's red debug style.
     return Material(type: MaterialType.transparency, child: SafeArea(bottom: false, child: page));
@@ -224,7 +244,9 @@ class FriendPageScaffold extends StatelessWidget {
 
 // ─── Surfaces ───────────────────────────────────────────────────────────────
 
-/// Tight editorial card — hairline border, optional accent stripe.
+/// The standard card: white, hairline, 16 radius. [tint] gives a very light
+/// wash of a colour for status cards. [accentStripe] is accepted for
+/// compatibility and ignored — coloured side borders are not part of v2.
 class CandyCard extends StatelessWidget {
   const CandyCard({
     super.key,
@@ -244,69 +266,63 @@ class CandyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(FriendRadii.card);
-    final stripeColor = tint ?? FriendColors.primary;
+    final fill = tint == null
+        ? FriendColors.surface
+        : Color.alphaBlend(tint!.withValues(alpha: 0.06), FriendColors.surface);
+    final line = tint == null
+        ? FriendColors.border
+        : Color.alphaBlend(tint!.withValues(alpha: 0.18), FriendColors.border);
 
-    Widget body = Padding(
-      padding: padding ?? const EdgeInsets.all(18),
-      child: child,
-    );
-
-    if (accentStripe) {
-      body = IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              width: 3,
-              decoration: BoxDecoration(
-                color: stripeColor,
-                borderRadius: const BorderRadius.horizontal(
-                  left: Radius.circular(FriendRadii.card),
-                ),
-              ),
-            ),
-            Expanded(child: body),
-          ],
+    return _Pressable(
+      onTap: onTap,
+      child: Material(
+        color: fill,
+        shape: RoundedRectangleBorder(borderRadius: radius, side: BorderSide(color: line)),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(padding: padding ?? const EdgeInsets.all(16), child: child),
         ),
-      );
-    }
-
-    final card = DecoratedBox(
-      decoration: BoxDecoration(
-        color: tint == null
-            ? FriendColors.surface
-            : Color.alphaBlend(
-                tint!.withValues(alpha: 0.07),
-                FriendColors.surface,
-              ),
-        borderRadius: radius,
-        border: Border.all(
-          color: FriendColors.border.withValues(alpha: 0.85),
-          width: 1,
-        ),
-        boxShadow: FriendElevation.card,
       ),
-      child: ClipRRect(borderRadius: radius, child: body),
     );
+  }
+}
 
-    if (onTap == null) return card;
+/// Short name for new code.
+typedef FriendCard = CandyCard;
 
+/// A group of rows inside one card, separated by inset hairlines —
+/// the pattern used for settings, menus and detail lists.
+class FriendListGroup extends StatelessWidget {
+  const FriendListGroup({super.key, required this.children, this.dividerIndent = 56});
+
+  final List<Widget> children;
+  final double dividerIndent;
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = <Widget>[];
+    for (var i = 0; i < children.length; i++) {
+      rows.add(children[i]);
+      if (i < children.length - 1) {
+        rows.add(Divider(height: 1, thickness: 1, indent: dividerIndent, color: FriendColors.divider));
+      }
+    }
     return Material(
-      color: Colors.transparent,
-      child: InkWell(onTap: onTap, borderRadius: radius, child: card),
+      color: FriendColors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FriendRadii.card),
+        side: const BorderSide(color: FriendColors.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(mainAxisSize: MainAxisSize.min, children: rows),
     );
   }
 }
 
 /// Back-compat alias — maps to [FriendPageHeader].
 class CandyGradientHeader extends StatelessWidget {
-  const CandyGradientHeader({
-    super.key,
-    required this.title,
-    this.subtitle,
-    this.action,
-    this.hue,
-  });
+  const CandyGradientHeader({super.key, required this.title, this.subtitle, this.action, this.hue});
 
   final String title;
   final String? subtitle;
@@ -315,16 +331,12 @@ class CandyGradientHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FriendPageHeader(
-      eyebrow: coreTr('Akilil'),
-      title: title,
-      subtitle: subtitle,
-      trailing: action,
-    );
+    return FriendPageHeader(eyebrow: '', title: title, subtitle: subtitle, trailing: action);
   }
 }
 
-/// Settings / menu row inside a card group.
+/// Row inside a [FriendListGroup] or card: leading icon, title, subtitle,
+/// chevron.
 class FriendMenuTile extends StatelessWidget {
   const FriendMenuTile({
     super.key,
@@ -333,6 +345,7 @@ class FriendMenuTile extends StatelessWidget {
     this.subtitle,
     this.onTap,
     this.trailing,
+    this.destructive = false,
   });
 
   final IconData icon;
@@ -340,49 +353,40 @@ class FriendMenuTile extends StatelessWidget {
   final String? subtitle;
   final VoidCallback? onTap;
   final Widget? trailing;
+  final bool destructive;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
+    final fg = destructive ? FriendColors.error : FriendColors.textPrimary;
+    return InkWell(
+      onTap: onTap,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 56),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: FriendColors.primaryLight,
-                  borderRadius: BorderRadius.circular(FriendRadii.small),
-                ),
-                child: Icon(icon, size: 20, color: FriendColors.primaryDeep),
-              ),
-              const SizedBox(width: 14),
+              Icon(icon, size: 22, color: destructive ? FriendColors.error : FriendColors.textSecondary),
+              const SizedBox(width: 18),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(title, style: theme.textTheme.titleSmall),
-                    if (subtitle != null)
-                      Text(
-                        subtitle!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: FriendColors.textSecondary,
-                        ),
-                      ),
+                    Text(title, style: theme.textTheme.bodyMedium?.copyWith(color: fg, fontWeight: FontWeight.w500)),
+                    if (subtitle != null && subtitle!.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(subtitle!, style: theme.textTheme.bodySmall),
+                    ],
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               trailing ??
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 14,
-                    color: FriendColors.textMuted,
-                  ),
+                  (onTap != null
+                      ? const Icon(Icons.chevron_right_rounded, size: 22, color: FriendColors.textMuted)
+                      : const SizedBox.shrink()),
             ],
           ),
         ),
@@ -391,47 +395,39 @@ class FriendMenuTile extends StatelessWidget {
   }
 }
 
-/// Icon chip for header actions (filters, inbox).
+/// Circular icon button for page headers (filters, inbox, add).
 class FriendIconChip extends StatelessWidget {
-  const FriendIconChip({
-    super.key,
-    required this.icon,
-    this.onPressed,
-    this.tooltip,
-  });
+  const FriendIconChip({super.key, required this.icon, this.onPressed, this.tooltip, this.filled = false});
 
   final IconData icon;
   final VoidCallback? onPressed;
   final String? tooltip;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip ?? '',
-      child: Material(
-        color: FriendColors.surface.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(FriendRadii.pill),
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(FriendRadii.pill),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(FriendRadii.pill),
-              border: Border.all(color: FriendColors.border),
-            ),
-            child: Icon(icon, size: 20, color: FriendColors.textPrimary),
-          ),
+    final button = Material(
+      color: filled ? FriendColors.ink : FriendColors.surface,
+      shape: CircleBorder(side: BorderSide(color: filled ? FriendColors.ink : FriendColors.border)),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onPressed,
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(icon, size: 20, color: filled ? Colors.white : FriendColors.textPrimary),
         ),
       ),
     );
+    if (tooltip == null || tooltip!.isEmpty) return button;
+    return Tooltip(message: tooltip!, child: button);
   }
 }
 
-/// Primary CTA — solid primary fill with one soft shadow.
-/// Press compresses slightly (peak-end micro-reward). BetterHelp-grade weight.
-class FriendGlowButton extends StatefulWidget {
+/// Primary call to action. Solid teal, 52 high, 12 radius. [secondary]
+/// gives the white outlined version. Presses scale down slightly and tick
+/// the haptic engine.
+class FriendGlowButton extends StatelessWidget {
   const FriendGlowButton({
     super.key,
     required this.label,
@@ -440,6 +436,7 @@ class FriendGlowButton extends StatefulWidget {
     this.expanded = false,
     this.secondary = false,
     this.showArrow = false,
+    this.busy = false,
   });
 
   final String label;
@@ -448,214 +445,182 @@ class FriendGlowButton extends StatefulWidget {
   final bool expanded;
   final bool secondary;
   final bool showArrow;
-
-  @override
-  State<FriendGlowButton> createState() => _FriendGlowButtonState();
-}
-
-class _FriendGlowButtonState extends State<FriendGlowButton> {
-  bool _pressed = false;
+  final bool busy;
 
   @override
   Widget build(BuildContext context) {
-    final enabled = widget.onPressed != null;
-    final secondary = widget.secondary;
-    const height = 54.0;
-
-    final child = secondary
-        ? OutlinedButton(
-            onPressed: widget.onPressed,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: FriendColors.primaryDeep,
-              backgroundColor: FriendColors.surface,
-              side: const BorderSide(color: FriendColors.border, width: 1.5),
-              minimumSize: Size(widget.expanded ? double.infinity : 0, height),
-              padding: const EdgeInsets.symmetric(horizontal: 26),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(FriendRadii.pill),
-              ),
-            ),
-            child: _label(secondary: true),
+    final fg = secondary ? FriendColors.textPrimary : FriendColors.onPrimary;
+    final enabled = onPressed != null && !busy;
+    final content = busy
+        ? SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2, color: secondary ? FriendColors.primary : Colors.white),
           )
-        : Listener(
-            onPointerDown: enabled ? (_) => setState(() => _pressed = true) : null,
-            onPointerUp: enabled ? (_) => setState(() => _pressed = false) : null,
-            onPointerCancel:
-                enabled ? (_) => setState(() => _pressed = false) : null,
-            child: AnimatedScale(
-              scale: _pressed ? 0.98 : 1.0,
-              duration: const Duration(milliseconds: 140),
-              curve: Curves.easeOutCubic,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                curve: Curves.easeOutCubic,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(FriendRadii.pill),
-                  gradient: enabled
-                      ? LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: _pressed
-                              ? const [
-                                  FriendColors.primaryDeep,
-                                  Color(0xFF0C6E8C),
-                                ]
-                              : const [
-                                  Color(0xFF2AADCF),
-                                  FriendColors.primary,
-                                ],
-                        )
-                      : null,
-                  color: enabled
-                      ? null
-                      : FriendColors.primary.withValues(alpha: 0.35),
-                  boxShadow: enabled
-                      ? (_pressed
-                          ? FriendElevation.glowPressed
-                          : FriendElevation.glow)
-                      : null,
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: widget.onPressed,
-                    borderRadius: BorderRadius.circular(FriendRadii.pill),
-                    splashColor: Colors.white.withValues(alpha: 0.16),
-                    highlightColor: Colors.white.withValues(alpha: 0.08),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: widget.expanded ? double.infinity : 0,
-                        minHeight: height,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 26),
-                        child: Center(child: _label(secondary: false)),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[Icon(icon, size: 18), const SizedBox(width: 8)],
+              Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis)),
+              if (showArrow) ...[const SizedBox(width: 6), const Icon(Icons.arrow_forward_rounded, size: 18)],
+            ],
           );
 
-    return widget.expanded
-        ? SizedBox(width: double.infinity, child: child)
-        : child;
+    void tap() {
+      HapticFeedback.selectionClick();
+      onPressed?.call();
+    }
+
+    final size = Size(expanded ? double.infinity : 0, 52);
+    final button = secondary
+        ? OutlinedButton(
+            onPressed: enabled ? tap : null,
+            style: OutlinedButton.styleFrom(minimumSize: size, foregroundColor: fg),
+            child: content,
+          )
+        : FilledButton(
+            onPressed: enabled ? tap : null,
+            style: FilledButton.styleFrom(
+              minimumSize: size,
+              disabledBackgroundColor: busy ? FriendColors.primary : null,
+            ),
+            child: content,
+          );
+
+    return _Pressable(onTap: enabled ? tap : null, child: button);
+  }
+}
+
+/// Scales its child down a touch while pressed.
+class _Pressable extends StatefulWidget {
+  const _Pressable({required this.child, this.onTap});
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  State<_Pressable> createState() => _PressableState();
+}
+
+class _PressableState extends State<_Pressable> {
+  bool _down = false;
+
+  void _set(bool v) {
+    if (widget.onTap == null || _down == v) return;
+    setState(() => _down = v);
   }
 
-  Widget _label({required bool secondary}) {
-    final style = GoogleFonts.urbanist(
-      fontSize: 16,
-      fontWeight: FontWeight.w700,
-      letterSpacing: -0.2,
-      color: secondary ? FriendColors.primaryDeep : FriendColors.onPrimary,
-      height: 1.1,
-    );
-    final fg = secondary ? FriendColors.primaryDeep : FriendColors.onPrimary;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (widget.icon != null) ...[
-          Icon(widget.icon, size: 19, color: fg),
-          const SizedBox(width: 8),
-        ],
-        Text(widget.label, style: style),
-        if (widget.showArrow) ...[
-          const SizedBox(width: 8),
-          Icon(Icons.arrow_forward_rounded, size: 18, color: fg),
-        ],
-      ],
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (_) => _set(true),
+      onPointerUp: (_) => _set(false),
+      onPointerCancel: (_) => _set(false),
+      child: AnimatedScale(
+        scale: _down ? 0.985 : 1,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: widget.child,
+      ),
     );
   }
 }
 
-// ─── Phase 2 — premium components ───────────────────────────────────────────
+// ─── Identity ───────────────────────────────────────────────────────────────
 
-/// Avatar — flat primary ring, no rainbow.
+/// Photo or initials. Initials sit on a soft tone picked from the name, so
+/// a list of people is easy to scan without being colourful.
 class FriendAvatar extends StatelessWidget {
-  const FriendAvatar({
-    super.key,
-    this.imageUrl,
-    this.initials,
-    this.size = 72,
-    this.verified = false,
-  });
+  const FriendAvatar({super.key, this.imageUrl, this.initials, this.size = 72, this.verified = false});
 
   final String? imageUrl;
   final String? initials;
   final double size;
   final bool verified;
 
+  static const _tones = [
+    (Color(0xFFE6EFEE), Color(0xFF0D5C63)),
+    (Color(0xFFEFECF4), Color(0xFF55477A)),
+    (Color(0xFFF7EEDF), Color(0xFF8A5517)),
+    (Color(0xFFF7EAE2), Color(0xFF8F4524)),
+    (Color(0xFFE5F2EA), Color(0xFF2F6B47)),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final inner = size - 4;
+    final key = (initials ?? '?').codeUnits.fold<int>(0, (a, b) => a + b);
+    final tone = _tones[key % _tones.length];
+    final text = (initials == null || initials!.isEmpty) ? '?' : initials!;
+    final face = ClipOval(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: imageUrl != null && imageUrl!.isNotEmpty
+            ? Image.network(
+                imageUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _Initials(text: text, tone: tone, size: size),
+              )
+            : _Initials(text: text, tone: tone, size: size),
+      ),
+    );
+    if (!verified) return face;
+    final badge = (size * 0.3).clamp(14.0, 24.0);
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Container(
-          width: size,
-          height: size,
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: FriendColors.primaryLight, width: 2),
-            color: FriendColors.surface,
-          ),
-          child: ClipOval(
-            child: imageUrl != null
-                ? Image.network(
-                    imageUrl!,
-                    fit: BoxFit.cover,
-                    width: inner,
-                    height: inner,
-                  )
-                : ColoredBox(
-                    color: FriendColors.primaryLight,
-                    child: Center(
-                      child: Text(
-                        initials ?? '?',
-                        style: GoogleFonts.urbanist(
-                          fontSize: inner * 0.36,
-                          fontWeight: FontWeight.w700,
-                          color: FriendColors.primaryDeep,
-                        ),
-                      ),
-                    ),
-                  ),
+        face,
+        Positioned(
+          right: -1,
+          bottom: -1,
+          child: Container(
+            width: badge,
+            height: badge,
+            decoration: BoxDecoration(
+              color: FriendColors.primary,
+              shape: BoxShape.circle,
+              border: Border.all(color: FriendColors.surface, width: 2),
+            ),
+            child: Icon(Icons.check_rounded, size: badge * 0.62, color: Colors.white),
           ),
         ),
-        if (verified)
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Container(
-              width: size * 0.28,
-              height: size * 0.28,
-              decoration: const BoxDecoration(
-                color: FriendColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check_rounded,
-                size: size * 0.16,
-                color: FriendColors.onPrimary,
-              ),
-            ),
-          ),
       ],
     );
   }
 }
 
-/// Compact feature tile for Today explore row.
+class _Initials extends StatelessWidget {
+  const _Initials({required this.text, required this.tone, required this.size});
+
+  final String text;
+  final (Color, Color) tone;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: tone.$1,
+      child: Center(
+        child: Text(
+          text.characters.take(2).toString().toUpperCase(),
+          style: friendFont(fontSize: size * 0.36, fontWeight: FontWeight.w600, color: tone.$2, letterSpacing: -0.2),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Tiles ──────────────────────────────────────────────────────────────────
+
+/// Compact tile for grids of tools.
 class FriendFeatureTile extends StatelessWidget {
   const FriendFeatureTile({
     super.key,
     required this.icon,
     required this.label,
     this.subtitle,
-    this.color = FriendColors.accent,
+    this.color = FriendColors.primary,
     this.onTap,
   });
 
@@ -674,26 +639,12 @@ class FriendFeatureTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: FriendGradients.cardTint(color),
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-              border: Border.all(color: FriendColors.border),
-            ),
-            child: Icon(icon, size: 20, color: FriendColors.accentDeep),
-          ),
-          const SizedBox(height: 12),
+          FriendIconTile(icon: icon, color: color),
+          const SizedBox(height: 14),
           Text(label, style: theme.textTheme.titleSmall),
           if (subtitle != null) ...[
             const SizedBox(height: 2),
-            Text(
-              subtitle!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: FriendColors.textSecondary,
-              ),
-            ),
+            Text(subtitle!, style: theme.textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
           ],
         ],
       ),
@@ -701,14 +652,31 @@ class FriendFeatureTile extends StatelessWidget {
   }
 }
 
-/// Featured hero card with soft gradient wash.
+/// A rounded square holding an icon, tinted by [color].
+class FriendIconTile extends StatelessWidget {
+  const FriendIconTile({super.key, required this.icon, this.color = FriendColors.primary, this.size = 40});
+
+  final IconData icon;
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Color.alphaBlend(color.withValues(alpha: 0.1), FriendColors.surface),
+        borderRadius: BorderRadius.circular(size * 0.28),
+      ),
+      child: Icon(icon, size: size * 0.5, color: color),
+    );
+  }
+}
+
+/// Featured card: a white card with slightly more breathing room.
 class FriendHeroCard extends StatelessWidget {
-  const FriendHeroCard({
-    super.key,
-    required this.child,
-    this.onTap,
-    this.tint = FriendColors.primary,
-  });
+  const FriendHeroCard({super.key, required this.child, this.onTap, this.tint = FriendColors.primary});
 
   final Widget child;
   final VoidCallback? onTap;
@@ -716,28 +684,11 @@ class FriendHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(FriendRadii.large);
-    final card = Container(
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        gradient: FriendGradients.cardTint(tint),
-        border: Border.all(color: FriendColors.border),
-        boxShadow: FriendElevation.button,
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Padding(padding: const EdgeInsets.all(20), child: child),
-      ),
-    );
-    if (onTap == null) return card;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(onTap: onTap, borderRadius: radius, child: card),
-    );
+    return CandyCard(onTap: onTap, padding: const EdgeInsets.all(20), child: child);
   }
 }
 
-/// Frosted sticky bottom bar for booking CTAs.
+/// Sticky bottom bar for booking and checkout actions.
 class FriendGlassBar extends StatelessWidget {
   const FriendGlassBar({super.key, required this.child});
 
@@ -745,29 +696,19 @@ class FriendGlassBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            color: FriendColors.surface.withValues(alpha: 0.88),
-            border: Border(top: BorderSide(color: FriendColors.border)),
-          ),
-          child: SafeArea(top: false, child: child),
-        ),
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: FriendColors.surface,
+        border: Border(top: BorderSide(color: FriendColors.border)),
       ),
+      child: SafeArea(top: false, child: FriendContentWidth(child: child)),
     );
   }
 }
 
-/// Soft search / filter bar for Discover.
+/// Tappable search field look-alike.
 class FriendSearchBar extends StatelessWidget {
-  const FriendSearchBar({
-    super.key,
-    required this.hint,
-    this.onTap,
-    this.trailing,
-  });
+  const FriendSearchBar({super.key, required this.hint, this.onTap, this.trailing});
 
   final String hint;
   final VoidCallback? onTap;
@@ -776,35 +717,23 @@ class FriendSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        FriendLayout.horizontal,
-        0,
-        FriendLayout.horizontal,
-        16,
-      ),
+      padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 0, FriendLayout.horizontal, 16),
       child: Material(
-        color: FriendColors.surface.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(FriendRadii.pill),
+        color: FriendColors.recessed,
+        borderRadius: BorderRadius.circular(FriendRadii.medium),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(FriendRadii.pill),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(FriendRadii.pill),
-              border: Border.all(color: FriendColors.border),
-            ),
+          borderRadius: BorderRadius.circular(FriendRadii.medium),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                const Icon(Icons.search_rounded,
-                    size: 20, color: FriendColors.textMuted),
+                const Icon(Icons.search_rounded, size: 20, color: FriendColors.textMuted),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     hint,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: FriendColors.textMuted,
-                        ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: FriendColors.textMuted),
                   ),
                 ),
                 if (trailing != null) trailing!,
@@ -817,7 +746,7 @@ class FriendSearchBar extends StatelessWidget {
   }
 }
 
-// ─── Empty / chips ──────────────────────────────────────────────────────────
+// ─── Empty states and badges ────────────────────────────────────────────────
 
 class FriendEmptyState extends StatelessWidget {
   const FriendEmptyState({
@@ -840,44 +769,42 @@ class FriendEmptyState extends StatelessWidget {
     final theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: FriendColors.primaryLight,
-                borderRadius: BorderRadius.circular(FriendRadii.medium),
-                border: Border.all(color: FriendColors.border),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 340),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: const BoxDecoration(color: FriendColors.recessed, shape: BoxShape.circle),
+                child: Icon(icon, size: 26, color: FriendColors.textSecondary),
               ),
-              child: Icon(icon, size: 28, color: FriendColors.primaryDeep),
-            ),
-            const SizedBox(height: 18),
-            Text(title, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
-            if (message != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                message!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: FriendColors.textSecondary,
-                  height: 1.45,
+              const SizedBox(height: 16),
+              Text(title, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
+              if (message != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  message!,
+                  style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
+              ],
+              if (ctaLabel != null && onCta != null) ...[
+                const SizedBox(height: 20),
+                FriendGlowButton(label: ctaLabel!, onPressed: onCta),
+              ],
             ],
-            if (ctaLabel != null && onCta != null) ...[
-              const SizedBox(height: 22),
-              FriendGlowButton(label: ctaLabel!, onPressed: onCta, icon: Icons.arrow_forward),
-            ],
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// Small status badge. Colour carries meaning: teal confirmed, clay live,
+/// red problem, grey neutral.
 class FriendStatusChip extends StatelessWidget {
   const FriendStatusChip({super.key, required this.label, required this.color});
 
@@ -886,35 +813,27 @@ class FriendStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fg = Color.alphaBlend(FriendColors.ink.withValues(alpha: 0.2), color);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(FriendRadii.pill),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
+        color: Color.alphaBlend(color.withValues(alpha: 0.12), FriendColors.surface),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         label,
-        style: GoogleFonts.urbanist(
-          color: color == FriendColors.primary ? FriendColors.primaryDeep : color,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.2,
-        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: friendFont(color: fg, fontSize: FriendTypeScale.caption, fontWeight: FontWeight.w600, height: 1.3),
       ),
     );
   }
 }
 
-// ─── Floating dock nav ──────────────────────────────────────────────────────
+// ─── Tab bar ────────────────────────────────────────────────────────────────
 
 class FriendDockItem {
-  const FriendDockItem({
-    required this.path,
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-  });
+  const FriendDockItem({required this.path, required this.icon, required this.selectedIcon, required this.label});
 
   final String path;
   final IconData icon;
@@ -922,14 +841,10 @@ class FriendDockItem {
   final String label;
 }
 
-/// Floating capsule nav — pure rounded surface, no Material/Scaffold chrome.
+/// Bottom tab bar, docked to the screen edge: white, one hairline on top,
+/// the selected tab shows its filled icon in teal and an ink label.
 class FriendFloatingDock extends StatelessWidget {
-  const FriendFloatingDock({
-    super.key,
-    required this.items,
-    required this.selectedIndex,
-    required this.onSelected,
-  });
+  const FriendFloatingDock({super.key, required this.items, required this.selectedIndex, required this.onSelected});
 
   final List<FriendDockItem> items;
   final int selectedIndex;
@@ -937,37 +852,32 @@ class FriendFloatingDock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(FriendRadii.pill),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-      height: 68,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-      decoration: BoxDecoration(
-        color: FriendColors.surface.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(FriendRadii.pill),
-        border: Border.all(color: FriendColors.border.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: FriendColors.ink.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: FriendColors.surface,
+        border: Border(top: BorderSide(color: FriendColors.border)),
       ),
-      child: Row(
-        children: [
-          for (var i = 0; i < items.length; i++)
-            Expanded(
-              child: _DockButton(
-                item: items[i],
-                selected: i == selectedIndex,
-                onTap: () => onSelected(i),
-              ),
+      child: SafeArea(
+        top: false,
+        child: FriendContentWidth(
+          child: SizedBox(
+            height: 58,
+            child: Row(
+              children: [
+                for (var i = 0; i < items.length; i++)
+                  Expanded(
+                    child: _DockButton(
+                      item: items[i],
+                      selected: i == selectedIndex,
+                      onTap: () {
+                        if (i != selectedIndex) HapticFeedback.selectionClick();
+                        onSelected(i);
+                      },
+                    ),
+                  ),
+              ],
             ),
-        ],
-      ),
+          ),
         ),
       ),
     );
@@ -975,11 +885,7 @@ class FriendFloatingDock extends StatelessWidget {
 }
 
 class _DockButton extends StatelessWidget {
-  const _DockButton({
-    required this.item,
-    required this.selected,
-    required this.onTap,
-  });
+  const _DockButton({required this.item, required this.selected, required this.onTap});
 
   final FriendDockItem item;
   final bool selected;
@@ -987,33 +893,35 @@ class _DockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = selected ? FriendColors.primary : FriendColors.textMuted;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
-        decoration: BoxDecoration(
-          color: selected ? FriendColors.primaryLight.withValues(alpha: 0.55) : Colors.transparent,
-          borderRadius: BorderRadius.circular(FriendRadii.pill),
-        ),
+    final fg = selected ? FriendColors.textPrimary : FriendColors.textMuted;
+    return Semantics(
+      selected: selected,
+      button: true,
+      label: item.label,
+      child: InkResponse(
+        onTap: onTap,
+        radius: 32,
+        highlightShape: BoxShape.circle,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              selected ? item.selectedIcon : item.icon,
-              size: 22,
-              color: fg,
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 160),
+              child: Icon(
+                selected ? item.selectedIcon : item.icon,
+                key: ValueKey(selected),
+                size: 23,
+                color: selected ? FriendColors.primary : fg,
+              ),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 4),
             Text(
               item.label,
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                letterSpacing: 0.1,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: friendFont(
+                fontSize: FriendTypeScale.micro,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 height: 1.1,
                 color: fg,
               ),

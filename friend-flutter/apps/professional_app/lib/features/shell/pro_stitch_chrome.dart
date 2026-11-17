@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:friend_professional/l10n/tr.dart';
 
 import 'package:core/core.dart';
 
@@ -65,18 +65,18 @@ class ProSosButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Crisis support', style: Theme.of(ctx).textTheme.titleLarge),
+            Text(tr('Crisis support'), style: Theme.of(ctx).textTheme.titleLarge),
             const SizedBox(height: 8),
-            const Text(
-              'If you or a client are in immediate danger, contact local emergency services. '
-              'Document the incident per your clinic protocol.',
+            Text(
+              tr('If you or a client are in immediate danger, contact local emergency services. '
+                  'Document the incident per your clinic protocol.'),
               style: TextStyle(color: FriendColors.textSecondary, height: 1.45),
             ),
             const SizedBox(height: 16),
             FilledButton.icon(
               onPressed: () => Navigator.pop(ctx),
               icon: const Icon(Icons.call),
-              label: const Text('Acknowledge'),
+              label: Text(tr('Acknowledge')),
             ),
           ],
         ),
@@ -103,10 +103,10 @@ class ProSosButton extends StatelessWidget {
               Icon(Icons.emergency, size: 16, color: FriendColors.onErrorContainer),
               const SizedBox(width: 6),
               Text(
-                'SOS',
-                style: GoogleFonts.inter(
+                tr('SOS'),
+                style: friendFont(
                   fontSize: 12,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 1.2,
                   color: FriendColors.onErrorContainer,
                 ),
@@ -143,10 +143,10 @@ class ProStitchCommandHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'AKILIL',
-                    style: GoogleFonts.plusJakartaSans(
+                    tr('AKILIL'),
+                    style: friendFont(
                       fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: -0.3,
                       color: FriendColors.textPrimary,
                     ),
@@ -172,7 +172,7 @@ class ProStitchCommandHeader extends StatelessWidget {
                   backgroundColor: FriendColors.primary,
                   child: Text(
                     personInitial(avatarInitial, 'P'),
-                    style: GoogleFonts.inter(
+                    style: friendFont(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: FriendColors.onPrimary,
@@ -209,7 +209,7 @@ class ProStitchDossierHeader extends StatelessWidget {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                icon: const Icon(Icons.arrow_back_rounded, size: 24),
                 onPressed: onBack,
               ),
               Expanded(
@@ -218,17 +218,17 @@ class ProStitchDossierHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'CLIENT',
-                      style: GoogleFonts.inter(
+                      tr('CLIENT'),
+                      style: friendFont(
                         fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 1.4,
                         color: FriendColors.accent,
                       ),
                     ),
                     Text(
-                      'Client record',
-                      style: GoogleFonts.plusJakartaSans(
+                      tr('Client record'),
+                      style: friendFont(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: FriendColors.textPrimary,
@@ -251,8 +251,8 @@ class ProStitchDossierHeader extends StatelessWidget {
                     Icon(Icons.verified_user, size: 14, color: FriendColors.accent),
                     const SizedBox(width: 4),
                     Text(
-                      'PRIVATE',
-                      style: GoogleFonts.inter(
+                      tr('PRIVATE'),
+                      style: friendFont(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.8,
@@ -322,9 +322,9 @@ class ProStitchMicroLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text.toUpperCase(),
-      style: GoogleFonts.inter(
+      style: friendFont(
         fontSize: FriendTypeScale.micro,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
         letterSpacing: 1.0,
         color: color ?? FriendColors.textMuted,
       ),
@@ -341,7 +341,7 @@ class ProStitchLivePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: FriendColors.secondaryFixed.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(FriendRadii.pill),
@@ -353,17 +353,17 @@ class ProStitchLivePill extends StatelessWidget {
             Container(
               width: 8,
               height: 8,
-              margin: const EdgeInsets.only(right: 6),
-              decoration: const BoxDecoration(
+              margin: EdgeInsets.only(right: 6),
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: FriendColors.accent,
               ),
             ),
           Text(
             label.toUpperCase(),
-            style: GoogleFonts.inter(
+            style: friendFont(
               fontSize: 10,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.8,
               color: FriendColors.accentDeep,
             ),
@@ -375,7 +375,7 @@ class ProStitchLivePill extends StatelessWidget {
 }
 
 class ProStitchBottomNav extends StatelessWidget {
-  const ProStitchBottomNav({
+  ProStitchBottomNav({
     super.key,
     required this.selectedIndex,
     required this.onSelected,
@@ -384,12 +384,12 @@ class ProStitchBottomNav extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onSelected;
 
-  static const _items = <(IconData, IconData, String)>[
-    (Icons.schedule_outlined, Icons.schedule, 'Today'),
-    (Icons.videocam_outlined, Icons.videocam, 'Sessions'),
-    (Icons.explore_outlined, Icons.explore, 'Groups'),
-    (Icons.calendar_month_outlined, Icons.calendar_month, 'Schedule'),
-    (Icons.account_circle_outlined, Icons.account_circle, 'Profile'),
+  static List<(IconData, IconData, String)> get _items => <(IconData, IconData, String)>[
+    (Icons.schedule_outlined, Icons.schedule, tr('Today')),
+    (Icons.videocam_outlined, Icons.videocam, tr('Sessions')),
+    (Icons.explore_outlined, Icons.explore, tr('Groups')),
+    (Icons.calendar_month_outlined, Icons.calendar_month, tr('Schedule')),
+    (Icons.account_circle_outlined, Icons.account_circle, tr('Profile')),
   ];
 
   @override
@@ -449,9 +449,9 @@ class _NavItem extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: friendFont(
               fontSize: 10,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               color: color,
             ),
           ),

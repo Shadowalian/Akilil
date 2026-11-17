@@ -118,7 +118,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          icon: const Icon(Icons.arrow_back_rounded, size: 24),
           onPressed: () => context.canPop() ? context.pop() : context.go(AppRoutes.home),
         ),
       ),
@@ -142,7 +142,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 fontFamily: 'Geist',
                 fontFamilyFallback: _ethiopicFallback,
                 fontSize: FriendTypeScale.headlineLarge,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 letterSpacing: -0.8,
                 color: FriendColors.textPrimary,
               ),
@@ -190,7 +190,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   style: const TextStyle(
                     fontFamily: 'Geist',
                     fontSize: FriendTypeScale.headlineSmall,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: FriendColors.textPrimary,
                   ),
                 ),
@@ -249,19 +249,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
           child: FilledButton(
             onPressed: _busy ? null : _topUp,
-            style: FilledButton.styleFrom(
-              backgroundColor: FriendColors.accent,
-              foregroundColor: FriendColors.onAccent,
-              minimumSize: const Size.fromHeight(52),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(FriendRadii.pill),
-              ),
-              textStyle: const TextStyle(
-                fontFamily: 'Geist',
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
-            ),
+            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
             child: Text(_busy ? s.processingTopUp : presetLabel),
           ),
         ),
@@ -314,7 +302,7 @@ class _BalanceHero extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: 'Geist',
                   fontSize: 40,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: -1,
                   color: FriendColors.textPrimary,
                   height: 1,
@@ -326,8 +314,8 @@ class _BalanceHero extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: 'Geist',
                   fontSize: FriendTypeScale.headlineSmall,
-                  fontWeight: FontWeight.w700,
-                  color: FriendColors.accentDeep,
+                  fontWeight: FontWeight.w600,
+                  color: FriendColors.textSecondary,
                 ),
               ),
             ],
@@ -370,7 +358,7 @@ class _AmountChip extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Geist',
               fontSize: FriendTypeScale.bodySmall,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: selected ? FriendColors.primaryDeep : FriendColors.textSecondary,
             ),
           ),
@@ -420,7 +408,7 @@ class _TransactionRow extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: 'Geist',
                     fontSize: FriendTypeScale.bodyLarge,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: FriendColors.textPrimary,
                   ),
                 ),
@@ -443,7 +431,7 @@ class _TransactionRow extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Geist Mono',
               fontSize: FriendTypeScale.bodyLarge,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: isCredit ? FriendColors.primary : FriendColors.textPrimary,
             ),
           ),

@@ -2,7 +2,6 @@ import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:core/core.dart';
 import '../core_data/seed_data.dart';
 import 'worksheet_store.dart';
@@ -47,119 +46,53 @@ class _WorksheetsScreenState extends ConsumerState<WorksheetsScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Quick Launch Banner for Box Breathing
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1A9FC4), Color(0xFF0F7FA0)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(FriendRadii.card),
-              boxShadow: [
-                BoxShadow(
-                  color: FriendColors.primary.withValues(alpha: 0.25),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
+          CandyCard(
+            onTap: () => BoxBreathingDialog.show(context),
             child: Row(
               children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.air_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
+                const FriendIconTile(icon: Icons.air_rounded, color: FriendColors.primary, size: 44),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        tr('Feeling Anxious Right Now?'),
-                        style: GoogleFonts.urbanist(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
+                      Text(tr('Feeling anxious right now?'), style: Theme.of(context).textTheme.titleSmall),
                       const SizedBox(height: 2),
                       Text(
                         tr('1-minute guided visual box breathing to quiet your heart rate.'),
-                        style: GoogleFonts.urbanist(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
+                const SizedBox(width: 12),
+                FilledButton(
                   onPressed: () => BoxBreathingDialog.show(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: FriendColors.primaryDeep,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(FriendRadii.pill),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  ),
-                  child: Text(
-                    tr('Breathe'),
-                    style: GoogleFonts.urbanist(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  style: FilledButton.styleFrom(minimumSize: const Size(0, 40), padding: const EdgeInsets.symmetric(horizontal: 16)),
+                  child: Text(tr('Breathe')),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-
-          // Categories Filter Row
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _categories.map((c) {
-                final isSel = _selectedCategory == c;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(tr(c)),
-                    selected: isSel,
-                    onSelected: (sel) {
-                      if (sel) setState(() => _selectedCategory = c);
-                    },
-                    selectedColor: FriendColors.primaryLight,
-                    backgroundColor: FriendColors.surface,
-                    labelStyle: GoogleFonts.urbanist(
-                      fontSize: 13,
-                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
-                      color: isSel ? FriendColors.primaryDeep : FriendColors.textSecondary,
-                    ),
-                    side: BorderSide(
-                      color: isSel ? FriendColors.primary : FriendColors.border,
-                    ),
-                  ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 40,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              itemCount: _categories.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, i) {
+                final c = _categories[i];
+                return FriendStitchFilterPill(
+                  label: tr(c),
+                  selected: _selectedCategory == c,
+                  onTap: () => setState(() => _selectedCategory = c),
                 );
-              }).toList(),
+              },
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
           // Worksheets List
           for (final w in filtered) ...[
@@ -215,119 +148,33 @@ class _WorksheetCard extends StatelessWidget {
     final isCompleted = worksheet['is_completed'] == true;
     final icon = _getIcon(worksheet['icon'] as String?);
 
+    final theme = Theme.of(context);
     return CandyCard(
-      tint: FriendColors.primary,
       onTap: onTap,
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: FriendColors.primaryLight,
-                  borderRadius: BorderRadius.circular(FriendRadii.small),
+          FriendIconTile(icon: icon, color: isCompleted ? FriendColors.success : FriendColors.primary, size: 44),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: theme.textTheme.titleSmall),
+                const SizedBox(height: 2),
+                Text(
+                  [category, if (isCompleted) tr('Completed') else if (tag.isNotEmpty) tag].join(' · '),
+                  style: theme.textTheme.labelSmall?.copyWith(color: isCompleted ? FriendColors.success : null),
                 ),
-                child: Icon(icon, color: FriendColors.primary, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.urbanist(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: FriendColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      category,
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: FriendColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (isCompleted)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: FriendColors.greenSoft,
-                    borderRadius: BorderRadius.circular(FriendRadii.pill),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.check_rounded, size: 12, color: FriendColors.primaryDeep),
-                      const SizedBox(width: 4),
-                      Text(
-                        tr('Completed'),
-                        style: GoogleFonts.urbanist(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: FriendColors.primaryDeep,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else if (tag.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: FriendColors.background,
-                    border: Border.all(color: FriendColors.border),
-                    borderRadius: BorderRadius.circular(FriendRadii.pill),
-                  ),
-                  child: Text(
-                    tag,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: FriendColors.primaryDeep,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            desc,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.urbanist(
-              fontSize: 13,
-              height: 1.4,
-              color: FriendColors.textSecondary,
+                const SizedBox(height: 8),
+                Text(desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Text(
-                isCompleted ? 'Review & Edit' : tr('Open Exercise'),
-                style: GoogleFonts.urbanist(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: FriendColors.primary,
-                ),
-              ),
-              const SizedBox(width: 4),
-              const Icon(
-                Icons.arrow_forward_rounded,
-                size: 14,
-                color: FriendColors.primary,
-              ),
-            ],
+          const SizedBox(width: 8),
+          const Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Icon(Icons.chevron_right_rounded, size: 22, color: FriendColors.textMuted),
           ),
         ],
       ),

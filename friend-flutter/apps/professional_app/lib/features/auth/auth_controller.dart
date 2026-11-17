@@ -1,3 +1,4 @@
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,7 +98,7 @@ class AuthController extends ChangeNotifier {
     if (data['requires_2fa'] == true) {
       final code = await askTwoFactorCode?.call();
       if (code == null || code.isEmpty) {
-        throw StateError('Sign-in cancelled.');
+        throw StateError(tr('Sign-in cancelled.'));
       }
       data = await completeTwoFactor(_dio, data['challenge_token'] as String, code);
     }
@@ -121,7 +122,7 @@ class AuthController extends ChangeNotifier {
     }
     if (!user.isProfessional) {
       await _storage.clear();
-      throw StateError('This account is not a professional. Use the client app.');
+      throw StateError(tr('This account is not a professional. Use the client app.'));
     }
     _user = user;
     notifyListeners();

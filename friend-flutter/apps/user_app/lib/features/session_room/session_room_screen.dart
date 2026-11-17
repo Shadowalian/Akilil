@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:core/core.dart';
 
@@ -152,7 +151,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
                       const SizedBox(width: 8),
                       Text(
                         tr('Camera & audio check'),
-                        style: GoogleFonts.plusJakartaSans(
+                        style: friendFont(
                           fontWeight: FontWeight.w600,
                           fontSize: FriendTypeScale.headlineSmall,
                         ),
@@ -162,7 +161,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
                   const SizedBox(height: 8),
                   Text(
                     tr('Your camera and microphone turn on when you join. You can switch your camera off at any time inside the room.'),
-                    style: GoogleFonts.inter(
+                    style: friendFont(
                       fontSize: FriendTypeScale.bodySmall,
                       height: 1.45,
                       color: FriendColors.textSecondary,
@@ -229,9 +228,9 @@ class _WaitingRoomCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       tr('ROOM READY'),
-                      style: GoogleFonts.inter(
+                      style: friendFont(
                         fontSize: FriendTypeScale.micro,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
                         color: FriendColors.accent,
                       ),
@@ -244,9 +243,9 @@ class _WaitingRoomCard extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 tr('PRIVATE'),
-                style: GoogleFonts.inter(
+                style: friendFont(
                   fontSize: FriendTypeScale.micro,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: FriendColors.textSecondary,
                 ),
               ),
@@ -273,15 +272,15 @@ class _WaitingRoomCard extends StatelessWidget {
                   children: [
                     Text(
                       clinicianName,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: friendFont(
                         fontSize: FriendTypeScale.headlineSmall,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       tr('Your professional joins at the session time. You will see them here when they arrive.'),
-                      style: GoogleFonts.inter(
+                      style: friendFont(
                         fontSize: FriendTypeScale.bodySmall,
                         color: FriendColors.textSecondary,
                         height: 1.4,

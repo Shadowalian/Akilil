@@ -205,8 +205,7 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
               children: [
                 if (_needsDob)
                   CandyCard(
-                    tint: FriendColors.accent,
-                    accentStripe: true,
+                    
                     onTap: _setMyDob,
                     child: ListTile(
                       contentPadding: EdgeInsets.zero,

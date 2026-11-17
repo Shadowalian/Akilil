@@ -1,3 +1,4 @@
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,15 +7,15 @@ import 'pro_stitch_chrome.dart';
 
 /// Bottom-nav shell — Stitch glass dock + clinical canvas.
 class MainShell extends StatelessWidget {
-  const MainShell({super.key, required this.child});
+  MainShell({super.key, required this.child});
   final Widget child;
 
-  static const _tabs = <_NavTab>[
-    _NavTab('/', 'Today'),
-    _NavTab('/sessions', 'Sessions'),
-    _NavTab('/groups', 'Groups'),
-    _NavTab('/availability', 'Schedule'),
-    _NavTab('/profile', 'Profile'),
+  static List<_NavTab> get _tabs => <_NavTab>[
+    _NavTab('/', tr('Today')),
+    _NavTab('/sessions', tr('Sessions')),
+    _NavTab('/groups', tr('Groups')),
+    _NavTab('/availability', tr('Schedule')),
+    _NavTab('/profile', tr('Profile')),
   ];
 
   int _indexFor(String location) {

@@ -82,7 +82,7 @@ class S {
 
   // ── Welcome / auth (C01) ────────────────────────────────────────────
   String get welcomeBack => _am ? 'እንኳን ደህና ተመለሱ' : 'Welcome back';
-  String get signInToAkilil => _am ? 'ወደ አኪሊል ይግቡ' : 'Sign In To Akilil';
+  String get signInToAkilil => _am ? 'ወደ አኪሊል ይግቡ' : 'Sign in to Akilil';
   String get welcomeToAkilil =>
       _am ? 'ወደ አኪሊል እንኳን ደህና መጡ' : 'Welcome to Akilil care';
   String get welcomeHeadline => _am
@@ -119,10 +119,10 @@ class S {
   String get logOut => _am ? 'ይውጡ' : 'Log out';
   String hiName(String name) => _am ? 'ሰላም $name' : 'Hi, $name';
   String get forgotPassword =>
-      _am ? 'የይለፍ ቃልዎን ረስተዋል?' : 'Forgot Password';
+      _am ? 'የይለፍ ቃልዎን ረስተዋል?' : 'Forgot password?';
   String get dontHaveAccount =>
       _am ? 'አካውንት የለዎትም? ' : "Don't have an account? ";
-  String get signUp => _am ? 'ይመዝገቡ' : 'Sign Up';
+  String get signUp => _am ? 'ይመዝገቡ' : 'Sign up';
 
   // ── Onboarding — choose support (C02) ─────────────────────────────
   String get chooseSupportTitle => _am
@@ -245,18 +245,7 @@ class S {
     }
   }
 
-  String discoverHeroAsset(String slug) {
-    switch (slug) {
-      case 'spiritual-psychiatry':
-        return 'assets/figma/c04_hero.jpg';
-      case 'cooking':
-        return 'assets/figma/c05_hero.jpg';
-      case 'psychiatry':
-        return 'assets/figma/c06_hero.jpg';
-      default:
-        return 'assets/figma/c04_hero.jpg';
-    }
-  }
+
   String get circlesVents => _am ? 'የውይይት ቡድኖችና የልብ ማውጫ' : 'Circles & vents';
   String get privateNotes => _am ? 'ለእርስዎ ብቻ' : 'Private notes';
   String get balanceTopUps => _am ? 'ቀሪ ሂሳብና ገንዘብ መሙያ' : 'Balance & top-ups';
@@ -516,6 +505,18 @@ class S {
         return cooking;
       default:
         return slug;
+    }
+  }
+
+  /// One-word pillar names for tabs.
+  String pillarShortName(String slug) {
+    switch (slug) {
+      case 'spiritual-psychiatry':
+        return _am ? 'መንፈሳዊ' : 'Faith';
+      case 'cooking':
+        return _am ? 'ምግብ' : 'Cooking';
+      default:
+        return _am ? 'ሕክምና' : 'Therapy';
     }
   }
 

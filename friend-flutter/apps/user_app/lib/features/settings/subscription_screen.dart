@@ -48,7 +48,6 @@ class SubscriptionScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           FriendHeroCard(
-            tint: FriendColors.primary,
             child: Row(
               children: [
                 Expanded(

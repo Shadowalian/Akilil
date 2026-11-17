@@ -66,26 +66,35 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CandyCard(
-            tint: FriendColors.primary,
-            padding: const EdgeInsets.fromLTRB(16, 28, 16, 28),
+            padding: const EdgeInsets.fromLTRB(12, 24, 12, 24),
             child: Column(
               children: [
-                Text(
-                  _mood == null ? tr('Tap a face') : _labelFor(_mood!),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 160),
+                  child: Text(
+                    _mood == null ? tr('Tap a face') : _labelFor(_mood!),
+                    key: ValueKey(_mood),
+                    style: theme.textTheme.titleMedium,
                   ),
                 ),
-                const SizedBox(height: 22),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 12,
-                  alignment: WrapAlignment.center,
+                const SizedBox(height: 20),
+                Row(
                   children: [
                     for (var i = 1; i <= 7; i++)
-                      GestureDetector(
-                        onTap: () => setState(() => _mood = i),
-                        child: _MoodTile(level: i, selected: _mood == i),
+                      Expanded(
+                        child: Semantics(
+                          button: true,
+                          selected: _mood == i,
+                          label: _labelFor(i),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => setState(() => _mood = i),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                              child: _MoodTile(level: i, selected: _mood == i),
+                            ),
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -100,20 +109,7 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
             decoration: InputDecoration(
               labelText: tr('Optional note'),
               hintText: tr('Anything else you want to capture?'),
-              filled: true,
-              fillColor: FriendColors.surface,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(FriendRadii.medium),
-                borderSide: const BorderSide(color: FriendColors.border),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(FriendRadii.medium),
-                borderSide: const BorderSide(color: FriendColors.border),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(FriendRadii.medium),
-                borderSide: const BorderSide(color: FriendColors.primary, width: 1.5),
-              ),
+              alignLabelWithHint: true,
             ),
           ),
           const SizedBox(height: 28),
@@ -164,7 +160,7 @@ class _MoodTile extends StatelessWidget {
       scale: selected ? 1.06 : 1.0,
       child: FreudArt.moodFaceAt(
         valence: (level - 1) / (_levels - 1),
-        size: 56,
+        size: 44,
         selected: selected,
       ),
     );

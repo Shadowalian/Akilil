@@ -274,10 +274,6 @@ class _VentCard extends StatelessWidget {
 
     return CandyCard(
 
-      accentStripe: true,
-
-      tint: FriendColors.accent,
-
       child: Column(
 
         crossAxisAlignment: CrossAxisAlignment.start,

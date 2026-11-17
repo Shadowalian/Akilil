@@ -27,9 +27,10 @@ class CommunityScreen extends ConsumerWidget {
       eyebrow: tr('Community'),
       title: tr('Circles'),
       subtitle: tr('Rooms where nobody has to explain themselves.'),
-      trailing: FriendGlowButton(
-        label: tr('Vent'),
-        icon: Icons.weekend_outlined,
+      trailing: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(minimumSize: const Size(0, 40), padding: const EdgeInsets.symmetric(horizontal: 14)),
+        icon: const Icon(Icons.edit_outlined, size: 18),
+        label: Text(tr('Vent')),
         onPressed: () => context.push(AppRoutes.vents),
       ),
       onRefresh: () async => ref.invalidate(_channelsProvider),
@@ -83,23 +84,11 @@ class _ChannelTile extends StatelessWidget {
     final isPrivate = channel['is_private'] == true;
 
     return CandyCard(
-      tint: FriendColors.primary,
       onTap: () => context.push('${AppRoutes.community}/${channel['id']}'),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: FriendColors.primaryLight,
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Icon(
-              isPrivate ? Icons.lock_outline_rounded : Icons.forum_outlined,
-              color: FriendColors.primary,
-            ),
-          ),
+          FriendIconTile(icon: isPrivate ? Icons.lock_outline_rounded : Icons.forum_outlined, size: 44),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -108,7 +97,7 @@ class _ChannelTile extends StatelessWidget {
                 Text(
                   name,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 if (description != null && description.isNotEmpty) ...[
@@ -127,7 +116,7 @@ class _ChannelTile extends StatelessWidget {
           ),
           if (members != null) ...[
             const SizedBox(width: 10),
-            FriendStatusChip(label: '$members', color: FriendColors.primary),
+            Text(trx('$members members', '$members አባላት'), style: theme.textTheme.labelSmall),
           ],
           const Icon(Icons.chevron_right_rounded, color: FriendColors.textMuted),
         ],

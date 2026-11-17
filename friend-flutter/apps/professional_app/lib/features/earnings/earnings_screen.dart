@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -30,7 +30,7 @@ class EarningsScreen extends ConsumerWidget {
     final earningsAsync = ref.watch(_earningsProvider);
     final payoutsAsync = ref.watch(_payoutsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Earnings')),
+      appBar: AppBar(title: Text(tr('Earnings'))),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(_earningsProvider);
@@ -46,14 +46,14 @@ class EarningsScreen extends ConsumerWidget {
               data: (data) => _EarningsCard(data: data),
             ),
             const SizedBox(height: 16),
-            Text('Recent payouts', style: Theme.of(context).textTheme.titleMedium),
+            Text(tr('Recent payouts'), style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             payoutsAsync.when(
               loading: () => const SizedBox(height: 80),
               error: (e, _) => const Text("Couldn't load payouts."),
               data: (list) => list.isEmpty
-                  ? const Card(child: Padding(padding: EdgeInsets.all(20),
-                      child: Text('No payouts yet.')))
+                  ? Card(child: Padding(padding: EdgeInsets.all(20),
+                      child: Text(tr('No payouts yet.'))))
                   : Column(children: [for (final p in list) _PayoutTile(payout: p)]),
             ),
             const SizedBox(height: 16),
@@ -78,7 +78,7 @@ class _RequestPayoutButtonState extends ConsumerState<_RequestPayoutButton> {
 
   Future<void> _request() async {
     setState(() => _busy = true);
-    String message = 'Payout request submitted for review.';
+    String message = tr('Payout request submitted for review.');
     var ok = true;
     try {
       await ref.read(dioProvider).post('/professional/payouts', data: {
@@ -110,7 +110,7 @@ class _RequestPayoutButtonState extends ConsumerState<_RequestPayoutButton> {
             ? const SizedBox(width: 18, height: 18,
                 child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
             : const Icon(Icons.account_balance),
-        label: const Text('Request payout'),
+        label: Text(tr('Request payout')),
       );
 }
 
@@ -142,7 +142,7 @@ class _EarningsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Available to withdraw', style: Theme.of(context).textTheme.labelLarge),
+            Text(tr('Available to withdraw'), style: Theme.of(context).textTheme.labelLarge),
             Text(formatMoney(data['available_cents'] as num?, currency),
                 style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 4),
@@ -199,7 +199,7 @@ class _PayoutTile extends StatelessWidget {
         title: Text('${cents.toStringAsFixed(2)} $currency'),
         subtitle: Text(createdAt == null
             ? status
-            : '${DateFormat('MMM d').format(createdAt)} • $status'),
+            : '${trDate('MMM d', createdAt)} • $status'),
         trailing: Icon(
           switch (status) {
             'sent'      => Icons.check_circle,

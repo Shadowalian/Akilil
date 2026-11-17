@@ -147,7 +147,7 @@ class CrisisScreen extends ConsumerWidget {
             style: const TextStyle(
               fontFamily: 'Geist',
               fontSize: FriendTypeScale.headlineSmall,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: FriendColors.textPrimary,
             ),
           ),
@@ -197,7 +197,7 @@ class _PrimaryCtaCard extends StatelessWidget {
                       style: const TextStyle(
                         fontFamily: 'Geist',
                         fontSize: FriendTypeScale.bodyLarge,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         color: FriendColors.onPrimary,
                       ),
                     ),
@@ -256,7 +256,7 @@ class _EmergencyCard extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: 'Geist',
                     fontSize: FriendTypeScale.caption,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: FriendColors.onErrorContainer,
                   ),
                 ),
@@ -266,7 +266,7 @@ class _EmergencyCard extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: 'Geist Mono',
                     fontSize: FriendTypeScale.headlineSmall,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: FriendColors.onErrorContainer,
                   ),
                 ),
@@ -278,15 +278,12 @@ class _EmergencyCard extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: FriendColors.error,
               foregroundColor: FriendColors.onPrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(FriendRadii.pill),
-              ),
             ),
             child: Text(
               callLabel,
               style: const TextStyle(
                 fontFamily: 'Geist',
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -315,18 +312,7 @@ class _ContactCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: FriendColors.primaryLight,
-            child: Text(
-              name.isNotEmpty ? name[0].toUpperCase() : '?',
-              style: const TextStyle(
-                fontFamily: 'Geist',
-                fontWeight: FontWeight.w800,
-                color: FriendColors.primary,
-              ),
-            ),
-          ),
+          FriendAvatar(size: 44, initials: personInitial(name)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -337,7 +323,7 @@ class _ContactCard extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: 'Geist',
                     fontSize: FriendTypeScale.bodyLarge,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
@@ -382,15 +368,7 @@ class _ToolkitCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: FriendColors.apricot,
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Icon(icon, color: FriendColors.accentDeep),
-          ),
+          FriendIconTile(icon: icon, size: 44),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -401,7 +379,7 @@ class _ToolkitCard extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: 'Geist',
                     fontSize: FriendTypeScale.bodyLarge,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
@@ -455,15 +433,7 @@ class _CrisisResourceCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: FriendColors.recessed,
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Icon(icon, color: FriendColors.primaryDeep, size: 22),
-          ),
+          FriendIconTile(icon: icon, color: FriendColors.error, size: 44),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -477,30 +447,12 @@ class _CrisisResourceCard extends StatelessWidget {
                         style: const TextStyle(
                           fontFamily: 'Geist',
                           fontSize: FriendTypeScale.bodyLarge,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     if (badge.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: FriendColors.primaryLight,
-                          borderRadius: BorderRadius.circular(FriendRadii.pill),
-                        ),
-                        child: Text(
-                          badge,
-                          style: const TextStyle(
-                            fontFamily: 'Geist',
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: FriendColors.primaryDeep,
-                          ),
-                        ),
-                      ),
+                      FriendStatusChip(label: badge, color: FriendColors.error),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -545,8 +497,7 @@ class _HelpRequestCard extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return CandyCard(
-      tint: FriendColors.primary,
-      accentStripe: true,
+      
       onTap: () => showHelpRequestSheet(context, ref),
       child: Row(
         children: [

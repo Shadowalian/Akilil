@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -60,7 +59,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            value ? 'Online walk-in activated.' : 'Walk-in paused.',
+            value ? 'Online walk-in activated.' : tr('Walk-in paused.'),
           ),
         ),
       );
@@ -82,7 +81,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         context.go('/sessions/$id/host');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Request declined.')),
+          SnackBar(content: Text(tr('Request declined.'))),
         );
       }
     } catch (e) {
@@ -146,7 +145,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         final onboarding = data['onboarding'] as Map<String, dynamic>;
         final profile = data['profile'] as Map<String, dynamic>;
         final offersWalkIn = profile['offers_free_listening'] == true;
-        final userName = user?.name ?? 'Clinician';
+        final userName = user?.name ?? tr('Clinician');
         final title = _clinicianTitle(profile);
         final todayCount = _sessionsToday(upcoming);
         final queue = _consultationQueue(upcoming);
@@ -238,7 +237,7 @@ String _clinicianTitle(Map<String, dynamic> profile) {
   if (bio != null && bio.isNotEmpty) {
     return bio.length > 48 ? '${bio.substring(0, 48)}…' : bio;
   }
-  return 'Licensed practitioner';
+  return tr('Licensed practitioner');
 }
 
 int _sessionsToday(List<Map<String, dynamic>> appts) {
@@ -348,9 +347,9 @@ class _IdentityCard extends StatelessWidget {
                         Flexible(
                           child: Text(
                             name,
-                            style: GoogleFonts.plusJakartaSans(
+                            style: friendFont(
                               fontSize: 18,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: FriendColors.textPrimary,
                             ),
                             maxLines: 1,
@@ -365,7 +364,7 @@ class _IdentityCard extends StatelessWidget {
                     ),
                     Text(
                       title,
-                      style: GoogleFonts.inter(
+                      style: friendFont(
                         fontSize: 13,
                         color: FriendColors.textSecondary,
                       ),
@@ -405,7 +404,7 @@ class _IdentityCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       crisisFlags == 0 ? 'No safety flags' : '$crisisFlags safety flags to review',
-                      style: GoogleFonts.inter(
+                      style: friendFont(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: FriendColors.accent,
@@ -418,7 +417,7 @@ class _IdentityCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const ProStitchMicroLabel('Online Walk-in'),
+                  ProStitchMicroLabel(tr('Online Walk-in')),
                   Switch.adaptive(
                     value: walkInEnabled,
                     activeTrackColor: FriendColors.primary,
@@ -454,9 +453,9 @@ class _MetricsStrip extends StatelessWidget {
         Expanded(
           child: _MetricTile(
             icon: Icons.event_available_outlined,
-            tag: 'Today',
+            tag: tr('Today'),
             value: '$todaySessions',
-            caption: 'Sessions today',
+            caption: tr('Sessions today'),
             onTap: onEarningsTap,
           ),
         ),
@@ -464,7 +463,7 @@ class _MetricsStrip extends StatelessWidget {
         Expanded(
           child: _MetricTile(
             icon: Icons.account_balance_wallet_outlined,
-            tag: 'Month',
+            tag: tr('Month'),
             value: _formatMtd(mtdEarnings).split(' ').first,
             caption: '${mtdEarnings['currency'] ?? 'ETB'} earned',
             onTap: onEarningsTap,
@@ -474,9 +473,9 @@ class _MetricsStrip extends StatelessWidget {
         Expanded(
           child: _MetricTile(
             icon: Icons.sensors_rounded,
-            tag: 'Live',
+            tag: tr('Live'),
             value: 'Go',
-            caption: 'Broadcast',
+            caption: tr('Broadcast'),
             valueColor: FriendColors.accent,
             onTap: () => context.push('/live'),
           ),
@@ -532,16 +531,16 @@ class _MetricTile extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 value,
-                style: GoogleFonts.plusJakartaSans(
+                style: friendFont(
                   fontSize: 22,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: -0.5,
                   color: valueColor ?? FriendColors.textPrimary,
                 ),
               ),
               Text(
                 caption,
-                style: GoogleFonts.inter(
+                style: friendFont(
                   fontSize: 10,
                   color: FriendColors.textSecondary,
                 ),
@@ -575,10 +574,10 @@ class _QueueSection extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Up next',
-              style: GoogleFonts.plusJakartaSans(
+              tr('Up next'),
+              style: friendFont(
                 fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(width: 8),
@@ -589,18 +588,18 @@ class _QueueSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(FriendRadii.pill),
               ),
               child: Text(
-                'Today',
-                style: GoogleFonts.inter(
+                tr('Today'),
+                style: friendFont(
                   fontSize: 10,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: FriendColors.primaryDeep,
                 ),
               ),
             ),
             const Spacer(),
             Text(
-              'Timeline',
-              style: GoogleFonts.inter(
+              tr('Timeline'),
+              style: friendFont(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: FriendColors.primary,
@@ -616,12 +615,12 @@ class _QueueSection extends StatelessWidget {
                 Icon(Icons.event_available, size: 40, color: FriendColors.textMuted),
                 const SizedBox(height: 8),
                 Text(
-                  'No upcoming consultations',
-                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+                  tr('No upcoming consultations'),
+                  style: friendFont(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Bookings from clients will appear here.',
+                Text(
+                  tr('Bookings from clients will appear here.'),
                   style: TextStyle(color: FriendColors.textSecondary),
                 ),
               ],
@@ -662,16 +661,16 @@ class _ActiveQueueCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final startsAt = DateTime.parse(appt['scheduled_at'] as String).toLocal();
     final guest = (appt['client'] as Map<String, dynamic>?) ?? const {};
-    final name = guest['name'] as String? ?? 'Client';
+    final name = guest['name'] as String? ?? tr('Client');
     final id = '${appt['id']}';
     final mins = startsAt.difference(DateTime.now()).inMinutes;
     final startsLabel = mins <= 0
-        ? 'Now'
+        ? tr('Now')
         : mins < 60
             ? 'In $mins min'
             : mins < 24 * 60
                 ? 'In ${mins ~/ 60}h ${mins % 60}m'
-                : DateFormat('EEE').format(startsAt);
+                : trDate('EEE', startsAt);
     final note = appt['client_note'] as String?;
 
     return ProStitchCard(
@@ -685,15 +684,15 @@ class _ActiveQueueCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${DateFormat('h:mm a').format(startsAt)} · ${appt['duration_minutes'] ?? 50} min',
+                  '${trDate('h:mm a', startsAt)} · ${appt['duration_minutes'] ?? 50} min',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(fontSize: 12, color: FriendColors.textSecondary),
+                  style: friendFont(fontSize: 12, color: FriendColors.textSecondary),
                 ),
               ),
               const Icon(Icons.lock_outline, size: 16, color: FriendColors.primary),
               const SizedBox(width: 4),
-              const ProStitchMicroLabel('Private'),
+              ProStitchMicroLabel(tr('Private')),
             ],
           ),
           const SizedBox(height: 14),
@@ -710,14 +709,14 @@ class _ActiveQueueCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: friendFont(
                         fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
                       appt['recipe'] is Map ? 'Cooking · ${(appt['recipe'] as Map)['title']}' : '${appt['care_format'] ?? 'individual'} session',
-                      style: GoogleFonts.inter(
+                      style: friendFont(
                         fontSize: 13,
                         color: FriendColors.textSecondary,
                       ),
@@ -740,10 +739,10 @@ class _ActiveQueueCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const ProStitchMicroLabel('Client note'),
+                      ProStitchMicroLabel(tr('Client note')),
                       Text(
-                        note?.isNotEmpty == true ? note! : 'No note from client',
-                        style: GoogleFonts.inter(
+                        note?.isNotEmpty == true ? note! : tr('No note from client'),
+                        style: friendFont(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -758,15 +757,15 @@ class _ActiveQueueCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const ProStitchMicroLabel('After session'),
+                      ProStitchMicroLabel(tr('After session')),
                       Row(
                         children: [
                           Icon(Icons.check_circle, size: 14, color: FriendColors.accent),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              'Write your session note',
-                              style: GoogleFonts.inter(
+                              tr('Write your session note'),
+                              style: friendFont(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -787,12 +786,9 @@ class _ActiveQueueCard extends StatelessWidget {
                 child: FilledButton.icon(
                   onPressed: () => onLaunchMeet(id),
                   icon: const Icon(Icons.videocam),
-                  label: const Text('Launch Akilil Meet'),
+                  label: Text(tr('Launch Akilil Meet')),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(0, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(FriendRadii.pill),
-                    ),
                   ),
                 ),
               ),
@@ -801,9 +797,6 @@ class _ActiveQueueCard extends StatelessWidget {
                 onPressed: () => onDossier(guest, 1),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(48, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(FriendRadii.pill),
-                  ),
                   backgroundColor: FriendColors.recessed,
                 ),
                 child: const Icon(Icons.folder_shared_outlined),
@@ -829,7 +822,7 @@ class _CompactQueueCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final startsAt = DateTime.parse(appt['scheduled_at'] as String).toLocal();
     final guest = (appt['client'] as Map<String, dynamic>?) ?? const {};
-    final name = guest['name'] as String? ?? 'Client';
+    final name = guest['name'] as String? ?? tr('Client');
     final note = appt['client_note'] as String?;
 
     return ProStitchCard(
@@ -848,10 +841,10 @@ class _CompactQueueCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
+                    Text(name, style: friendFont(fontWeight: FontWeight.w600)),
                     Text(
-                      '${DateFormat('h:mm a').format(startsAt)} • ${note ?? 'Upcoming session'}',
-                      style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
+                      '${trDate('h:mm a', startsAt)} • ${note ?? tr('Upcoming session')}',
+                      style: friendFont(fontSize: 13, color: FriendColors.textSecondary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -865,10 +858,10 @@ class _CompactQueueCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(FriendRadii.pill),
                 ),
                 child: Text(
-                  'Paid',
-                  style: GoogleFonts.inter(
+                  tr('Paid'),
+                  style: friendFont(
                     fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: FriendColors.primary,
                   ),
                 ),
@@ -880,12 +873,12 @@ class _CompactQueueCard extends StatelessWidget {
             children: [
               Expanded(
                 child: ProStitchMicroLabel(
-                  appt['kind'] == 'listening_request' ? 'Walk-in' : 'Booked session',
+                  appt['kind'] == 'listening_request' ? 'Walk-in' : tr('Booked session'),
                 ),
               ),
               TextButton(
                 onPressed: () => onDossier(guest, 1),
-                child: const Text('Review Notes'),
+                child: Text(tr('Review Notes')),
               ),
             ],
           ),
@@ -921,15 +914,15 @@ class _EveningWindowsSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Evening Open Windows',
-                      style: GoogleFonts.plusJakartaSans(
+                      tr('Evening Open Windows'),
+                      style: friendFont(
                         fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      'Instant slots visible to network triage',
-                      style: GoogleFonts.inter(
+                      tr('Instant slots visible to network triage'),
+                      style: friendFont(
                         fontSize: 13,
                         color: FriendColors.textSecondary,
                       ),
@@ -951,14 +944,14 @@ class _EveningWindowsSection extends StatelessWidget {
                     child: InputChip(
                       label: Text(slots[i]),
                       avatar: const Icon(Icons.schedule, size: 16),
-                      onDeleted: slots[i].contains('Standby') ? null : () => onRemoveSlot(slots[i]),
+                      onDeleted: slots[i].contains(tr('Standby')) ? null : () => onRemoveSlot(slots[i]),
                       backgroundColor: i == 0
                           ? FriendColors.secondaryFixed
                           : FriendColors.recessed,
                     ),
                   ),
                 ActionChip(
-                  label: const Text('Open Extra Slot'),
+                  label: Text(tr('Open Extra Slot')),
                   avatar: const Icon(Icons.add, size: 16),
                   onPressed: onAddSlot,
                   backgroundColor: FriendColors.primaryLight,
@@ -989,8 +982,8 @@ class _ListeningSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Walk-in requests',
-          style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w700),
+          tr('Walk-in requests'),
+          style: friendFont(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         for (final a in requests)
@@ -1002,8 +995,8 @@ class _ListeningSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (a['client'] as Map?)?['name'] as String? ?? 'Client',
-                    style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+                    (a['client'] as Map?)?['name'] as String? ?? tr('Client'),
+                    style: friendFont(fontWeight: FontWeight.w600),
                   ),
                   if ((a['client_note'] as String?)?.isNotEmpty == true)
                     Text(a['client_note'] as String),
@@ -1012,12 +1005,12 @@ class _ListeningSection extends StatelessWidget {
                     children: [
                       FilledButton(
                         onPressed: () => onAccept((a['id'] as num).toInt()),
-                        child: const Text('Accept & join'),
+                        child: Text(tr('Accept & join')),
                       ),
                       const SizedBox(width: 8),
                       OutlinedButton(
                         onPressed: () => onDecline((a['id'] as num).toInt()),
-                        child: const Text('Decline'),
+                        child: Text(tr('Decline')),
                       ),
                     ],
                   ),
@@ -1042,7 +1035,7 @@ class _OnboardingNudge extends StatelessWidget {
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         leading: const Icon(Icons.checklist, color: FriendColors.accent),
-        title: const Text('Finish setting up your practice'),
+        title: Text(tr('Finish setting up your practice')),
         subtitle: Text('Remaining: ${pending.join(", ")}'),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => context.go('/onboarding'),
@@ -1068,7 +1061,7 @@ class _PeerSupervisionCard extends StatelessWidget {
                 child: const Icon(Icons.psychology, size: 18, color: FriendColors.primaryDeep),
               ),
               const SizedBox(width: 8),
-              const ProStitchMicroLabel('Clinical Peer Governance'),
+              ProStitchMicroLabel(tr('Clinical Peer Governance')),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1077,20 +1070,20 @@ class _PeerSupervisionCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(FriendRadii.pill),
                 ),
                 child: Text(
-                  'CME Credited',
-                  style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600),
+                  tr('CME Credited'),
+                  style: friendFont(fontSize: 10, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
           Text(
-            'Monthly supervision check-in',
-            style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w700),
+            tr('Monthly supervision check-in'),
+            style: friendFont(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           Text(
-            'Schedule peer review through your clinic calendar.',
-            style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
+            tr('Schedule peer review through your clinic calendar.'),
+            style: friendFont(fontSize: 13, color: FriendColors.textSecondary),
           ),
         ],
       ),

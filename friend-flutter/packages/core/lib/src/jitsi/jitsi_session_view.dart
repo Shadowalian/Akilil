@@ -4,7 +4,6 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/design_tokens.dart';
@@ -387,7 +386,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                           widget.title ?? coreTr('Akilil Meet'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: friendFont(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
@@ -407,7 +406,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                             const SizedBox(width: 4),
                             Text(
                               widget.mode == JitsiRoomMode.group ? coreTr('PRIVATE GROUP') : coreTr('PRIVATE SESSION'),
-                              style: GoogleFonts.inter(
+                              style: friendFont(
                                 color: Colors.white.withValues(alpha: 0.85),
                                 fontWeight: FontWeight.w700,
                                 fontSize: 10,

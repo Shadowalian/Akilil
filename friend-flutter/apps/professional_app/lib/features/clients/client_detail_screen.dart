@@ -1,9 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -83,7 +82,7 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
     final id = _clientId;
     if (id == null) return;
     setState(() => _busy = true);
-    var message = 'Conversation ready in Messages.';
+    var message = tr('Conversation ready in Messages.');
     try {
       await ref.read(dioProvider).post('/conversations', data: {
         'participant_user_id': id,
@@ -105,7 +104,7 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
     final id = latestAppt?['id'];
     if (id == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Complete a session first to attach notes.')),
+        SnackBar(content: Text(tr('Complete a session first to attach notes.'))),
       );
       return;
     }
@@ -114,13 +113,13 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.user['name'] as String? ?? 'Anonymous';
+    final name = widget.user['name'] as String? ?? tr('Anonymous');
     final clientId = _clientId;
     final pro = ref.watch(currentUserProvider);
     final headerInset = MediaQuery.paddingOf(context).top + 56;
 
     if (clientId == null) {
-      return const Scaffold(body: Center(child: Text('Invalid client.')));
+      return Scaffold(body: Center(child: Text(tr('Invalid client.'))));
     }
 
     final dossier = ref.watch(_clientDossierProvider(clientId));
@@ -168,7 +167,7 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
                   _DiagnosticCard(
                     presentation: intake?.isNotEmpty == true
                         ? intake!
-                        : 'They have not left a note when booking.',
+                        : tr('They have not left a note when booking.'),
                     modality: _formatSummary(appts),
                   ),
                   const SizedBox(height: 16),
@@ -194,7 +193,7 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
                   OutlinedButton.icon(
                     onPressed: _busy ? null : _message,
                     icon: const Icon(Icons.chat_bubble_outline),
-                    label: Text(_busy ? 'Opening…' : 'Message client'),
+                    label: Text(_busy ? 'Opening…' : tr('Message client')),
                   ),
                 ],
               );
@@ -268,8 +267,8 @@ class _ProfileRibbon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final memberSince = lastSessionAt != null
-        ? DateFormat('MMM yyyy').format(lastSessionAt!)
-        : 'Active member';
+        ? trDate('MMM yyyy', lastSessionAt!)
+        : tr('Active member');
     return ProStitchCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,18 +307,18 @@ class _ProfileRibbon extends StatelessWidget {
                       name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: friendFont(
                         fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
                       '$sessionCount ${sessionCount == 1 ? 'session' : 'sessions'}',
-                      style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
+                      style: friendFont(fontSize: 13, color: FriendColors.textSecondary),
                     ),
                     Text(
                       'Client since $memberSince',
-                      style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
+                      style: friendFont(fontSize: 10, color: FriendColors.textMuted),
                     ),
                   ],
                 ),
@@ -351,7 +350,7 @@ class _DiagnosticCard extends StatelessWidget {
             children: [
               const Icon(Icons.psychology, size: 18, color: FriendColors.primary),
               const SizedBox(width: 6),
-              const ProStitchMicroLabel('Overview'),
+              ProStitchMicroLabel(tr('Overview')),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -360,8 +359,8 @@ class _DiagnosticCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(FriendRadii.small),
                 ),
                 child: Text(
-                  'Active',
-                  style: GoogleFonts.inter(
+                  tr('Active'),
+                  style: friendFont(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                     color: FriendColors.primaryDeep,
@@ -371,10 +370,10 @@ class _DiagnosticCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const ProStitchMicroLabel('What they shared when booking'),
+          ProStitchMicroLabel(tr('What they shared when booking')),
           Text(
             presentation,
-            style: GoogleFonts.plusJakartaSans(
+            style: friendFont(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -391,10 +390,10 @@ class _DiagnosticCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'SESSIONS SO FAR',
-                  style: GoogleFonts.inter(
+                  tr('SESSIONS SO FAR'),
+                  style: friendFont(
                     fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 0.8,
                     color: FriendColors.primary,
                   ),
@@ -407,7 +406,7 @@ class _DiagnosticCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         modality,
-                        style: GoogleFonts.inter(
+                        style: friendFont(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -442,8 +441,8 @@ class _SoapHistorySection extends StatelessWidget {
     if (appointments.isEmpty) {
       return ProStitchCard(
         child: Text(
-          'No session history yet.',
-          style: GoogleFonts.inter(color: FriendColors.textSecondary),
+          tr('No session history yet.'),
+          style: friendFont(color: FriendColors.textSecondary),
         ),
       );
     }
@@ -456,13 +455,13 @@ class _SoapHistorySection extends StatelessWidget {
             const Icon(Icons.history_edu, size: 18, color: FriendColors.primary),
             const SizedBox(width: 6),
             Text(
-              'SOAP Session History',
-              style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w700),
+              tr('SOAP Session History'),
+              style: friendFont(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const Spacer(),
             Text(
               'Showing ${appointments.length.clamp(0, 2)} of ${appointments.length}',
-              style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
+              style: friendFont(fontSize: 10, color: FriendColors.textMuted),
             ),
           ],
         ),
@@ -520,9 +519,9 @@ class _SoapCard extends StatelessWidget {
                       children: [
                         Text(
                           'Session #${index + 1}',
-                          style: GoogleFonts.inter(
+                          style: friendFont(
                             fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -534,7 +533,7 @@ class _SoapCard extends StatelessWidget {
                           ),
                           child: Text(
                             _statusLabel(appointment['status'] as String?),
-                            style: GoogleFonts.inter(fontSize: 10),
+                            style: friendFont(fontSize: 10),
                           ),
                         ),
                       ],
@@ -542,8 +541,8 @@ class _SoapCard extends StatelessWidget {
                     if (when != null)
                       Text(
                         // Literal text must stay outside the pattern: 'mins' would be read as minute/second codes.
-                        '${DateFormat('MMM d, yyyy').format(when.toLocal())} • ${appointment['duration_minutes'] ?? 50} min',
-                        style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
+                        '${trDate('MMM d, yyyy', when.toLocal())} • ${appointment['duration_minutes'] ?? 50} min',
+                        style: friendFont(fontSize: 10, color: FriendColors.textMuted),
                       ),
                   ],
                 ),
@@ -552,23 +551,23 @@ class _SoapCard extends StatelessWidget {
           ),
           if (expanded && subjective?.isNotEmpty == true) ...[
             const SizedBox(height: 12),
-            _SoapBlock(letter: 'S', label: 'Subjective', text: subjective!, color: FriendColors.primary),
+            _SoapBlock(letter: 'S', label: tr('Subjective'), text: subjective!, color: FriendColors.primary),
             if (plan != null)
-              _SoapBlock(letter: 'P', label: 'Plan', text: plan, color: FriendColors.primaryContainer),
+              _SoapBlock(letter: 'P', label: tr('Plan'), text: plan, color: FriendColors.primaryContainer),
           ] else if (!expanded && subjective?.isNotEmpty == true) ...[
             const SizedBox(height: 10),
             Text(
               subjective!,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
+              style: friendFont(fontSize: 13, color: FriendColors.textSecondary),
             ),
           ],
           if (subjective?.isNotEmpty == true)
             TextButton.icon(
               onPressed: onToggle,
               icon: Icon(expanded ? Icons.expand_less : Icons.expand_more),
-              label: Text(expanded ? 'Collapse Detailed SOAP' : 'Expand Detailed SOAP'),
+              label: Text(expanded ? 'Collapse Detailed SOAP' : tr('Expand Detailed SOAP')),
             ),
         ],
       ),
@@ -618,9 +617,9 @@ class _SoapBlock extends StatelessWidget {
                 ),
                 child: Text(
                   letter,
-                  style: GoogleFonts.inter(
+                  style: friendFont(
                     fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: FriendColors.onPrimary,
                   ),
                 ),
@@ -628,14 +627,14 @@ class _SoapBlock extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 label.toUpperCase(),
-                style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
+                style: friendFont(fontSize: 10, fontWeight: FontWeight.w600),
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
             text,
-            style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary, height: 1.4),
+            style: friendFont(fontSize: 13, color: FriendColors.textSecondary, height: 1.4),
           ),
         ],
       ),
@@ -665,21 +664,21 @@ class _WorksheetsSection extends StatelessWidget {
               const Icon(Icons.task_alt, size: 18, color: FriendColors.primary),
               const SizedBox(width: 6),
               Text(
-                'Assigned Worksheets & Somatics',
-                style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w700),
+                tr('Assigned Worksheets & Somatics'),
+                style: friendFont(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const Spacer(),
               Text(
                 '${items.isEmpty ? 0 : items.length} Active',
-                style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
+                style: friendFont(fontSize: 10, color: FriendColors.textMuted),
               ),
             ],
           ),
           const SizedBox(height: 12),
           if (items.isEmpty)
             Text(
-              'Action items from saved session notes appear here.',
-              style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
+              tr('Action items from saved session notes appear here.'),
+              style: friendFont(fontSize: 13, color: FriendColors.textSecondary),
             )
           else
             for (final item in items)
@@ -706,7 +705,7 @@ class _WorksheetsSection extends StatelessWidget {
                       Expanded(
                         child: Text(
                           item,
-                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
+                          style: friendFont(fontSize: 13, fontWeight: FontWeight.w600),
                         ),
                       ),
                       Container(
@@ -716,8 +715,8 @@ class _WorksheetsSection extends StatelessWidget {
                           borderRadius: BorderRadius.circular(FriendRadii.pill),
                         ),
                         child: Text(
-                          'Assigned',
-                          style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
+                          tr('Assigned'),
+                          style: friendFont(fontSize: 10, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -754,12 +753,9 @@ class _DossierActionBar extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onAddNote,
                     icon: const Icon(Icons.add),
-                    label: const Text('Add note'),
+                    label: Text(tr('Add note')),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(0, 48),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(FriendRadii.pill),
-                      ),
                     ),
                   ),
                 ),
@@ -768,13 +764,10 @@ class _DossierActionBar extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: onCarePlan,
                     icon: const Icon(Icons.chat_bubble_outline_rounded),
-                    label: const Text('Message'),
+                    label: Text(tr('Message')),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(0, 48),
                       backgroundColor: FriendColors.surfaceContainer,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(FriendRadii.pill),
-                      ),
                     ),
                   ),
                 ),
@@ -787,8 +780,8 @@ class _DossierActionBar extends StatelessWidget {
                 Icon(Icons.lock_outline, size: 14, color: FriendColors.accent),
                 const SizedBox(width: 6),
                 Text(
-                  'VISIBLE ONLY TO YOU',
-                  style: GoogleFonts.inter(
+                  tr('VISIBLE ONLY TO YOU'),
+                  style: friendFont(
                     fontSize: 9,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.6,
@@ -806,12 +799,12 @@ class _DossierActionBar extends StatelessWidget {
 }
 
 String _statusLabel(String? status) => switch (status) {
-      'completed' => 'Completed',
-      'confirmed' => 'Upcoming',
-      'in_progress' => 'In progress',
-      'cancelled' => 'Cancelled',
-      'no_show' => 'No-show',
-      _ => 'Booked',
+      'completed' => tr('Completed'),
+      'confirmed' => tr('Upcoming'),
+      'in_progress' => tr('In progress'),
+      'cancelled' => tr('Cancelled'),
+      'no_show' => tr('No-show'),
+      _ => tr('Booked'),
     };
 
 
@@ -848,26 +841,26 @@ class _SafetyPlanCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(Icons.health_and_safety_outlined, size: 18, color: FriendColors.primary),
               SizedBox(width: 6),
-              ProStitchMicroLabel('Their safety plan'),
+              ProStitchMicroLabel(tr('Their safety plan')),
             ],
           ),
           if (empty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
-                'They have not written one yet. If it fits your work together, you could build it with them in a session.',
+                tr('They have not written one yet. If it fits your work together, you could build it with them in a session.'),
                 style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
               ),
             )
           else ...[
-            part('Warning signs', list('warning_signs')),
-            part('Things that help', list('coping')),
-            part('People they can call', people),
-            part('Making things safer', list('environment')),
+            part(tr('Warning signs'), list('warning_signs')),
+            part(tr('Things that help'), list('coping')),
+            part(tr('People they can call'), people),
+            part(tr('Making things safer'), list('environment')),
           ],
         ],
       ),

@@ -1,9 +1,9 @@
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_lock_controller.dart';
 import 'auth_controller.dart';
@@ -59,7 +59,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           return;
         } catch (_) {
           if (mounted) {
-            setState(() => _error = 'Biometric session expired. Please sign in with password.');
+            setState(() => _error = tr('Biometric session expired. Please sign in with password.'));
           }
         }
       }
@@ -91,11 +91,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _error =
               "Can't reach Akilil servers. Check your internet and try again.";
         } else if (e.response?.statusCode == 429) {
-          _error = 'Too many login attempts. Wait a minute and try again.';
+          _error = tr('Too many login attempts. Wait a minute and try again.');
         } else if (e.response?.data is Map) {
-          _error = ((e.response!.data['message'] ?? 'Login failed') as String);
+          _error = ((e.response!.data['message'] ?? tr('Login failed')) as String);
         } else {
-          _error = 'Login failed. Please try again.';
+          _error = tr('Login failed. Please try again.');
         }
       });
     } catch (e) {
@@ -128,18 +128,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         proBrandMark(size: 72),
                         const SizedBox(height: 24),
                         Text(
-                          'Welcome back',
-                          style: GoogleFonts.urbanist(
+                          tr('Welcome back'),
+                          style: friendFont(
                             fontSize: 28,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             color: FriendColors.textPrimary,
                           ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Sign in to your Akilil Pro workspace',
-                          style: GoogleFonts.urbanist(
+                          tr('Sign in to your Akilil Pro workspace'),
+                          style: friendFont(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: FriendColors.textSecondary,
@@ -151,8 +151,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           controller: _emailCtrl,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: GoogleFonts.urbanist(),
+                            labelText: tr('Email'),
+                            labelStyle: friendFont(),
                             prefixIcon: const Icon(Icons.alternate_email),
                           ),
                           validator: (v) =>
@@ -164,8 +164,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           obscureText: _obscure,
                           onFieldSubmitted: (_) => _submit(),
                           decoration: InputDecoration(
-                            labelText: 'Password',
-                            labelStyle: GoogleFonts.urbanist(),
+                            labelText: tr('Password'),
+                            labelStyle: friendFont(),
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
                               icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
@@ -179,7 +179,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 16),
                           Text(
                             _error!,
-                            style: GoogleFonts.urbanist(
+                            style: friendFont(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: FriendColors.error,
@@ -192,9 +192,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: FilledButton.styleFrom(
                             backgroundColor: FriendColors.primary,
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(FriendRadii.pill),
-                            ),
                           ),
                           child: _busy
                               ? const SizedBox(
@@ -202,9 +199,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   child: CircularProgressIndicator(
                                       strokeWidth: 2.5, color: Colors.white))
                               : Text(
-                                  'Sign in with password',
-                                  style: GoogleFonts.urbanist(
-                                    fontWeight: FontWeight.w800,
+                                  tr('Sign in with password'),
+                                  style: friendFont(
+                                    fontWeight: FontWeight.w600,
                                     fontSize: 15,
                                   ),
                                 ),
@@ -226,7 +223,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     padding: const EdgeInsets.symmetric(horizontal: 12),
                                     child: Text(
                                       'or',
-                                      style: GoogleFonts.urbanist(
+                                      style: friendFont(
                                         fontSize: 13,
                                         color: FriendColors.textMuted,
                                         fontWeight: FontWeight.w600,
@@ -277,8 +274,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Sign in with Face ID / Fingerprint',
-                                style: GoogleFonts.urbanist(
+                                tr('Sign in with Face ID / Fingerprint'),
+                                style: friendFont(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                   color: FriendColors.textMuted,
@@ -295,14 +292,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ref.read(dioProvider),
                             initialEmail: _emailCtrl.text.trim(),
                           ),
-                          child: const Text('Forgot password?'),
+                          child: Text(tr('Forgot password?')),
                         ),
                         TextButton(
                           // go_router app: Navigator.pushNamed has no route table and threw.
                           onPressed: () => context.go('/register'),
                           child: Text(
-                            'New here? Apply to join Akilil Pro',
-                            style: GoogleFonts.urbanist(
+                            tr('New here? Apply to join Akilil Pro'),
+                            style: friendFont(
                               fontWeight: FontWeight.w600,
                               color: FriendColors.primary,
                             ),

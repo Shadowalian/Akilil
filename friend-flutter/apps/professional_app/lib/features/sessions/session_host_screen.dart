@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
@@ -73,7 +74,7 @@ class _SessionHostScreenState extends ConsumerState<SessionHostScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: FriendDarkColors.background,
         body: Center(
           child: Column(
@@ -85,7 +86,7 @@ class _SessionHostScreenState extends ConsumerState<SessionHostScreen> {
               ),
               SizedBox(height: 16),
               Text(
-                'Starting live session…',
+                tr('Starting live session…'),
                 style: TextStyle(
                   color: FriendDarkColors.textSecondary,
                   fontSize: 14,
@@ -119,8 +120,8 @@ class _SessionHostScreenState extends ConsumerState<SessionHostScreen> {
                     _error = null;
                   });
                   _start();
-                }, child: const Text('Retry')),
-                TextButton(onPressed: _leave, child: const Text('Back')),
+                }, child: Text(tr('Retry'))),
+                TextButton(onPressed: _leave, child: Text(tr('Back'))),
               ],
             ),
           ),

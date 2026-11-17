@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:core/core.dart';
 import 'app_lock_controller.dart';
@@ -56,7 +56,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
     if (!mounted) return;
     setState(() => _busy = false);
     if (!ok && lock.biometricsAvailable) {
-      setState(() => _error = 'Biometric check failed — enter your password.');
+      setState(() => _error = tr('Biometric check failed — enter your password.'));
     }
     if (!ok && !lock.biometricsAvailable) {
       setState(() => _showPassword = true);
@@ -66,7 +66,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
   Future<void> _submitPassword() async {
     final pwd = _passCtrl.text.trim();
     if (pwd.length < 6) {
-      setState(() => _error = 'Password must be at least 6 characters.');
+      setState(() => _error = tr('Password must be at least 6 characters.'));
       return;
     }
     setState(() {
@@ -82,7 +82,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
       if (!mounted) return;
       ref.read(appLockProvider.notifier).unlockWithPassword();
     } catch (_) {
-      if (mounted) setState(() => _error = 'Incorrect password. Try again.');
+      if (mounted) setState(() => _error = tr('Incorrect password. Try again.'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -92,7 +92,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
   Widget build(BuildContext context) {
     final lock = ref.read(appLockProvider.notifier);
     final user = ref.watch(currentUserProvider);
-    final name = user?.name.trim().split(' ').first ?? 'Counselor';
+    final name = user?.name.trim().split(' ').first ?? tr('Counselor');
     final initial = name.isNotEmpty ? name[0].toUpperCase() : 'P';
 
     return Scaffold(
@@ -113,9 +113,9 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                       backgroundColor: FriendColors.primary.withValues(alpha: 0.15),
                       child: Text(
                         initial,
-                        style: GoogleFonts.urbanist(
+                        style: friendFont(
                           fontSize: 34,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: FriendColors.primaryDeep,
                         ),
                       ),
@@ -124,18 +124,18 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                     Text(
                       'Welcome back, Dr. $name',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.urbanist(
+                      style: friendFont(
                         fontSize: 26,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: -0.6,
                         color: FriendColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Clinical workspace is locked for patient privacy',
+                      tr('Clinical workspace is locked for patient privacy'),
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.urbanist(
+                      style: friendFont(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: FriendColors.textSecondary,
@@ -188,9 +188,9 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Tap to scan Face ID or Fingerprint',
+                        tr('Tap to scan Face ID or Fingerprint'),
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.urbanist(
+                        style: friendFont(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: FriendColors.textMuted,
@@ -203,10 +203,10 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                           _error = null;
                         }),
                         child: Text(
-                          'Use password instead',
-                          style: GoogleFonts.urbanist(
+                          tr('Use password instead'),
+                          style: friendFont(
                             fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             color: FriendColors.primary,
                             decoration: TextDecoration.underline,
                             decorationColor: FriendColors.primary,
@@ -223,10 +223,10 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'Enter counselor password',
-                              style: GoogleFonts.urbanist(
+                              tr('Enter counselor password'),
+                              style: friendFont(
                                 fontSize: 17,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 color: FriendColors.textPrimary,
                               ),
                             ),
@@ -256,7 +256,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                               const SizedBox(height: 12),
                               Text(
                                 _error!,
-                                style: GoogleFonts.urbanist(
+                                style: friendFont(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: FriendColors.error,
@@ -265,7 +265,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                             ],
                             const SizedBox(height: 20),
                             FriendGlowButton(
-                              label: _busy ? 'Verifying…' : 'Unlock Workspace',
+                              label: _busy ? 'Verifying…' : tr('Unlock Workspace'),
                               icon: Icons.lock_open_rounded,
                               expanded: true,
                               onPressed: _busy ? null : _submitPassword,
@@ -282,10 +282,10 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                           }),
                           icon: const Icon(Icons.fingerprint_rounded, size: 18),
                           label: Text(
-                            'Use biometrics',
-                            style: GoogleFonts.urbanist(
+                            tr('Use biometrics'),
+                            style: friendFont(
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -301,8 +301,8 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
                         context.go('/login');
                       },
                       child: Text(
-                        'Sign in with a different counselor account',
-                        style: GoogleFonts.urbanist(
+                        tr('Sign in with a different counselor account'),
+                        style: friendFont(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: FriendColors.textMuted,

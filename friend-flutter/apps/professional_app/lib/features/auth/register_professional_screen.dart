@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'auth_controller.dart';
@@ -38,7 +39,7 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_pillar == null) {
-      setState(() => _error = 'Choose what you practise.');
+      setState(() => _error = tr('Choose what you practise.'));
       return;
     }
     setState(() { _busy = true; _error = null; });
@@ -52,7 +53,7 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
           );
     } on DioException catch (e) {
       setState(() {
-        _error = apiErrorMessage(e.response?.data, 'Sign-up failed.');
+        _error = apiErrorMessage(e.response?.data, tr('Sign-up failed.'));
       });
     } catch (e) {
       setState(() => _error = e.toString());
@@ -85,13 +86,13 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
                   children: [
                     proBrandMark(size: 56),
                     const SizedBox(height: 16),
-                    Text('Apply to be an Akilil Pro', style: theme.textTheme.headlineMedium),
+                    Text(tr('Apply to be an Akilil Pro'), style: theme.textTheme.headlineMedium),
                     const SizedBox(height: 8),
                     Text("A few details. Our team checks every professional before clients can book them.",
                         style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                     const SizedBox(height: 24),
-                    Text('What do you practise?', style: theme.textTheme.titleSmall),
+                    Text(tr('What do you practise?'), style: theme.textTheme.titleSmall),
                     const SizedBox(height: 10),
                     FriendPillarPicker(
                       selectedSlug: _pillar,
@@ -101,7 +102,7 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _name,
-                      decoration: const InputDecoration(labelText: 'Your name'),
+                      decoration: InputDecoration(labelText: tr('Your name')),
                       validator: (v) =>
                           (v == null || v.trim().length < 2) ? 'Enter your name' : null,
                     ),
@@ -109,7 +110,7 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
                     TextFormField(
                       controller: _email,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      decoration: InputDecoration(labelText: tr('Email')),
                       validator: (v) =>
                           (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
                     ),
@@ -117,11 +118,11 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
                     TextFormField(
                       controller: _pass,
                       obscureText: true,
-                      decoration: const InputDecoration(labelText: 'Password'),
+                      decoration: InputDecoration(labelText: tr('Password')),
                       validator: (v) {
-                        if (v == null || v.length < 8) return 'At least 8 characters';
+                        if (v == null || v.length < 8) return tr('At least 8 characters');
                         if (!RegExp(r'[A-Z]').hasMatch(v) || !RegExp(r'[a-z]').hasMatch(v) || !RegExp(r'[0-9]').hasMatch(v)) {
-                          return 'Use upper and lower case letters and a number';
+                          return tr('Use upper and lower case letters and a number');
                         }
                         return null;
                       },
@@ -130,8 +131,8 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
                     TextFormField(
                       controller: _pass2,
                       obscureText: true,
-                      decoration: const InputDecoration(labelText: 'Confirm password'),
-                      validator: (v) => v == _pass.text ? null : 'Passwords don\'t match',
+                      decoration: InputDecoration(labelText: tr('Confirm password')),
+                      validator: (v) => v == _pass.text ? null : tr("Passwords don't match"),
                     ),
                     if (_error != null) ...[
                       const SizedBox(height: 12),
@@ -145,7 +146,7 @@ class _S extends ConsumerState<RegisterProfessionalScreen> {
                           ? const SizedBox(
                               height: 20, width: 20,
                               child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
-                          : const Text('Create Pro account'),
+                          : Text(tr('Create Pro account')),
                     ),
                   ],
                 ),

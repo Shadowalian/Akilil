@@ -92,7 +92,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                icon: const Icon(Icons.arrow_back_rounded, size: 24),
                 onPressed: () => context.pop(),
               ),
             ),

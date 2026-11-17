@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -22,13 +22,13 @@ class ClientsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(_clientsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Clients')),
+      appBar: AppBar(title: Text(tr('Clients'))),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text("Couldn't load clients.")),
         data: (list) {
           if (list.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
                 child: Column(
@@ -36,7 +36,7 @@ class ClientsScreen extends ConsumerWidget {
                   children: [
                     Icon(Icons.people_outline, size: 64, color: FriendColors.textMuted),
                     SizedBox(height: 8),
-                    Text('No clients yet. Complete a session to start your list.'),
+                    Text(tr('No clients yet. Complete a session to start your list.')),
                   ],
                 ),
               ),
@@ -53,10 +53,10 @@ class ClientsScreen extends ConsumerWidget {
                 leading: CircleAvatar(
                   child: Text(personInitial(user['name'] as String?)),
                 ),
-                title: Text(user['name'] as String? ?? 'Anonymous'),
+                title: Text(user['name'] as String? ?? tr('Anonymous')),
                 subtitle: Text(
                   '${c['session_count'] ?? 0} sessions'
-                  '${last != null ? " • last ${DateFormat('MMM d').format(last)}" : ""}',
+                  '${last != null ? " • last ${trDate('MMM d', last)}" : ""}',
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.of(context).push(

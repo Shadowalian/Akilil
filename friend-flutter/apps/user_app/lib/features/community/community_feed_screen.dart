@@ -71,7 +71,7 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                icon: const Icon(Icons.arrow_back_rounded, size: 24),
                 onPressed: () => context.pop(),
               ),
             ),
@@ -157,7 +157,6 @@ class _PostCard extends StatelessWidget {
         (post['comment_count'] as num?)?.toInt();
 
     return CandyCard(
-      tint: FriendColors.primary,
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +172,7 @@ class _PostCard extends StatelessWidget {
                     Text(
                       author,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     if (created != null)

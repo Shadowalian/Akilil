@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:core/core.dart';
 
@@ -153,9 +152,9 @@ class _PlayingCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.urbanist(
+                      style: friendFont(
                         fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         height: 1.15,
                         letterSpacing: -0.3,
                         color: FriendColors.textPrimary,
@@ -167,7 +166,7 @@ class _PlayingCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.urbanist(
+                      style: friendFont(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                         height: 1.3,
@@ -199,9 +198,9 @@ class _Pip extends StatelessWidget {
       children: [
         Text(
           pip,
-          style: GoogleFonts.urbanist(
+          style: friendFont(
             fontSize: 15,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             height: 1,
             letterSpacing: 0,
             color: suit,
@@ -280,8 +279,8 @@ class ExploreRevolveCards extends ConsumerWidget {
                             children: [
                               Text(
                                 item.$2,
-                                style: GoogleFonts.urbanist(
-                                  fontWeight: FontWeight.w700,
+                                style: friendFont(
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                   letterSpacing: -0.2,
                                   color: FriendColors.textPrimary,
@@ -292,7 +291,7 @@ class ExploreRevolveCards extends ConsumerWidget {
                                 item.$3,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.urbanist(
+                                style: friendFont(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
                                   color: FriendColors.textSecondary,

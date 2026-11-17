@@ -17,30 +17,6 @@ import 'features/auth/auth_controller.dart';
 class FriendApp extends ConsumerWidget {
   const FriendApp({super.key});
 
-  TextTheme _withEthiopic(TextTheme base) {
-    TextStyle merge(TextStyle? s) => (s ?? const TextStyle()).copyWith(
-          fontFamily: 'NotoSansEthiopic',
-          fontFamilyFallback: const ['Urbanist', 'sans-serif'],
-        );
-    return base.copyWith(
-      displayLarge: merge(base.displayLarge),
-      displayMedium: merge(base.displayMedium),
-      displaySmall: merge(base.displaySmall),
-      headlineLarge: merge(base.headlineLarge),
-      headlineMedium: merge(base.headlineMedium),
-      headlineSmall: merge(base.headlineSmall),
-      titleLarge: merge(base.titleLarge),
-      titleMedium: merge(base.titleMedium),
-      titleSmall: merge(base.titleSmall),
-      bodyLarge: merge(base.bodyLarge),
-      bodyMedium: merge(base.bodyMedium),
-      bodySmall: merge(base.bodySmall),
-      labelLarge: merge(base.labelLarge),
-      labelMedium: merge(base.labelMedium),
-      labelSmall: merge(base.labelSmall),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
@@ -48,14 +24,7 @@ class FriendApp extends ConsumerWidget {
     trAmharic = lang == AppLanguage.am;
     coreTr = tr;
     coreLanguageCode = lang.code;
-    final base = FriendAppTheme.light();
-
-    final theme = lang == AppLanguage.am
-        ? base.copyWith(
-            textTheme: _withEthiopic(base.textTheme),
-            primaryTextTheme: _withEthiopic(base.primaryTextTheme),
-          )
-        : base;
+    final theme = FriendAppTheme.light();
 
     return MaterialApp.router(
       title: 'Akilil',

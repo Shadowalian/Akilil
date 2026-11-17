@@ -1,7 +1,6 @@
 import 'package:friend_user/l10n/tr.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:core/core.dart';
 
 /// Interactive Box Breathing Exercise (4s Inhale, 4s Hold, 4s Exhale, 4s Hold)
@@ -133,15 +132,15 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
                     children: [
                       Text(
                         tr('Box Breathing'),
-                        style: GoogleFonts.urbanist(
+                        style: friendFont(
                           fontSize: 18,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: FriendColors.textPrimary,
                         ),
                       ),
                       Text(
                         tr('Slows your heart and calms your body'),
-                        style: GoogleFonts.urbanist(
+                        style: friendFont(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: FriendColors.textSecondary,
@@ -239,7 +238,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
                           children: [
                             Text(
                               '$_secondsInPhase',
-                              style: GoogleFonts.urbanist(
+                              style: friendFont(
                                 fontSize: 36,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
@@ -247,9 +246,9 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
                             ),
                             Text(
                               _phaseLabel.toUpperCase(),
-                              style: GoogleFonts.urbanist(
+                              style: friendFont(
                                 fontSize: 11,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 letterSpacing: 1.2,
                                 color: Colors.white.withValues(alpha: 0.9),
                               ),
@@ -267,7 +266,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
             Text(
               _phaseHint,
               textAlign: TextAlign.center,
-              style: GoogleFonts.urbanist(
+              style: friendFont(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: FriendColors.textSecondary,
@@ -284,9 +283,9 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
               ),
               child: Text(
                 trx('Completed cycles: $_cycleCount', 'የተጠናቀቁ ዙሮች፦ $_cycleCount'),
-                style: GoogleFonts.urbanist(
+                style: friendFont(
                   fontSize: 12,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: FriendColors.primaryDeep,
                 ),
               ),

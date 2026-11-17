@@ -277,7 +277,7 @@ class _Section extends StatelessWidget {
 
             Expanded(child: Text(title, style: theme.textTheme.headlineSmall)),
 
-            FriendGlowButton(label: tr('Add'), icon: Icons.add, onPressed: onAdd),
+            TextButton.icon(onPressed: onAdd, icon: const Icon(Icons.add_rounded, size: 18), label: Text(tr('Add'))),
 
           ],
 
@@ -337,7 +337,7 @@ class _Section extends StatelessWidget {
 
                   CandyCard(
 
-                    accentStripe: true,
+                    
 
                     child: Row(
 

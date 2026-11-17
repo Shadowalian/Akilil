@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:core/core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'l10n/language.dart';
+import 'l10n/tr.dart';
 
 import 'router.dart';
 import 'features/auth/app_lock_controller.dart';
@@ -10,30 +13,38 @@ import 'features/auth/auth_controller.dart';
 
 /// Top-level Akilil professional app widget.
 ///
-/// Shares design language, typography (Urbanist), and auto-lock security
-/// with the user app.
+/// Shares the design system, Amharic support and auto-lock security with the
+/// client app.
 class FriendProApp extends ConsumerWidget {
   const FriendProApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    final base = FriendAppTheme.light();
-    final urbanistTheme = base.copyWith(
-      textTheme: GoogleFonts.urbanistTextTheme(base.textTheme),
-      primaryTextTheme: GoogleFonts.urbanistTextTheme(base.primaryTextTheme),
-    );
+    final lang = ref.watch(proLanguageProvider);
+    trAmharic = lang == ProLanguage.am;
+    coreTr = tr;
+    coreLanguageCode = lang.code;
 
     return MaterialApp.router(
-      title: 'Akilil Pro',
+      title: tr('Akilil Pro'),
       debugShowCheckedModeBanner: false,
-      theme: urbanistTheme,
+      theme: FriendAppTheme.light(),
       themeMode: ThemeMode.light,
+      locale: lang.locale,
+      supportedLocales: const [Locale('en'), Locale('am')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: router,
       // Scaffolds are transparent by design; give every page the brand canvas.
       builder: (context, child) => ColoredBox(
         color: FriendColors.background,
-        child: _AppLockWrapper(child: child ?? const SizedBox.shrink()),
+        child: _AppLockWrapper(
+          child: KeyedSubtree(key: ValueKey(lang), child: child ?? const SizedBox.shrink()),
+        ),
       ),
     );
   }

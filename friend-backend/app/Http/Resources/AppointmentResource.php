@@ -49,7 +49,11 @@ class AppointmentResource extends JsonResource
             'cancelled_at'              => optional($this->cancelled_at)?->toIso8601String(),
             'cancellation_reason'       => $this->cancellation_reason,
             'client'   => $this->whenLoaded('client',   fn () => $this->client?->only(['id','name','avatar_path'])),
-            'professional' => $this->whenLoaded('professional', fn () => $this->professional?->only(['id','name','avatar_path'])),
+            'professional' => $this->whenLoaded('professional', fn () => $this->professional ? [
+                ...$this->professional->only(['id', 'name', 'avatar_path']),
+                // Lets the client offer "Book again" straight to their profile.
+                'profile_id' => $this->professional->professionalProfile()->value('id'),
+            ] : null),
             'call_session' => $this->whenLoaded('callSession'),
             'review' => $this->whenLoaded('review', fn () => $this->review ? [
                 'id'     => $this->review->id,

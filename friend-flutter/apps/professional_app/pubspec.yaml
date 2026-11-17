@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # Akilil shared core (theming, networking, Jitsi, Reverb)
   core:
@@ -69,13 +71,40 @@ flutter_launcher_icons:
   windows:
     generate: true
   image_path: assets/figma/app_icon.png
-  adaptive_icon_background: "#1A9FC4"
-  adaptive_icon_foreground: assets/figma/app_icon.png
+  adaptive_icon_background: "#0D5C63"
+  adaptive_icon_foreground: assets/figma/app_icon_foreground.png
 
 flutter:
   uses-material-design: true
   assets:
     - assets/figma/
+  fonts:
+    - family: NotoSansEthiopic
+      fonts:
+        - asset: assets/fonts/NotoSansEthiopic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSansEthiopic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSansEthiopic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansEthiopic-Bold.ttf
+          weight: 700
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/Geist-Regular.otf
+          weight: 400
+        - asset: assets/fonts/Geist-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Geist-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/Geist-Bold.otf
+          weight: 700
+    - family: Geist Mono
+      fonts:
+        - asset: assets/fonts/GeistMono-Regular.otf
+          weight: 400
+        - asset: assets/fonts/GeistMono-Medium.otf
+          weight: 500
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

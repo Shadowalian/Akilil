@@ -9,30 +9,32 @@ import 'package:core/core.dart';
 class BrandAssets {
   BrandAssets._();
 
-  static Widget mark({double size = 56}) {
+  /// The Akilil mark: an open teal ring around a clay core.
+  static Widget mark({double size = 56, Color color = FriendColors.primary, Color core = FriendColors.accent}) {
     return SizedBox(
       width: size,
       height: size,
       child: CustomPaint(
-        painter: _AkililMarkPainter(),
+        painter: _AkililMarkPainter(color: color, coreColor: core),
         size: Size(size, size),
       ),
     );
   }
 
-  static Widget logo() {
+  /// Mark plus wordmark, for the top of auth screens.
+  static Widget logo({double size = 26}) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        mark(size: 32),
-        const SizedBox(width: 10),
+        mark(size: size),
+        const SizedBox(width: 8),
         Text(
           tr('Akilil'),
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
+          style: friendFont(
+            fontWeight: FontWeight.w600,
+            fontSize: size * 0.72,
             color: FriendColors.textPrimary,
-            letterSpacing: -0.6,
+            letterSpacing: -0.4,
             height: 1,
           ),
         ),
@@ -42,6 +44,11 @@ class BrandAssets {
 }
 
 class _AkililMarkPainter extends CustomPainter {
+  _AkililMarkPainter({this.color = FriendColors.primary, this.coreColor = FriendColors.accent});
+
+  final Color color;
+  final Color coreColor;
+
   @override
   void paint(Canvas canvas, Size size) {
     final stroke = size.width * (5.4 / 40);
@@ -52,9 +59,7 @@ class _AkililMarkPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
-      ..shader = FriendGradients.accentRing.createShader(
-        Rect.fromCircle(center: center, radius: radius),
-      );
+      ..color = color;
 
     // Open arc — same silhouette as website #i-mark
     canvas.drawArc(
@@ -66,16 +71,11 @@ class _AkililMarkPainter extends CustomPainter {
     );
 
     final coreRadius = size.width * (5.4 / 40);
-    final corePaint = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [FriendColors.spark, FriendColors.coral],
-      ).createShader(Rect.fromCircle(center: center, radius: coreRadius));
+    final corePaint = Paint()..color = coreColor;
 
     canvas.drawCircle(center, coreRadius, corePaint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _AkililMarkPainter old) => old.color != color || old.coreColor != coreColor;
 }

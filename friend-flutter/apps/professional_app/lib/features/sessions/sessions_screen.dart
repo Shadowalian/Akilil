@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -32,7 +32,7 @@ class SessionsScreen extends ConsumerWidget {
         context.go('/sessions/$id/host');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Request declined.')),
+          SnackBar(content: Text(tr('Request declined.'))),
         );
       }
     } on DioException catch (e) {
@@ -41,8 +41,8 @@ class SessionsScreen extends ConsumerWidget {
         SnackBar(
           content: Text(
             e.response?.data is Map
-                ? (e.response!.data['message'] ?? 'Failed').toString()
-                : 'Failed',
+                ? (e.response!.data['message'] ?? tr('Failed')).toString()
+                : tr('Failed'),
           ),
         ),
       );
@@ -54,7 +54,7 @@ class SessionsScreen extends ConsumerWidget {
     final async = ref.watch(_sessionsProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sessions'),
+        title: Text(tr('Sessions')),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -67,11 +67,11 @@ class SessionsScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text("Couldn't load sessions.")),
         data: (list) {
           if (list.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
                 child: Text(
-                  'No sessions yet. When a client books you, it shows up here.',
+                  tr('No sessions yet. When a client books you, it shows up here.'),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -108,7 +108,7 @@ class SessionsScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
               children: [
                 if (listening.isNotEmpty) ...[
-                  Text('Listening requests',
+                  Text(tr('Listening requests'),
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   for (final a in listening)
@@ -120,7 +120,7 @@ class SessionsScreen extends ConsumerWidget {
                           children: [
                             Text(
                               ((a['client'] as Map?)?['name'] as String?) ??
-                                  'Client',
+                                  tr('Client'),
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             if ((a['client_note'] as String?)?.isNotEmpty ==
@@ -138,7 +138,7 @@ class SessionsScreen extends ConsumerWidget {
                                     (a['id'] as num).toInt(),
                                     true,
                                   ),
-                                  child: const Text('Accept & join'),
+                                  child: Text(tr('Accept & join')),
                                 ),
                                 const SizedBox(width: 8),
                                 OutlinedButton(
@@ -148,7 +148,7 @@ class SessionsScreen extends ConsumerWidget {
                                     (a['id'] as num).toInt(),
                                     false,
                                   ),
-                                  child: const Text('Decline'),
+                                  child: Text(tr('Decline')),
                                 ),
                               ],
                             ),
@@ -159,14 +159,14 @@ class SessionsScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                 ],
                 if (upcoming.isNotEmpty) ...[
-                  Text('Upcoming',
+                  Text(tr('Upcoming'),
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   for (final a in upcoming) _ApptTile(appt: a),
                 ],
                 if (past.isNotEmpty) ...[
                   const SizedBox(height: 16),
-                  Text('Past', style: Theme.of(context).textTheme.titleMedium),
+                  Text(tr('Past'), style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   for (final a in past.take(20)) _ApptTile(appt: a, joinable: false),
                 ],
@@ -188,7 +188,7 @@ class _ApptTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final startsAt = DateTime.parse(appt['scheduled_at'] as String);
     final guest = (appt['client'] as Map<String, dynamic>?) ?? const {};
-    final name = guest['name'] as String? ?? 'Guest';
+    final name = guest['name'] as String? ?? tr('Guest');
     final status = appt['status'] as String? ?? 'pending';
     final kind = appt['kind'] as String? ?? 'scheduled';
     final priceCents = (appt['price_cents'] as num?)?.toInt() ?? -1;
@@ -216,14 +216,14 @@ class _ApptTile extends StatelessWidget {
       child: ListTile(
         title: Text(name),
         subtitle: Text(
-          '${DateFormat('EEE, MMM d • h:mm a').format(startsAt.toLocal())}'
+          '${trDate('EEE, MMM d • h:mm a', startsAt.toLocal())}'
           '${kind == 'listening_request' ? ' · listening' : ''}$who$cooking',
         ),
         trailing: canJoin
             ? FilledButton.icon(
                 onPressed: () => context.go('/sessions/${appt['id']}/host'),
                 icon: const Icon(Icons.videocam, size: 18),
-                label: const Text('Join'),
+                label: Text(tr('Join')),
               )
             : FriendStatusChip(
                 label: status == 'confirmed' && !inWindow ? 'Upcoming' : status[0].toUpperCase() + status.substring(1),

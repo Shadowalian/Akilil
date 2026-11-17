@@ -225,7 +225,7 @@ class _StepHeader extends StatelessWidget {
           CircleAvatar(
             radius: 13,
             backgroundColor: FriendColors.primary,
-            child: Text('$n', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+            child: Text('$n', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
           ),
           const SizedBox(width: 12),
           Expanded(

@@ -1,3 +1,4 @@
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
@@ -66,7 +67,7 @@ class AppLockController extends StateNotifier<bool> {
     if (!_biometricsAvailable || !_biometricEnabled) return false;
     try {
       final authenticated = await _auth.authenticate(
-        localizedReason: 'Scan face or fingerprint to unlock Akilil Pro clinical workspace',
+        localizedReason: tr('Scan face or fingerprint to unlock Akilil Pro clinical workspace'),
         options: const AuthenticationOptions(
           biometricOnly: false,
           stickyAuth: true,

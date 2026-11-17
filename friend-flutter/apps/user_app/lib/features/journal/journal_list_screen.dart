@@ -107,7 +107,7 @@ class JournalListScreen extends ConsumerWidget {
               style: _geist(
                 context,
                 size: FriendTypeScale.headlineSmall,
-                weight: FontWeight.w800,
+                weight: FontWeight.w600,
                 height: 1.1,
               ),
             ),
@@ -129,7 +129,6 @@ class JournalListScreen extends ConsumerWidget {
             data: (list) {
               if (list.isEmpty) {
                 return CandyCard(
-                  tint: FriendColors.accent,
                   child: FriendEmptyState(
                     icon: Icons.edit_note_outlined,
                     title: s.journalEmptyTitle,
@@ -191,7 +190,7 @@ class _JournalHeader extends StatelessWidget {
               fontFamily: 'Geist',
               fontFamilyFallback: JournalListScreen._ethiopicFallback,
               fontSize: FriendTypeScale.headlineLarge,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               letterSpacing: -0.8,
               color: FriendColors.textPrimary,
               height: 1.05,
@@ -204,20 +203,7 @@ class _JournalHeader extends StatelessWidget {
           onPressed: onInsights,
         ),
         const SizedBox(width: 8),
-        Material(
-          color: FriendColors.accent,
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onNew,
-            child: const SizedBox(
-              width: 46,
-              height: 46,
-              child: Icon(Icons.add_rounded,
-                  color: FriendColors.onAccent, size: 26),
-            ),
-          ),
-        ),
+        FriendIconChip(icon: Icons.add_rounded, tooltip: tr('New entry'), filled: true, onPressed: onNew),
       ],
     );
   }
@@ -285,7 +271,6 @@ class _ThisWeekMoodCard extends StatelessWidget {
     }
 
     return CandyCard(
-      tint: FriendColors.primary,
       padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,7 +280,7 @@ class _ThisWeekMoodCard extends StatelessWidget {
             style: const TextStyle(
               fontFamily: 'Geist',
               fontSize: FriendTypeScale.caption,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.4,
               color: FriendColors.textSecondary,
             ),
@@ -313,7 +298,7 @@ class _ThisWeekMoodCard extends StatelessWidget {
                       style: const TextStyle(
                         fontFamily: 'Geist',
                         fontSize: FriendTypeScale.headlineSmall,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         color: FriendColors.textPrimary,
                         height: 1.1,
                       ),
@@ -385,7 +370,6 @@ class _PromptCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return CandyCard(
       onTap: onTap,
-      tint: FriendColors.accent,
       padding: const EdgeInsets.all(18),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +383,7 @@ class _PromptCard extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: 'Geist',
                     fontSize: FriendTypeScale.caption,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: FriendColors.accentDeep,
                   ),
                 ),
@@ -467,7 +451,7 @@ class _JournalEntryTile extends StatelessWidget {
               style: const TextStyle(
                 fontFamily: 'Geist Mono',
                 fontSize: 11,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: FriendColors.textSecondary,
                 letterSpacing: 0.5,
               ),
@@ -486,7 +470,7 @@ class _JournalEntryTile extends StatelessWidget {
                         style: const TextStyle(
                           fontFamily: 'Geist',
                           fontSize: FriendTypeScale.bodyLarge,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: FriendColors.textPrimary,
                         ),
                       ),

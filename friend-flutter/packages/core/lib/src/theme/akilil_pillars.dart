@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/design_tokens.dart';
+import '../ui/candy_widgets.dart';
 
 /// Akilil product pillars — the only practice areas in user + pro apps.
 class AkililPillar {
@@ -27,7 +28,7 @@ class AkililPillars {
     name: 'Spiritual Psychiatry',
     subtitle: 'Faith-aware mental care',
     icon: Icons.volunteer_activism_rounded,
-    color: FriendColors.wood,
+    color: FriendColors.pillarSpiritual,
   );
 
   static const psychiatry = AkililPillar(
@@ -35,7 +36,7 @@ class AkililPillars {
     name: 'Psychiatry',
     subtitle: 'Licensed clinical support',
     icon: Icons.psychology_rounded,
-    color: FriendColors.green,
+    color: FriendColors.pillarMind,
   );
 
   static const cooking = AkililPillar(
@@ -43,7 +44,7 @@ class AkililPillars {
     name: 'Cooking',
     subtitle: 'Live classes with chefs',
     icon: Icons.restaurant_rounded,
-    color: FriendColors.accent,
+    color: FriendColors.pillarCooking,
   );
 
   static const List<AkililPillar> all = [
@@ -129,68 +130,49 @@ class _PillarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(FriendRadii.large),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          padding: EdgeInsets.symmetric(
-            horizontal: compact ? 14 : 16,
-            vertical: compact ? 12 : 16,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(FriendRadii.large),
-            gradient: selected
-                ? FriendGradients.cardTint(pillar.color)
-                : null,
-            color: selected ? null : FriendColors.surface.withValues(alpha: 0.9),
-            border: Border.all(
-              color: selected
-                  ? pillar.color.withValues(alpha: 0.55)
-                  : FriendColors.border,
-              width: selected ? 1.5 : 1,
+    final radius = BorderRadius.circular(FriendRadii.large);
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: Material(
+        color: selected ? FriendColors.primaryLight : FriendColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: radius,
+          side: BorderSide(color: selected ? FriendColors.primary : FriendColors.border, width: selected ? 1.5 : 1),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: compact ? 12 : 16),
+            child: Row(
+              children: [
+                FriendIconTile(icon: pillar.icon, color: pillar.color, size: compact ? 40 : 44),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: theme.textTheme.titleSmall),
+                      const SizedBox(height: 2),
+                      Text(subtitle, style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: selected ? FriendColors.primary : FriendColors.surface,
+                    border: Border.all(color: selected ? FriendColors.primary : FriendColors.borderStrong, width: 1.5),
+                  ),
+                  child: selected ? const Icon(Icons.check_rounded, size: 14, color: Colors.white) : null,
+                ),
+              ],
             ),
-            boxShadow: selected ? FriendElevation.card : null,
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: compact ? 40 : 46,
-                height: compact ? 40 : 46,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(FriendRadii.small),
-                  gradient: FriendGradients.cardTint(pillar.color),
-                  border: Border.all(color: FriendColors.border),
-                ),
-                child: Icon(pillar.icon, color: pillar.color, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: theme.textTheme.titleSmall),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: FriendColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                selected
-                    ? Icons.check_circle_rounded
-                    : Icons.circle_outlined,
-                color: selected ? FriendColors.primaryDeep : FriendColors.textMuted,
-                size: 22,
-              ),
-            ],
           ),
         ),
       ),

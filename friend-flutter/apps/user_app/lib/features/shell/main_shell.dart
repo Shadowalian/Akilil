@@ -36,7 +36,6 @@ class MainShell extends ConsumerWidget {
     final location = GoRouterState.of(context).matchedLocation;
     final index = _indexFor(location);
     final hideDock = _hideDock(location);
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     final tabs = <FriendDockItem>[
       FriendDockItem(
@@ -75,31 +74,14 @@ class MainShell extends ConsumerWidget {
     // the debug style (yellow double underline).
     return Material(
       color: FriendColors.background,
-      child: Stack(
-        fit: StackFit.expand,
+      child: Column(
         children: [
-          const FriendAtmosphere(),
-          Positioned.fill(
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: hideDock ? 0 : FriendLayout.dockClearance,
-                ),
-                child: child,
-              ),
-            ),
-          ),
+          Expanded(child: SafeArea(bottom: false, child: child)),
           if (!hideDock)
-            Positioned(
-              left: 20,
-              right: 20,
-              bottom: bottomInset > 0 ? bottomInset : 14,
-              child: FriendFloatingDock(
-                items: tabs,
-                selectedIndex: index,
-                onSelected: (i) => context.go(tabs[i].path),
-              ),
+            FriendFloatingDock(
+              items: tabs,
+              selectedIndex: index,
+              onSelected: (i) => context.go(tabs[i].path),
             ),
         ],
       ),

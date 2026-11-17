@@ -3,17 +3,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:core/core.dart';
 
-import '../../l10n/language_toggle.dart';
 import '../../router.dart';
-import '../brand/figma_assets.dart';
 import 'auth_controller.dart';
 import 'auth_fields.dart';
 
-/// Create account — same Freud chrome as sign in, four fields, one CTA.
+/// Create account.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -96,257 +93,153 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
     if (e.type == DioExceptionType.connectionError ||
         e.type == DioExceptionType.connectionTimeout) {
-      return "Can't reach Akilil servers. Is the API running on :8000?";
+      return tr("We can't reach Akilil right now. Check your connection and try again.");
     }
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final topInset = MediaQuery.paddingOf(context).top;
+    final theme = Theme.of(context);
+    final dob = _dob;
 
-    return Scaffold(
-      backgroundColor: FriendColors.background,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
+    return AuthScaffold(
+      title: tr('Create your account'),
+      subtitle: tr('Your answers are saved. One more step and you are in.'),
+      footer: AuthSwitchLink(
+        leading: tr('Already have an account? '),
+        label: tr('Sign In'),
+        onTap: () => context.go(AppRoutes.login),
+      ),
+      children: [
+        AutofillGroup(
+          child: Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const FreudCurvedHeader(height: 190),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 26, 24, 36),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 420),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              tr('Create Your Account'),
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.urbanist(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.6,
-                                height: 1.2,
-                                color: FriendColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              tr('Your answers are saved. One more step and you are in.'),
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.urbanist(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                height: 1.45,
-                                color: FriendColors.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 26),
-                            FreudField(
-                              label: tr('Full Name'),
-                              controller: _name,
-                              hint: 'Selam Bekele',
-                              icon: const Icon(
-                                Icons.person_outline_rounded,
-                                size: 22,
-                                color: FriendColors.wood,
-                              ),
-                              textInputAction: TextInputAction.next,
-                              autofillHints: const [AutofillHints.name],
-                              validator: (v) =>
-                                  (v == null || v.trim().length < 2)
-                                      ? tr('Enter your name')
-                                      : null,
-                            ),
-                            const SizedBox(height: 22),
-                            FreudField(
-                              label: tr('Email Address'),
-                              controller: _email,
-                              hint: 'you@example.com',
-                              icon: FigmaAssets.email(),
-                              keyboardType: TextInputType.emailAddress,
-                              textInputAction: TextInputAction.next,
-                              autofillHints: const [AutofillHints.email],
-                              validator: (v) =>
-                                  (v == null || !v.contains('@'))
-                                      ? tr('Enter a valid email')
-                                      : null,
-                            ),
-                            const SizedBox(height: 22),
-                            FreudField(
-                              label: tr('Password'),
-                              controller: _pass,
-                              hint: tr('At least 8 characters'),
-                              icon: FigmaAssets.lock(),
-                              obscureText: _obscure,
-                              textInputAction: TextInputAction.next,
-                              autofillHints: const [AutofillHints.newPassword],
-                              suffix: IconButton(
-                                icon: Icon(
-                                  _obscure
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  size: 20,
-                                  color: FriendColors.textMuted,
-                                ),
-                                onPressed: () =>
-                                    setState(() => _obscure = !_obscure),
-                              ),
-                              validator: (v) {
-                                if (v == null || v.length < 8) {
-                                  return tr('At least 8 characters');
-                                }
-                                if (!RegExp(r'[A-Z]').hasMatch(v) ||
-                                    !RegExp(r'[a-z]').hasMatch(v)) {
-                                  return tr('Use upper and lower case letters');
-                                }
-                                if (!RegExp(r'[0-9]').hasMatch(v)) {
-                                  return tr('Include at least one number');
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 22),
-                            FreudField(
-                              label: tr('Confirm Password'),
-                              controller: _pass2,
-                              hint: tr('Repeat your password'),
-                              icon: FigmaAssets.lock(),
-                              obscureText: true,
-                              textInputAction: TextInputAction.done,
-                              onSubmitted: (_) => _submit(),
-                              validator: (v) => v == _pass.text
-                                  ? null
-                                  : "Passwords don't match",
-                            ),
-                            const SizedBox(height: 22),
-                            Text(
-                              tr('Date of Birth'),
-                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: FriendColors.primaryDeep,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                            ),
-                            const SizedBox(height: 8),
-                            Material(
-                              color: FriendColors.surface,
-                              borderRadius: BorderRadius.circular(FriendRadii.pill),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(FriendRadii.pill),
-                                onTap: () async {
-                                  final now = DateTime.now();
-                                  final picked = await showDatePicker(
-                                    context: context,
-                                    initialDate: _dob ?? DateTime(now.year - 25),
-                                    firstDate: DateTime(1900),
-                                    lastDate: now,
-                                    helpText: tr('Your date of birth'),
-                                  );
-                                  if (picked != null) setState(() => _dob = picked);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.cake_outlined, size: 22, color: FriendColors.wood),
-                                      const SizedBox(width: 14),
-                                      Text(
-                                        _dob == null
-                                            ? tr('Select your date of birth')
-                                            : '${_dob!.day} ${const ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][_dob!.month - 1]} ${_dob!.year}',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: _dob == null ? FriendColors.textMuted : FriendColors.textPrimary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              tr('Akilil accounts are for adults. Parents and guardians can add children after signing up.'),
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
-                            ),
-                            SizedBox(height: 16),
-                            Text(tr('Who are you looking for support for?'),
-                                style: Theme.of(context).textTheme.labelLarge),
-                            SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 4,
-                              children: [
-                                for (final o in [
-                                  ('self', tr('Myself')),
-                                  ('couple', tr('Me & my partner')),
-                                  ('child', tr('My child')),
-                                  ('family', tr('My family')),
-                                ])
-                                  ChoiceChip(
-                                    label: Text(o.$2),
-                                    showCheckmark: false,
-                                    selected: _careFor == o.$1,
-                                    onSelected: (_) => setState(() => _careFor = o.$1),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            CheckboxListTile(
-                              contentPadding: EdgeInsets.zero,
-                              controlAffinity: ListTileControlAffinity.leading,
-                              value: _terms,
-                              onChanged: (v) => setState(() => _terms = v ?? false),
-                              title: Text(
-                                tr('I am 18 or older and accept the Terms and Privacy Policy.'),
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ),
-                            if (_error != null) ...[
-                              const SizedBox(height: 20),
-                              FreudAuthError(message: _error!),
-                            ],
-                            const SizedBox(height: 30),
-                            FreudPillButton(
-                              label: _busy ? '…' : tr('Create Account'),
-                              onPressed: _busy ? null : _submit,
-                            ),
-                            const SizedBox(height: 26),
-                            FreudLink(
-                              leading: tr('Already have an account? '),
-                              label: tr('Sign In'),
-                              onTap: () => context.go(AppRoutes.login),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                AuthField(
+                  label: tr('Full Name'),
+                  controller: _name,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.name],
+                  validator: (v) => (v == null || v.trim().length < 2) ? tr('Enter your name') : null,
+                ),
+                const SizedBox(height: 20),
+                AuthField(
+                  label: tr('Email Address'),
+                  controller: _email,
+                  hint: 'you@example.com',
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
+                  validator: (v) => (v == null || !v.contains('@')) ? tr('Enter a valid email') : null,
+                ),
+                const SizedBox(height: 20),
+                AuthField(
+                  label: tr('Password'),
+                  controller: _pass,
+                  obscureText: _obscure,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.newPassword],
+                  helper: tr('At least 8 characters, with upper and lower case and a number'),
+                  suffix: IconButton(
+                    tooltip: _obscure ? tr('Show password') : tr('Hide password'),
+                    icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 20),
+                    onPressed: () => setState(() => _obscure = !_obscure),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.length < 8) return tr('At least 8 characters');
+                    if (!RegExp(r'[A-Z]').hasMatch(v) || !RegExp(r'[a-z]').hasMatch(v)) {
+                      return tr('Use upper and lower case letters');
+                    }
+                    if (!RegExp(r'[0-9]').hasMatch(v)) return tr('Include at least one number');
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                AuthField(
+                  label: tr('Confirm Password'),
+                  controller: _pass2,
+                  obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.newPassword],
+                  validator: (v) => v == _pass.text ? null : tr("Passwords don't match"),
+                ),
+                const SizedBox(height: 20),
+                AuthPickerField(
+                  label: tr('Date of Birth'),
+                  value: dob == null ? null : trDate('d MMMM y', dob),
+                  placeholder: tr('Select your date of birth'),
+                  helper: tr('Akilil accounts are for adults. Parents and guardians can add children after signing up.'),
+                  onTap: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _dob ?? DateTime(now.year - 25),
+                      firstDate: DateTime(1900),
+                      lastDate: now,
+                      helpText: tr('Your date of birth'),
+                      initialEntryMode: DatePickerEntryMode.calendarOnly,
+                    );
+                    if (picked != null) setState(() => _dob = picked);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 28),
+        AuthLabel(tr('Who are you looking for support for?')),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final o in [
+              ('self', tr('Myself')),
+              ('couple', tr('Me & my partner')),
+              ('child', tr('My child')),
+              ('family', tr('My family')),
+            ])
+              ChoiceChip(
+                label: Text(o.$2),
+                selected: _careFor == o.$1,
+                onSelected: (_) => setState(() => _careFor = o.$1),
+              ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        InkWell(
+          borderRadius: BorderRadius.circular(FriendRadii.small),
+          onTap: () => setState(() => _terms = !_terms),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Checkbox(value: _terms, onChanged: (v) => setState(() => _terms = v ?? false)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    tr('I am 18 or older and accept the Terms and Privacy Policy.'),
+                    style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textPrimary),
                   ),
                 ),
               ],
             ),
           ),
-          Positioned(
-            top: topInset + 8,
-            right: 16,
-            child: Material(
-              color: FriendColors.surface.withValues(alpha: 0.92),
-              elevation: 1,
-              shadowColor: FriendColors.primary.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(FriendRadii.pill),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                child: LanguageToggle(compact: true),
-              ),
-            ),
-          ),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 20),
+          AuthError(message: _error!),
         ],
-      ),
+        const SizedBox(height: 24),
+        FriendGlowButton(label: tr('Create Account'), busy: _busy, expanded: true, onPressed: _submit),
+      ],
     );
   }
 }
