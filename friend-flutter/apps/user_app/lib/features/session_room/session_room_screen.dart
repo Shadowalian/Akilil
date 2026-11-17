@@ -87,7 +87,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return SessionConnectingView(
-        message: 'Preparing your sanctuary chamber…',
+        message: 'Getting your room ready…',
       );
     }
 
@@ -120,7 +120,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
       return Scaffold(
         backgroundColor: FriendColors.background,
         appBar: FriendStitchGlassHeader(
-          title: 'Pre Session Waiting Room',
+          title: 'Waiting room',
           onBack: _leave,
           onSos: () => context.push(AppRoutes.crisis),
           showProfileAvatar: false,
@@ -160,7 +160,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'When you enter the chamber, video runs inside Akilil Meet on an encrypted connection. You can stay voice-only if you prefer.',
+                    'Your camera and microphone turn on when you join. You can switch your camera off at any time inside the room.',
                     style: GoogleFonts.inter(
                       fontSize: FriendTypeScale.bodySmall,
                       height: 1.45,
@@ -175,7 +175,7 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
           ],
         ),
         bottomNavigationBar: FriendStitchStickyBar(
-          primaryLabel: 'Enter Sanctuary Chamber',
+          primaryLabel: 'Join session',
           primaryEnabled: _roomUrl != null,
           onPrimary: () => setState(() => _admitted = true),
         ),
@@ -227,7 +227,7 @@ class _WaitingRoomCard extends StatelessWidget {
                     const FriendLivePulse(size: 8),
                     const SizedBox(width: 6),
                     Text(
-                      'CHAMBER RESERVED',
+                      'ROOM READY',
                       style: GoogleFonts.inter(
                         fontSize: FriendTypeScale.micro,
                         fontWeight: FontWeight.w700,
@@ -242,7 +242,7 @@ class _WaitingRoomCard extends StatelessWidget {
               Icon(Icons.lock_outline_rounded, size: 16, color: FriendColors.primary),
               const SizedBox(width: 4),
               Text(
-                'E2EE',
+                'PRIVATE',
                 style: GoogleFonts.inter(
                   fontSize: FriendTypeScale.micro,
                   fontWeight: FontWeight.w700,

@@ -7,7 +7,6 @@ import 'package:core/core.dart';
 import '../studio/studio_screens.dart';
 
 import '../auth/auth_controller.dart';
-import '../auth/brand_stub.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -25,11 +24,22 @@ class ProfileScreen extends ConsumerWidget {
           Center(
             child: Column(
               children: [
-                proBrandMark(size: 80),
-                const SizedBox(height: 8),
+                FriendAvatar(
+                  initials: personInitial(user?.name, 'P'),
+                  size: 80,
+                  verified: profile['verification_status'] == 'approved',
+                ),
+                const SizedBox(height: 10),
                 Text(user?.name ?? '', style: theme.textTheme.titleLarge),
                 Text(user?.email ?? '',
                     style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                if (profile['verification_status'] != null && profile['verification_status'] != 'approved') ...[
+                  const SizedBox(height: 10),
+                  FriendStatusChip(
+                    label: 'Under review — clients cannot book you yet',
+                    color: FriendColors.accent,
+                  ),
+                ],
               ],
             ),
           ),

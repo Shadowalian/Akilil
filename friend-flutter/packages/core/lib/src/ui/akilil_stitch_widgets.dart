@@ -111,7 +111,7 @@ class FriendSosChip extends StatelessWidget {
 class FriendVaultBadge extends StatelessWidget {
   const FriendVaultBadge({
     super.key,
-    this.label = 'Zero-Knowledge Vault • AES-256 Encrypted',
+    this.label = 'Private and confidential',
   });
 
   final String label;
@@ -229,7 +229,7 @@ class FriendStitchProgressTrack extends StatelessWidget {
   }
 }
 
-/// Glassmorphic sticky app header with E2EE subline + SOS.
+/// Glassmorphic sticky app header with a privacy subline + SOS.
 class FriendStitchGlassHeader extends StatelessWidget implements PreferredSizeWidget {
   const FriendStitchGlassHeader({
     super.key,
@@ -307,7 +307,7 @@ class FriendStitchGlassHeader extends StatelessWidget implements PreferredSizeWi
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'E2EE SESSION',
+                          'PRIVATE',
                           style: _micro(context),
                         ),
                       ],

@@ -383,7 +383,7 @@ class _JitsiSessionViewState extends State<JitsiSessionView> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          widget.title ?? 'Live Sanctuary Chamber',
+                          widget.title ?? 'Akilil Meet',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.plusJakartaSans(

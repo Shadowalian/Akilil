@@ -1,13 +1,15 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:core/core.dart';
+
 import '../../l10n/language_toggle.dart';
 import '../auth/app_lock_controller.dart';
-import 'subscription_screen.dart';
-import 'switch_therapist_screen.dart';
+import '../messaging/care_team.dart';
+import '../messaging/conversations_screen.dart';
 
+/// Account settings: who you see, how you pay, your safety tools, privacy.
+/// Everything here does something real.
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -16,9 +18,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _sessionReminders = true;
-  bool _therapistMessages = true;
-  bool _dailyCheckIn = true;
   late bool _biometricLock;
 
   @override
@@ -29,259 +28,150 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final team = ref.watch(careTeamProvider);
+
+    Widget section(String title, List<Widget> children) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 24, 4, 10),
+              child: Text(title, style: theme.textTheme.titleSmall),
+            ),
+            CandyCard(padding: EdgeInsets.zero, child: Column(children: children)),
+          ],
+        );
+    const divider = Divider(height: 1, indent: 18, endIndent: 18);
+
     return FriendPageScaffold(
       eyebrow: 'Account',
-      title: 'Settings & Care',
-      subtitle: 'Manage your BetterHelp counseling membership, privacy, and therapy matching preferences.',
-      showBack: true,
+      title: 'Settings',
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Primary Counselor Match Tile
-          CandyCard(
-            tint: FriendColors.primary,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: FriendColors.primaryLight,
-                      child: Text(
-                        'M',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: FriendColors.primaryDeep,
-                        ),
+          section('Your care team', [
+            ...team.when(
+              loading: () => const [Padding(padding: EdgeInsets.all(20), child: LinearProgressIndicator(minHeight: 2))],
+              error: (_, _) => const [ListTile(title: Text("Couldn't load your care team"))],
+              data: (list) => list.isEmpty
+                  ? [
+                      ListTile(
+                        leading: const Icon(Icons.person_search_rounded, color: FriendColors.primary),
+                        title: const Text('No one yet'),
+                        subtitle: const Text('Find a professional who fits you'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.go('/'),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Dr. Maya Lin, Psy.D.',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: FriendColors.textPrimary,
-                            ),
-                          ),
-                          Text(
-                            'Primary Matched Counselor • Active',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: FriendColors.primaryDeep,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const SwitchTherapistScreen()),
-                        ),
-                        icon: const Icon(Icons.sync_rounded, size: 16),
-                        label: const Text('Switch Therapist'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: FriendColors.primary,
-                          side: const BorderSide(color: FriendColors.primary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(FriendRadii.pill),
+                    ]
+                  : [
+                      for (final (i, t) in list.indexed) ...[
+                        if (i > 0) divider,
+                        ListTile(
+                          leading: FriendAvatar(initials: personInitial(t['name'] as String?), size: 40),
+                          title: Text('${t['name']}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                tooltip: 'Message',
+                                icon: const Icon(Icons.chat_bubble_outline_rounded),
+                                onPressed: () => openConversationWith(context, ref, t['user_id'] as int),
+                              ),
+                              IconButton(
+                                tooltip: 'Book again',
+                                icon: const Icon(Icons.event_repeat_rounded),
+                                onPressed: () => context.push('/pros/${t['profile_id']}/book'),
+                              ),
+                            ],
                           ),
                         ),
+                      ],
+                      divider,
+                      FriendMenuTile(
+                        icon: Icons.swap_horiz_rounded,
+                        title: 'Switch professional',
+                        subtitle: 'Free, any time. They are not told why.',
+                        onTap: () => context.push('/settings/switch-therapist'),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
-                        ),
-                        icon: const Icon(Icons.card_membership_rounded, size: 16),
-                        label: const Text('Plan: \$65/wk'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: FriendColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(FriendRadii.pill),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
             ),
+          ]),
+          section('Payments', [
+            FriendMenuTile(
+              icon: Icons.account_balance_wallet_outlined,
+              title: 'Wallet',
+              subtitle: 'Balance, top-ups and receipts',
+              onTap: () => context.push('/wallet'),
+            ),
+            divider,
+            FriendMenuTile(
+              icon: Icons.receipt_long_outlined,
+              title: 'Pricing & refunds',
+              subtitle: 'How sessions, classes and gifts are charged',
+              onTap: () => context.push('/settings/subscription'),
+            ),
+          ]),
+          section('Care & safety', [
+            FriendMenuTile(
+              icon: Icons.emergency_outlined,
+              title: 'Crisis support',
+              subtitle: 'Emergency numbers and your safety plan',
+              onTap: () => context.push('/crisis'),
+            ),
+            divider,
+            FriendMenuTile(
+              icon: Icons.edit_note_rounded,
+              title: 'Worksheets',
+              subtitle: 'Thought records and calming exercises',
+              onTap: () => context.push('/worksheets'),
+            ),
+            divider,
+            FriendMenuTile(
+              icon: Icons.insights_rounded,
+              title: 'Check-ins (PHQ-9 & GAD-7)',
+              subtitle: 'Track low mood and anxiety over time',
+              onTap: () => context.push('/assessments'),
+            ),
+          ]),
+          section('Privacy & security', [
+            SwitchListTile(
+              secondary: const Icon(Icons.fingerprint_rounded, color: FriendColors.primary),
+              title: const Text('App lock'),
+              subtitle: const Text('Ask for your fingerprint or face to open Akilil'),
+              value: _biometricLock,
+              onChanged: (v) {
+                setState(() => _biometricLock = v);
+                ref.read(appLockProvider.notifier).setBiometricEnabled(enabled: v);
+              },
+            ),
+            divider,
+            FriendMenuTile(
+              icon: Icons.lock_outline_rounded,
+              title: 'Two-step sign-in',
+              subtitle: 'Add a code from an authenticator app',
+              onTap: () => context.push('/2fa-setup'),
+            ),
+            divider,
+            const Padding(
+              padding: EdgeInsets.fromLTRB(18, 10, 12, 10),
+              child: Row(
+                children: [
+                  Icon(Icons.translate_rounded, color: FriendColors.primary),
+                  SizedBox(width: 16),
+                  Expanded(child: Text('Language')),
+                  LanguageToggle(compact: true),
+                ],
+              ),
+            ),
+          ]),
+          const SizedBox(height: 24),
+          Text(
+            'Akilil is not an emergency service. If you are in danger, call 907 or 991, or go to the nearest hospital.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
           ),
           const SizedBox(height: 24),
-
-          // Clinical Tools & Crisis
-          _SectionHeader('Clinical Care & Safety'),
-          CandyCard(
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                FriendMenuTile(
-                  icon: Icons.emergency_rounded,
-                  title: 'Crisis & Safety Center',
-                  subtitle: '24/7 Lifelines (988) & Safety Plan',
-                  onTap: () => context.push('/crisis'),
-                ),
-                const Divider(height: 1, indent: 18, endIndent: 18),
-                FriendMenuTile(
-                  icon: Icons.edit_note_rounded,
-                  title: 'CBT Worksheets & Exercises',
-                  subtitle: 'Assigned thought records & somatic tools',
-                  onTap: () => context.push('/worksheets'),
-                ),
-                const Divider(height: 1, indent: 18, endIndent: 18),
-                FriendMenuTile(
-                  icon: Icons.assessment_outlined,
-                  title: 'Symptom Screeners (PHQ-9 & GAD-7)',
-                  subtitle: 'Depression & Anxiety track scores',
-                  onTap: () => context.push('/assessments'),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Notifications Preferences
-          _SectionHeader('Notification Preferences'),
-          CandyCard(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              children: [
-                SwitchListTile(
-                  title: Text(
-                    'Session Reminders',
-                    style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                  subtitle: Text(
-                    'Alert 15 minutes before scheduled video call',
-                    style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
-                  ),
-                  value: _sessionReminders,
-                  activeThumbColor: FriendColors.primary,
-                  onChanged: (v) => setState(() => _sessionReminders = v),
-                ),
-                const Divider(height: 1),
-                SwitchListTile(
-                  title: Text(
-                    'Counselor Messages',
-                    style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                  subtitle: Text(
-                    'Notify immediately when Dr. Maya Lin replies',
-                    style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
-                  ),
-                  value: _therapistMessages,
-                  activeThumbColor: FriendColors.primary,
-                  onChanged: (v) => setState(() => _therapistMessages = v),
-                ),
-                const Divider(height: 1),
-                SwitchListTile(
-                  title: Text(
-                    'Daily Mindfulness Check-in',
-                    style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                  subtitle: Text(
-                    'Gentle daily reminder to log mood & gratitude',
-                    style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
-                  ),
-                  value: _dailyCheckIn,
-                  activeThumbColor: FriendColors.primary,
-                  onChanged: (v) => setState(() => _dailyCheckIn = v),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Privacy & Security
-          _SectionHeader('Privacy & Security'),
-          CandyCard(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              children: [
-                SwitchListTile(
-                  title: Text(
-                    'Biometric & PIN App Lock',
-                    style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                  subtitle: Text(
-                    'Require FaceID/Fingerprint to open private journal and chat',
-                    style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
-                  ),
-                  value: _biometricLock,
-                  activeThumbColor: FriendColors.primary,
-                  onChanged: (v) {
-                    setState(() => _biometricLock = v);
-                    ref.read(appLockProvider.notifier).setBiometricEnabled(enabled: v);
-                  },
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.file_download_outlined, color: FriendColors.primary),
-                  title: Text(
-                    'Export Clinical Records & Journal',
-                    style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                  subtitle: Text(
-                    'Download encrypted PDF of your therapy worksheets & progress',
-                    style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
-                  ),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Preparing encrypted export archive...')),
-                    );
-                  },
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.language_rounded, color: FriendColors.primary),
-                  title: Text(
-                    'App Language',
-                    style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                  trailing: const LanguageToggle(compact: true),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 36),
         ],
-      ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.title);
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, left: 4),
-      child: Text(
-        title,
-        style: GoogleFonts.urbanist(
-          fontSize: 15,
-          fontWeight: FontWeight.w800,
-          color: FriendColors.textPrimary,
-        ),
       ),
     );
   }

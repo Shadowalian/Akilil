@@ -7,7 +7,7 @@ import 'package:core/core.dart';
 
 import '../../l10n/app_locale.dart';
 import '../../router.dart';
-import '../core_data/seed_data.dart';
+import 'safety_plan_store.dart';
 import '../worksheets/box_breathing_dialog.dart';
 
 class CrisisScreen extends ConsumerWidget {
@@ -46,33 +46,50 @@ class CrisisScreen extends ConsumerWidget {
     }
   }
 
-  int _safetyPlanProgress() {
-    final p = SeedData.safetyPlan;
-    var done = 0;
-    if ((p['warning_signs'] as List).isNotEmpty) done++;
-    if ((p['internal_coping'] as List).isNotEmpty) done++;
-    if ((p['trusted_people'] as List).isNotEmpty) done++;
-    return done;
-  }
+  /// Numbers that work in Ethiopia. Deliberately short: in a crisis, fewer
+  /// choices is kinder. Review with a local clinical advisor before launch.
+  static const _resources = <Map<String, dynamic>>[
+    {
+      'name': 'Ambulance',
+      'desc': 'Medical emergency, overdose or serious injury.',
+      'action_type': 'call',
+      'action_target': '907',
+      'badge': 'Call 907',
+      'icon': 'phone_in_talk_rounded',
+    },
+    {
+      'name': 'Police',
+      'desc': 'If you or someone else is in immediate danger.',
+      'action_type': 'call',
+      'action_target': '991',
+      'badge': 'Call 991',
+      'icon': 'shield_rounded',
+    },
+    {
+      'name': 'Outside Ethiopia?',
+      'desc': 'Find a free, confidential helpline in your country.',
+      'action_type': 'url',
+      'action_target': 'https://findahelpline.com',
+      'badge': 'Worldwide',
+      'icon': 'public_rounded',
+    },
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final resources = SeedData.crisisResources;
+    const resources = _resources;
     final s = ref.watch(stringsProvider);
-    final trusted =
-        (SeedData.safetyPlan['trusted_people'] as List).cast<Map<String, String>>();
-    final contact = trusted.isNotEmpty
-        ? trusted.first
-        : const <String, String>{'name': 'Selam', 'phone': ''};
-    final planDone = _safetyPlanProgress();
+    final plan = ref.watch(safetyPlanProvider);
+    final person = plan.people.isEmpty ? null : plan.people.first;
+    final planDone = plan.stepsDone;
 
     return FriendPageScaffold(
       eyebrow: s.crisis,
       title: s.notAlone,
       showBack: true,
       subtitle: s.someoneCanTalkNow,
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 32),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _PrimaryCtaCard(
             title: s.talkToListenerNow,
@@ -90,20 +107,22 @@ class CrisisScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 14),
-          _ContactCard(
-            name: contact['name'] ?? 'Selam',
-            role: s.trustedContact,
-            phone: contact['phone'],
-            onCall: contact['phone']?.isNotEmpty == true
-                ? () => _handleAction(
-                      context,
-                      {
-                        'action_type': 'call',
-                        'action_target': contact['phone'],
-                      },
-                    )
-                : null,
-          ),
+          if (person != null)
+            _ContactCard(
+              name: person.name,
+              role: s.trustedContact,
+              phone: person.phone,
+              onCall: person.phone.isNotEmpty
+                  ? () => _handleAction(context, {'action_type': 'call', 'action_target': person.phone})
+                  : null,
+            )
+          else
+            _ToolkitCard(
+              title: 'Add someone you trust',
+              subtitle: 'So their number is one tap away when you need it',
+              icon: Icons.person_add_alt_1_rounded,
+              onTap: () => context.push(AppRoutes.safetyPlan),
+            ),
           const SizedBox(height: 14),
           _ToolkitCard(
             title: s.breatheWithMe,
@@ -114,7 +133,7 @@ class CrisisScreen extends ConsumerWidget {
           const SizedBox(height: 14),
           _ToolkitCard(
             title: s.mySafetyPlan,
-            subtitle: s.safetyPlanStepsComplete(planDone, 3),
+            subtitle: s.safetyPlanStepsComplete(planDone, 4),
             icon: Icons.shield_outlined,
             onTap: () => context.push(AppRoutes.safetyPlan),
           ),

@@ -318,7 +318,7 @@ class _ProfileRibbon extends StatelessWidget {
                       style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
                     ),
                     Text(
-                      'Sanctuary member • $memberSince',
+                      'Client since $memberSince',
                       style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
                     ),
                   ],
@@ -1027,7 +1027,7 @@ class _DossierActionBar extends StatelessWidget {
                 Icon(Icons.lock_outline, size: 14, color: FriendColors.accent),
                 const SizedBox(width: 6),
                 Text(
-                  'ENCRYPTED WITH AES-256 VAULT • HIPAA / GDPR SHIELD',
+                  'VISIBLE ONLY TO YOU',
                   style: GoogleFonts.inter(
                     fontSize: 9,
                     fontWeight: FontWeight.w600,

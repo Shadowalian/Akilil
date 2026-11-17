@@ -243,6 +243,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     /* Notifications */
     Route::get ('notifications',                  [NotificationController::class, 'index'])->name('notifications.index');
     Route::get ('notifications/unread-count',     [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    Route::post('notifications/read-all',         [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
     Route::post('notifications/{id}/read',        [NotificationController::class, 'markRead'])->name('notifications.read');
 
     /* Devices — push tokens */

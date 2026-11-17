@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:core/core.dart';
 import '../core_data/seed_data.dart';
+import 'worksheet_store.dart';
 import 'box_breathing_dialog.dart';
 
-class WorksheetsScreen extends StatefulWidget {
+class WorksheetsScreen extends ConsumerStatefulWidget {
   const WorksheetsScreen({super.key});
 
   @override
-  State<WorksheetsScreen> createState() => _WorksheetsScreenState();
+  ConsumerState<WorksheetsScreen> createState() => _WorksheetsScreenState();
 }
 
-class _WorksheetsScreenState extends State<WorksheetsScreen> {
+class _WorksheetsScreenState extends ConsumerState<WorksheetsScreen> {
   String _selectedCategory = 'All';
 
   final List<String> _categories = [
@@ -26,16 +28,19 @@ class _WorksheetsScreenState extends State<WorksheetsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final allWorksheets = SeedData.worksheets;
+    final done = ref.watch(worksheetStoreProvider);
+    final allWorksheets = [
+      for (final w in SeedData.worksheets) {...w, 'is_completed': done[w['id']]?.containsKey('_completed_at') ?? false},
+    ];
     final filtered = _selectedCategory == 'All'
         ? allWorksheets
         : allWorksheets.where((w) => w['category'] == _selectedCategory).toList();
 
     return FriendPageScaffold(
-      eyebrow: 'Clinical Tools',
-      title: 'Therapy Worksheets',
+      eyebrow: 'Tools',
+      title: 'Worksheets',
       subtitle:
-          'Evidence-based CBT exercises, anxiety decatastrophizers, and somatic tools assigned by your counselor.',
+          'Short, well-tested exercises you can do on your own or alongside your sessions.',
       showBack: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -24,6 +24,7 @@ class BookingConfirmedNotification extends Notification
             'type'            => 'booking_confirmed',
             'appointment_id'  => $this->appointment->id,
             'scheduled_at'    => $this->appointment->scheduled_at?->toIso8601String(),
+            'professional'    => $this->appointment->professional?->name,
         ];
     }
 

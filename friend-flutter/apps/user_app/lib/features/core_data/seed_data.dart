@@ -334,10 +334,9 @@ class SeedData {
       'id': 'ws-thought-record',
       'title': 'CBT Thought Record',
       'category': 'CBT Tools',
-      'tag': 'Assigned by Therapist',
+      'tag': 'Self-guided',
       'icon': 'edit_note_rounded',
-      'is_completed': true,
-      'updated_at': 'Today, 11:30 AM',
+      'is_completed': false,
       'description':
           'Identify automatic negative thoughts, test cognitive distortions, and construct balanced, objective counter-perspectives.',
       'fields': [
@@ -345,34 +344,26 @@ class SeedData {
           'id': 'situation',
           'label': 'Situation / Trigger',
           'placeholder': 'What happened? Where were you? Who was involved?',
-          'value':
-              'Received an unexpected email from my director asking for a project update without details.',
         },
         {
           'id': 'automatic_thought',
           'label': 'Automatic Thought',
           'placeholder': 'What was the immediate sentence that entered your mind?',
-          'value': 'I messed up and they are going to take me off the project.',
         },
         {
           'id': 'distortion',
           'label': 'Cognitive Distortion Identified',
           'type': 'distortion_picker',
-          'value': 'Catastrophizing & Jumping to Conclusions',
         },
         {
           'id': 'evidence_against',
           'label': 'Evidence Against the Thought',
           'placeholder': 'What facts contradict your catastrophic prediction?',
-          'value':
-              'My last two reviews were excellent. The director regularly asks for informal updates from all leads on Tuesdays.',
         },
         {
           'id': 'balanced_thought',
           'label': 'Balanced / Rational Perspective',
           'placeholder': 'What is a realistic, compassionate alternative view?',
-          'value':
-              'They simply need status points for the leadership sync. Even if there are issues, we can solve them constructively.',
         },
       ],
     },
@@ -383,7 +374,6 @@ class SeedData {
       'tag': 'Evidence-Based',
       'icon': 'psychology_alt_rounded',
       'is_completed': false,
-      'updated_at': 'Recommended',
       'description':
           'Walk through the absolute worst-case scenario, examine its true probability, and build an actionable contingency plan.',
       'fields': [
@@ -391,25 +381,21 @@ class SeedData {
           'id': 'worry',
           'label': 'What is your core catastrophic worry?',
           'placeholder': 'e.g. Giving the presentation tomorrow and freezing up.',
-          'value': '',
         },
         {
           'id': 'worst_case',
           'label': 'If the worst really happened, what would it look like?',
           'placeholder': 'Describe the scenario without self-censoring.',
-          'value': '',
         },
         {
           'id': 'probability',
           'label': 'Realistically, how likely is this worst case? (1-10)',
           'placeholder': 'e.g. 2 out of 10',
-          'value': '',
         },
         {
           'id': 'coping_plan',
           'label': 'How would you recover and handle it if it did happen?',
           'placeholder': 'I could pause, take a sip of water, look at my notes...',
-          'value': '',
         },
       ],
     },
@@ -430,35 +416,29 @@ class SeedData {
       'category': 'Anxiety & Panic',
       'tag': 'Somatic Tool',
       'icon': 'spa_rounded',
-      'is_completed': true,
-      'updated_at': '2 days ago',
+      'is_completed': false,
       'description':
           'Anchor your awareness in physical reality using sight, touch, sound, smell, and taste to defuse acute panic or dissociation.',
       'fields': [
         {
           'id': 'step5',
           'label': '5 Things You Can See',
-          'value': 'Green plant on window, oak desk grain, coffee cup steam, cloud, pen shadow',
         },
         {
           'id': 'step4',
           'label': '4 Things You Can Physically Touch',
-          'value': 'Cool glass surface, cotton sleeve, warm laptop keys, soft chair fabric',
         },
         {
           'id': 'step3',
           'label': '3 Things You Can Hear',
-          'value': 'Distant traffic hum, refrigerator fan, gentle breathing',
         },
         {
           'id': 'step2',
           'label': '2 Things You Can Smell',
-          'value': 'Roasted coffee aroma, fresh cedar scent',
         },
         {
           'id': 'step1',
           'label': '1 Thing You Can Taste',
-          'value': 'Peppermint tea aftertaste',
         },
       ],
     },
@@ -469,7 +449,6 @@ class SeedData {
       'tag': 'Communication',
       'icon': 'shield_outlined',
       'is_completed': false,
-      'updated_at': 'Suggested by Dr. Lin',
       'description':
           'Draft clear, respectful boundary declarations without over-explaining or apologizing for your emotional capacity.',
       'fields': [
@@ -477,13 +456,11 @@ class SeedData {
           'id': 'boundary_situation',
           'label': 'Where is a boundary needed?',
           'placeholder': 'e.g. Taking weekend work requests from colleagues.',
-          'value': '',
         },
         {
           'id': 'boundary_script',
           'label': 'My Assertive Statement Script',
           'placeholder': '“I value our project, but I do not review emails on weekends. I will gladly review this first thing Monday.”',
-          'value': '',
         },
       ],
     },
@@ -493,25 +470,21 @@ class SeedData {
       'category': 'Depression & Mood',
       'tag': 'Daily Habit',
       'icon': 'favorite_border_rounded',
-      'is_completed': true,
-      'updated_at': 'Yesterday',
+      'is_completed': false,
       'description':
           'Counteract the brain’s evolutionary negativity bias by deliberately cataloging specific moments of safety, warmth, and grace.',
       'fields': [
         {
           'id': 'g1',
           'label': '1. A specific moment that brought peace today',
-          'value': 'Sitting in the quiet morning light with my first cup of coffee before opening any screens.',
         },
         {
           'id': 'g2',
           'label': '2. Something I appreciate about my body or mind',
-          'value': 'My resilience in continuing to show up even when energy was low.',
         },
         {
           'id': 'g3',
           'label': '3. An act of kindness I witnessed or received',
-          'value': 'A thoughtful note from a colleague thanking me for support.',
         },
       ],
     },
@@ -598,9 +571,6 @@ class SeedData {
     'phq9': {
       'title': 'PHQ-9 Depression Screener',
       'subtitle': 'Over the last 2 weeks, how often have you been bothered by:',
-      'last_score': 6,
-      'last_severity': 'Mild',
-      'last_date': '3 days ago',
       'questions': [
         'Little interest or pleasure in doing things',
         'Feeling down, depressed, or hopeless',
@@ -616,9 +586,6 @@ class SeedData {
     'gad7': {
       'title': 'GAD-7 Anxiety Screener',
       'subtitle': 'Over the last 2 weeks, how often have you been bothered by:',
-      'last_score': 8,
-      'last_severity': 'Mild Anxiety',
-      'last_date': '3 days ago',
       'questions': [
         'Feeling nervous, anxious, or on edge',
         'Not being able to stop or control worrying',

@@ -143,9 +143,9 @@ class S {
   String get psychiatryTherapyDesc => _am
       ? 'ፈቃድ ያላቸው ሐኪሞችና አማካሪዎች ለባለሙያ እንክብካቤ።'
       : 'Licensed psychiatrists and therapists for clinical support.';
-  String get guidesBadge => _am ? '42 መሪዎች' : '42 GUIDES';
-  String get chefsBadge => _am ? '18 ሼፎች' : '18 CHEFS';
-  String get cliniciansBadge => _am ? '96 ባለሙያዎች' : '96 CLINICIANS';
+  String get guidesBadge => _am ? 'እምነትን የሚያከብሩ' : 'FAITH-AWARE';
+  String get chefsBadge => _am ? 'በቀጥታ' : 'LIVE CLASSES';
+  String get cliniciansBadge => _am ? 'ፈቃድ ያላቸው' : 'LICENSED';
 
   // ── Profile groups ──────────────────────────────────────────────────
   String get account => _am ? 'መለያዬ' : 'Account';
@@ -493,7 +493,7 @@ class S {
   String get talkToListenerNow =>
       _am ? 'አሁን አዳማጭ ያግኙ' : 'Talk to a listener now';
   String get listenersAvailableFree =>
-      _am ? '4 ዝግጁ · ነጻ' : '4 available · free';
+      _am ? 'ዛሬ የሚያነጋግርዎ ሰው ያግኙ' : 'Find someone to talk to today';
   String get emergencyServices =>
       _am ? 'የአስቸኳይ አገልግሎት' : 'Emergency services';
   String get localEmergencyNumber => _am ? '991' : '991';
@@ -509,8 +509,8 @@ class S {
       ? '$total ውስጥ $done ተጠናቋል'
       : '$done of $total steps complete';
   String get verifiedCrisisLifelines => _am
-      ? 'የተረጋገጡ የአስቸኳይ መስመሮች'
-      : 'Verified crisis lifelines';
+      ? 'የአስቸኳይ ጊዜ ቁጥሮች'
+      : 'Emergency numbers';
 
   String pillarName(String slug) {
     switch (slug) {

@@ -19,7 +19,6 @@ import 'features/goals_habits/goals_habits_screen.dart';
 import 'features/payments/wallet_screen.dart';
 import 'features/vents/vents_screen.dart';
 import 'features/session_room/session_room_screen.dart';
-import 'features/session_room/video_setup_screen.dart';
 import 'features/messaging/conversations_screen.dart';
 import 'features/messaging/conversation_screen.dart';
 import 'features/journal/journal_list_screen.dart';
@@ -116,7 +115,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (authNotifier.isAuthenticated == true) {
-        if (isPreAuth) return AppRoutes.today;
+        // Signed-in people can still open 2FA setup from Settings.
+        if (isPreAuth && loc != AppRoutes.setup2fa) return AppRoutes.today;
         return null;
       }
 
@@ -189,7 +189,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: ':id/setup',
-                builder: (_, s) => VideoSetupScreen(appointmentId: s.pathParameters['id']!),
+                // The waiting room doubles as the pre-join check.
+                builder: (_, s) => SessionRoomScreen(appointmentId: s.pathParameters['id']!),
               ),
             ],
           ),

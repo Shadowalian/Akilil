@@ -48,6 +48,14 @@ class NotificationController extends Controller
         return response()->json((new NotificationResource($notification))->toArray($request));
     }
 
+    /** POST /api/notifications/read-all */
+    public function markAllRead(Request $request): JsonResponse
+    {
+        $updated = $this->forUser($request->user())->whereNull('read_at')->update(['read_at' => now()]);
+
+        return response()->json(['updated' => $updated]);
+    }
+
     /**
      * GET /api/notifications/unread-count
      */

@@ -124,6 +124,7 @@ class AuthController extends ChangeNotifier {
     required String email,
     required String password,
     required String passwordConfirmation,
+    String? pillar,
   }) async {
     final res = await _dio.post<Map<String, dynamic>>(
       '/auth/register-professional',
@@ -132,6 +133,7 @@ class AuthController extends ChangeNotifier {
         'email': email,
         'password': password,
         'password_confirmation': passwordConfirmation,
+        if (pillar != null) 'category': pillar,
       },
     );
     final data = res.data ?? const {};

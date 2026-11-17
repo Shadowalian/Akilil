@@ -1,37 +1,36 @@
-import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:flutter/material.dart';
 
-/// Pro-brand mark — same shape as the user-app brand but the inner
-/// accent dot is larger to read as a "broadcast / host" presence.
-/// Lives in this app (not the shared `core`) because the user app
-/// has its own variant.
+/// The Akilil mark (four petals) on a teal disc — the same logomark as the
+/// client app, drawn in code so the Pro app needs no image asset.
 class ProBrand {
   ProBrand._();
 
   static Widget mark({double size = 56}) {
-    return SizedBox(
+    final petal = size * 0.17;
+    final offset = size * 0.13;
+    Widget dot(double dx, double dy) => Transform.translate(
+          offset: Offset(dx, dy),
+          child: Container(
+            width: petal,
+            height: petal,
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+          ),
+        );
+
+    return Container(
       width: size,
       height: size,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: FriendGradients.spectrumHot,
-          shape: BoxShape.circle,
-          boxShadow: FriendElevation.glow,
-        ),
-        child: Center(
-          child: Container(
-            width: size * 0.42,
-            height: size * 0.42,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [FriendColors.spark, FriendColors.coral],
-              ),
-              shape: BoxShape.circle,
-            ),
-          ),
-        ),
+      decoration: BoxDecoration(
+        color: FriendColors.primary,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(color: FriendColors.primary.withValues(alpha: 0.28), blurRadius: size * 0.35, offset: Offset(0, size * 0.1)),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [dot(0, -offset), dot(-offset, 0), dot(offset, 0), dot(0, offset)],
       ),
     );
   }

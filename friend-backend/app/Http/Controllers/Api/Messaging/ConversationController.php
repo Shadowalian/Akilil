@@ -59,7 +59,14 @@ class ConversationController extends Controller
             if ($existing) {
                 return response()->json((new ConversationResource($existing->load('participants.user')))->toArray($request), 200);
             }
-            return DB::transaction(function () use ($user, $other) {
+            // Direct messages are for people who share care: a client and a
+            // professional with a booking between them. No cold messaging.
+            $sharesCare = \App\Models\Appointment::where(fn ($q) => $q
+                    ->where(fn ($a) => $a->where('user_id', $user->id)->where('professional_user_id', $other))
+                    ->orWhere(fn ($a) => $a->where('user_id', $other)->where('professional_user_id', $user->id)))
+                ->exists();
+            abort_unless($sharesCare || $user->hasAnyRole(['admin', 'support']), 403, 'You can message professionals you have booked.');
+            return DB::transaction(function () use ($user, $other, $request) {
                 $conv = Conversation::create(['type' => 'direct', 'created_by' => $user->id]);
                 ConversationParticipant::create(['conversation_id' => $conv->id, 'user_id' => $user->id, 'joined_at' => now()]);
                 ConversationParticipant::create(['conversation_id' => $conv->id, 'user_id' => $other, 'joined_at' => now()]);
@@ -74,7 +81,7 @@ class ConversationController extends Controller
             'participant_user_ids.*' => ['integer', 'exists:users,id'],
         ]);
 
-        return DB::transaction(function () use ($user, $data) {
+        return DB::transaction(function () use ($user, $data, $request) {
             $conv = Conversation::create([
                 'type'       => 'group',
                 'title'      => $data['title'],

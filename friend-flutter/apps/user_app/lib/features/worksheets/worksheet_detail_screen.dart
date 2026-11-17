@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:core/core.dart';
 import '../core_data/seed_data.dart';
 import 'box_breathing_dialog.dart';
+import 'worksheet_store.dart';
 
-class WorksheetDetailScreen extends StatefulWidget {
+class WorksheetDetailScreen extends ConsumerStatefulWidget {
   const WorksheetDetailScreen({super.key, required this.worksheetId});
   final String worksheetId;
 
   @override
-  State<WorksheetDetailScreen> createState() => _WorksheetDetailScreenState();
+  ConsumerState<WorksheetDetailScreen> createState() => _WorksheetDetailScreenState();
 }
 
-class _WorksheetDetailScreenState extends State<WorksheetDetailScreen> {
+class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
   late Map<String, dynamic> _worksheet;
   final Map<String, TextEditingController> _controllers = {};
-  bool _shareWithTherapist = true;
   bool _saving = false;
   String? _selectedDistortion;
 
@@ -44,13 +45,17 @@ class _WorksheetDetailScreenState extends State<WorksheetDetailScreen> {
       orElse: () => list.first,
     );
 
+    // Copy so marking it completed never touches the shared template.
+    _worksheet = Map<String, dynamic>.from(_worksheet);
+    final saved = ref.read(worksheetStoreProvider)[widget.worksheetId] ?? const {};
+    _worksheet['is_completed'] = saved.containsKey('_completed_at');
     final fields = (_worksheet['fields'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     for (final f in fields) {
       final id = f['id'] as String;
-      final val = f['value'] as String? ?? '';
+      final val = saved[id] ?? '';
       _controllers[id] = TextEditingController(text: val);
       if (f['type'] == 'distortion_picker') {
-        _selectedDistortion = val.isNotEmpty ? val : _distortions.first;
+        _selectedDistortion = val.isNotEmpty ? val : null;
       }
     }
   }
@@ -65,12 +70,16 @@ class _WorksheetDetailScreenState extends State<WorksheetDetailScreen> {
 
   Future<void> _save() async {
     setState(() => _saving = true);
-    await Future.delayed(const Duration(milliseconds: 600));
+    await ref.read(worksheetStoreProvider.notifier).save(widget.worksheetId, {
+      for (final e in _controllers.entries) e.key: e.value.text,
+      if (_selectedDistortion != null)
+        for (final f in ((_worksheet['fields'] as List?) ?? const []))
+          if (f['type'] == 'distortion_picker') f['id'] as String: _selectedDistortion!,
+    });
     if (!mounted) return;
 
     setState(() {
       _worksheet['is_completed'] = true;
-      _worksheet['updated_at'] = 'Just now';
       _saving = false;
     });
 
@@ -83,9 +92,7 @@ class _WorksheetDetailScreenState extends State<WorksheetDetailScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                _shareWithTherapist
-                    ? 'Worksheet saved and shared with Dr. Maya Lin.'
-                    : 'Worksheet saved privately to your records.',
+                'Saved on this phone. Bring it to your next session if you want to talk it through.',
                 style: GoogleFonts.urbanist(fontWeight: FontWeight.w600),
               ),
             ),
@@ -180,7 +187,7 @@ class _WorksheetDetailScreenState extends State<WorksheetDetailScreen> {
                     const Icon(Icons.verified_rounded, size: 16, color: FriendColors.primary),
                     const SizedBox(width: 4),
                     Text(
-                      'Clinical Protocol',
+                      'Self-guided',
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -256,65 +263,23 @@ class _WorksheetDetailScreenState extends State<WorksheetDetailScreen> {
 
             const SizedBox(height: 12),
 
-            // Share with Therapist Toggle
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: FriendColors.surface,
-                borderRadius: BorderRadius.circular(FriendRadii.card),
-                border: Border.all(color: FriendColors.border),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: FriendColors.primaryLight,
-                      borderRadius: BorderRadius.circular(FriendRadii.small),
-                    ),
-                    child: const Icon(
-                      Icons.connect_without_contact_rounded,
-                      color: FriendColors.primary,
-                      size: 20,
-                    ),
+            Row(
+              children: [
+                const Icon(Icons.lock_outline_rounded, size: 16, color: FriendColors.textSecondary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Your answers stay on this phone. Nobody else sees them unless you choose to share.',
+                    style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Share with Dr. Maya Lin',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: FriendColors.textPrimary,
-                          ),
-                        ),
-                        Text(
-                          'Your counselor will review this in your next session',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: FriendColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: _shareWithTherapist,
-                    activeTrackColor: FriendColors.primary,
-                    activeThumbColor: Colors.white,
-                    onChanged: (val) => setState(() => _shareWithTherapist = val),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
             const SizedBox(height: 28),
 
             FriendGlowButton(
-              label: _saving ? 'Saving...' : 'Save & Submit Worksheet',
+              label: _saving ? 'Saving…' : 'Save',
+              expanded: true,
               icon: Icons.save_rounded,
               onPressed: _saving ? null : _save,
             ),

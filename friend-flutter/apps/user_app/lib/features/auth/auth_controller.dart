@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:core/core.dart';
 
+import 'onboarding_prefs.dart';
+
 /// Authenticated user shape — what `/api/me` returns.
 /// Minimal fields used by the app; full profile is fetched on demand.
 @immutable
@@ -154,6 +156,7 @@ class AuthController extends ChangeNotifier {
     try {
       await _storage.write(token);
     } catch (_) {/* memory token still set */}
+    await _sendPendingIntake(token, seekingCareFor);
     final embedded = data['user'];
     if (embedded is Map) {
       _user = AuthUser.fromJson(Map<String, dynamic>.from(embedded));
@@ -169,6 +172,28 @@ class AuthController extends ChangeNotifier {
     }
     _user = AuthUser.fromJson(me.data!);
     notifyListeners();
+  }
+
+  /// Hands the pre-sign-up questionnaire to the matching API so
+  /// "Recommended" reflects it. Best effort: sign-up never fails over this.
+  Future<void> _sendPendingIntake(String token, String seekingCareFor) async {
+    final intake = await takePendingIntake();
+    if (intake == null) return;
+    try {
+      await _dio.post(
+        '/intake',
+        data: {
+          if (intake['pillar'] != null) 'pillar': intake['pillar'],
+          'care_format': switch (seekingCareFor) {
+            'couple' => 'couples',
+            'family' => 'family',
+            _ => 'individual',
+          },
+          'answers': intake['answers'] ?? const {},
+        },
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } catch (_) {}
   }
 
   /// `POST /api/auth/logout` — revokes the current token server-side.

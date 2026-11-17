@@ -224,22 +224,54 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   : "Passwords don't match",
                             ),
                             const SizedBox(height: 22),
-                            OutlinedButton.icon(
-                              icon: const Icon(Icons.cake_outlined, size: 18),
-                              label: Text(_dob == null
-                                  ? 'Date of birth'
-                                  : 'Born ${_dob!.day}/${_dob!.month}/${_dob!.year}'),
-                              onPressed: () async {
-                                final now = DateTime.now();
-                                final picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: _dob ?? DateTime(now.year - 25),
-                                  firstDate: DateTime(1900),
-                                  lastDate: now,
-                                  helpText: 'Your date of birth',
-                                );
-                                if (picked != null) setState(() => _dob = picked);
-                              },
+                            Text(
+                              'Date of Birth',
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: FriendColors.primaryDeep,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            Material(
+                              color: FriendColors.surface,
+                              borderRadius: BorderRadius.circular(FriendRadii.pill),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(FriendRadii.pill),
+                                onTap: () async {
+                                  final now = DateTime.now();
+                                  final picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: _dob ?? DateTime(now.year - 25),
+                                    firstDate: DateTime(1900),
+                                    lastDate: now,
+                                    helpText: 'Your date of birth',
+                                  );
+                                  if (picked != null) setState(() => _dob = picked);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.cake_outlined, size: 22, color: FriendColors.wood),
+                                      const SizedBox(width: 14),
+                                      Text(
+                                        _dob == null
+                                            ? 'Select your date of birth'
+                                            : '${_dob!.day} ${const ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][_dob!.month - 1]} ${_dob!.year}',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: _dob == null ? FriendColors.textMuted : FriendColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Akilil accounts are for adults. Parents and guardians can add children after signing up.',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                             ),
                             const SizedBox(height: 16),
                             Text('Who are you looking for support for?',
@@ -257,11 +289,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 ])
                                   ChoiceChip(
                                     label: Text(o.$2),
+                                    showCheckmark: false,
                                     selected: _careFor == o.$1,
                                     onSelected: (_) => setState(() => _careFor = o.$1),
                                   ),
                               ],
                             ),
+                            const SizedBox(height: 8),
                             CheckboxListTile(
                               contentPadding: EdgeInsets.zero,
                               controlAffinity: ListTileControlAffinity.leading,

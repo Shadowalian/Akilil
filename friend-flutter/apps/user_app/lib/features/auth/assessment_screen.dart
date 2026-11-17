@@ -23,7 +23,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
 
   int _step = 0;
   final _answers = <int?>[null, null, null];
-  final _concerns = <int>{0, 1};
+  final _concerns = <int>{};
   int _genderPref = 0;
   final _languages = <int>{0};
   final _modalities = <int>{0};
@@ -78,9 +78,9 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
       ];
 
   String get _stepLabel => switch (_step) {
-        0 => 'Step 1 of $_totalSteps • Presenting Concerns',
-        1 => 'Step 2 of $_totalSteps • Clinical Alignment & Modality',
-        2 => 'Step 3 of $_totalSteps • Therapeutic Modality',
+        0 => 'Step 1 of $_totalSteps • What brings you here',
+        1 => 'Step 2 of $_totalSteps • How you feel',
+        2 => 'Step 3 of $_totalSteps • Your path',
         _ => 'Step 4 of $_totalSteps • Connection Preference',
       };
 
@@ -97,6 +97,15 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
       final slug = AkililPillars.all[pathAnswer].slug;
       ref.read(discoverPillarProvider.notifier).state = slug;
     }
+    // Kept until the account exists, then sent to the matching API.
+    await savePendingIntake({
+      'pillar': pathAnswer != null && pathAnswer < 3 ? AkililPillars.all[pathAnswer].slug : null,
+      'answers': {
+        'concerns': [for (final i in _concerns) _concernItems[i].$2],
+        'feeling': _answers[0],
+        'connect': _answers[2],
+      },
+    });
     if (!mounted) return;
     context.go(AppRoutes.register);
     await ref.read(onboardingDoneProvider.notifier).complete();
@@ -128,7 +137,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     return Scaffold(
       backgroundColor: FriendColors.background,
       appBar: FriendStitchGlassHeader(
-        title: 'Clinical Intake Form',
+        title: 'A few questions',
         onBack: _back,
         onSos: () => context.push(AppRoutes.crisis),
       ),
@@ -153,7 +162,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                   const FriendVaultBadge(),
                   const SizedBox(height: 12),
                   Text(
-                    'Tailor your therapeutic sanctuary.',
+                    'Help us find the right person.',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: FriendTypeScale.headlineMedium,
                       fontWeight: FontWeight.w700,
@@ -163,7 +172,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Your confidential responses calibrate our matching algorithm to pair you with certified psychologists and specialized listeners.',
+                    'Your answers help us suggest people who fit. Only you and the professional you book can see them.',
                     style: GoogleFonts.inter(
                       fontSize: FriendTypeScale.bodyMedium,
                       height: 1.45,

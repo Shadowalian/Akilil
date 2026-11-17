@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:core/core.dart';
 import '../core_data/seed_data.dart';
@@ -12,8 +14,32 @@ class SymptomTrackerScreen extends StatefulWidget {
 
 class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
   String _activeAssessment = 'gad7';
-  final Map<int, int> _gad7Answers = {0: 1, 1: 1, 2: 2, 3: 1, 4: 1, 5: 1, 6: 1};
-  final Map<int, int> _phq9Answers = {0: 1, 1: 0, 2: 1, 3: 2, 4: 0, 5: 1, 6: 0, 7: 1, 8: 0};
+  // Nothing is pre-answered: a screener only means something if you fill it in.
+  final Map<int, int> _gad7Answers = {};
+  final Map<int, int> _phq9Answers = {};
+  String? _lastResult;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLast();
+  }
+
+  Future<void> _loadLast() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (mounted) setState(() => _lastResult = prefs.getString('akilil_screener_last_$_activeAssessment'));
+    } catch (_) {}
+  }
+
+  Future<void> _saveResult(int score, String severity) async {
+    final line = '$score · $severity · ${DateTime.now().toLocal().toString().substring(0, 10)}';
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('akilil_screener_last_$_activeAssessment', line);
+    } catch (_) {}
+    if (mounted) setState(() => _lastResult = line);
+  }
 
   static const List<String> _scaleLabels = [
     'Not at all (0)',
@@ -29,15 +55,15 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
   (String, String, Color) _interpretScore(String type, int score) {
     if (type == 'gad7') {
       if (score <= 4) return ('Minimal Anxiety', 'Your symptoms reflect minimal nervous tension.', FriendColors.green);
-      if (score <= 9) return ('Mild Anxiety', 'Mild anxiety symptoms present. CBT thought records and daily box breathing are recommended.', FriendColors.primaryDeep);
-      if (score <= 14) return ('Moderate Anxiety', 'Moderate anxiety detected. Weekly video therapy with Dr. Maya Lin is highly advised.', FriendColors.accent);
-      return ('Severe Anxiety', 'High anxiety load. Please discuss immediate somatic down-regulation and coping protocols with your counselor.', FriendColors.error);
+      if (score <= 9) return ('Mild Anxiety', 'Mild anxiety. Breathing exercises and thought records can help.', FriendColors.primaryDeep);
+      if (score <= 14) return ('Moderate Anxiety', 'Moderate anxiety. Talking with a professional regularly is likely to help.', FriendColors.accent);
+      return ('Severe Anxiety', 'Severe anxiety. Please book a session with a licensed professional soon.', FriendColors.error);
     } else {
       if (score <= 4) return ('Minimal Depression', 'No significant depressive patterns indicated.', FriendColors.green);
       if (score <= 9) return ('Mild Depression', 'Mild low mood. Daily physical movement and gratitude logging can help lift energy.', FriendColors.primaryDeep);
       if (score <= 14) return ('Moderate Depression', 'Moderate depression symptoms. Continued regular counseling sessions recommended.', FriendColors.accent);
-      if (score <= 19) return ('Moderately Severe', 'Significant depressive fatigue. Ensure regular communication with Dr. Lin.', FriendColors.accentDeep);
-      return ('Severe Depression', 'High severity score. Immediate clinical consultation advised.', FriendColors.error);
+      if (score <= 19) return ('Moderately Severe', 'Moderately severe. Please book a session with a licensed professional.', FriendColors.accentDeep);
+      return ('Severe Depression', 'Severe. Please speak with a licensed professional as soon as you can.', FriendColors.error);
     }
   }
 
@@ -47,13 +73,19 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
     final questions = (meta['questions'] as List).cast<String>();
     final answers = _activeAssessment == 'gad7' ? _gad7Answers : _phq9Answers;
     final score = _calculateScore(answers);
-    final (severityTitle, severityDesc, severityColor) = _interpretScore(_activeAssessment, score);
+    final complete = answers.length == questions.length;
+    final (severityTitle, severityDesc, severityColor) = complete
+        ? _interpretScore(_activeAssessment, score)
+        : ('${answers.length} of ${questions.length} answered', 'Answer every question to see your result.', FriendColors.textMuted);
+    // PHQ-9 item 9 asks about self-harm. Any answer above "not at all"
+    // means we stop and offer help, whatever the total score.
+    final selfHarmFlag = _activeAssessment == 'phq9' && (answers[8] ?? 0) > 0;
 
     return FriendPageScaffold(
-      eyebrow: 'Clinical Screeners',
-      title: 'Symptom Checkers',
+      eyebrow: 'Check-ins',
+      title: 'How have you been?',
       subtitle:
-          'Standardized PHQ-9 & GAD-7 clinical questionnaires to track anxiety and mood progression over time.',
+          'Two short, widely used questionnaires (GAD-7 and PHQ-9) to track anxiety and low mood over time.',
       showBack: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -65,7 +97,10 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
                 child: _TabButton(
                   title: 'GAD-7 (Anxiety)',
                   isSelected: _activeAssessment == 'gad7',
-                  onTap: () => setState(() => _activeAssessment = 'gad7'),
+                  onTap: () {
+                    setState(() => _activeAssessment = 'gad7');
+                    _loadLast();
+                  },
                 ),
               ),
               const SizedBox(width: 10),
@@ -73,12 +108,48 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
                 child: _TabButton(
                   title: 'PHQ-9 (Depression)',
                   isSelected: _activeAssessment == 'phq9',
-                  onTap: () => setState(() => _activeAssessment = 'phq9'),
+                  onTap: () {
+                    setState(() => _activeAssessment = 'phq9');
+                    _loadLast();
+                  },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
+
+          if (selfHarmFlag) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: FriendColors.errorContainer,
+                borderRadius: BorderRadius.circular(FriendRadii.card),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Thank you for being honest. You don't have to carry this alone.",
+                    style: GoogleFonts.urbanist(fontSize: 16, fontWeight: FontWeight.w800, color: FriendColors.onErrorContainer),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'If you might act on these thoughts, call 907 for an ambulance now, or go to the nearest hospital. '
+                    'Otherwise, please talk to someone today.',
+                    style: GoogleFonts.urbanist(fontSize: 13, height: 1.4, color: FriendColors.onErrorContainer),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: () => context.push('/crisis'),
+                    style: FilledButton.styleFrom(backgroundColor: FriendColors.error),
+                    icon: const Icon(Icons.support_rounded),
+                    label: const Text('Get support now'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
 
           // Score Summary Card
           Container(
@@ -100,7 +171,7 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      '$score',
+                      complete ? '$score' : '–',
                       style: GoogleFonts.urbanist(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
@@ -174,7 +245,7 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
                           children: [
                             Radio<int>(
                               value: val,
-                              groupValue: answers[i] ?? 0,
+                              groupValue: answers[i],
                               activeColor: FriendColors.primary,
                               onChanged: (newVal) {
                                 if (newVal != null) {
@@ -208,20 +279,33 @@ class _SymptomTrackerScreenState extends State<SymptomTrackerScreen> {
           ],
           const SizedBox(height: 20),
 
+          if (_lastResult != null) ...[
+            Text(
+              'Last time: $_lastResult',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
+            ),
+            const SizedBox(height: 10),
+          ],
           FriendGlowButton(
-            label: 'Save & Share Assessment with Counselor',
+            label: 'Save result',
             icon: Icons.check_circle_rounded,
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: FriendColors.primaryDeep,
-                  content: Text(
-                    'Assessment saved. Dr. Maya Lin has been notified of your updated score ($score).',
-                    style: GoogleFonts.urbanist(fontWeight: FontWeight.w600),
-                  ),
-                ),
-              );
-            },
+            expanded: true,
+            onPressed: !complete
+                ? null
+                : () async {
+                    await _saveResult(score, severityTitle);
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Saved on this phone. Check in again in two weeks to see the trend.')),
+                    );
+                  },
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'This is a screening tool, not a diagnosis.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textMuted),
           ),
           const SizedBox(height: 36),
         ],
