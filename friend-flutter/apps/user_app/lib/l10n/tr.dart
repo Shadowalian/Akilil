@@ -17,6 +17,7 @@ bool trAmharic = false;
 String tr(String en) => trAmharic ? (_am[en] ?? en) : en;
 
 const Map<String, String> _am = {
+  'Test camera': 'ካሜራ ይሞክሩ',
   'Write something first.': 'መጀመሪያ የሆነ ነገር ይጻፉ።',
   'Other ways to get support': 'ሌሎች የድጋፍ መንገዶች',
   'Find someone to talk to': 'የሚያናግሩት ሰው ያግኙ',

@@ -650,10 +650,10 @@ class _DayStripState extends State<_DayStrip> {
             label: trDate('EEEE d MMMM', d),
             excludeSemantics: true,
             child: Material(
-              color: sel ? FriendColors.ink : FriendColors.surface,
+              color: sel ? FriendColors.selected : FriendColors.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(FriendRadii.medium),
-                side: BorderSide(color: sel ? FriendColors.ink : FriendColors.border),
+                side: BorderSide(color: sel ? FriendColors.selected : FriendColors.border),
               ),
               child: InkWell(
                 onTap: () => widget.onChanged(d),
@@ -740,10 +740,10 @@ class _TimeChip extends StatelessWidget {
       selected: selected,
       button: true,
       child: Material(
-        color: selected ? FriendColors.ink : FriendColors.surface,
+        color: selected ? FriendColors.selected : FriendColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FriendRadii.medium),
-          side: BorderSide(color: selected ? FriendColors.ink : FriendColors.border),
+          side: BorderSide(color: selected ? FriendColors.selected : FriendColors.border),
         ),
         child: InkWell(
           onTap: onTap,

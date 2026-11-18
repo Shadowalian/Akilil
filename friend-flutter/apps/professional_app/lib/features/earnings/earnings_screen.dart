@@ -8,19 +8,27 @@ import 'package:core/core.dart';
 
 /// Earnings: what is available to withdraw, where it came from, twelve
 /// weeks of bookings as bars, payouts, and a payout request.
-final _earningsProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+final _earningsProvider = FutureProvider.autoDispose<Map<String, dynamic>>((
+  ref,
+) async {
   final dio = ref.read(dioProvider);
-  final res = await dio.get<Map<String, dynamic>>('/professional/earnings/summary', queryParameters: {
-    'days': 84, // 12 weeks
-  });
+  final res = await dio.get<Map<String, dynamic>>(
+    '/professional/earnings/summary',
+    queryParameters: {
+      'days': 84, // 12 weeks
+    },
+  );
   return res.data ?? const {};
 });
 
-final _payoutsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  final dio = ref.read(dioProvider);
-  final res = await dio.get<Map<String, dynamic>>('/professional/payouts');
-  return ((res.data?['data'] as List?) ?? const []).cast<Map<String, dynamic>>();
-});
+final _payoutsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>(
+  (ref) async {
+    final dio = ref.read(dioProvider);
+    final res = await dio.get<Map<String, dynamic>>('/professional/payouts');
+    return ((res.data?['data'] as List?) ?? const [])
+        .cast<Map<String, dynamic>>();
+  },
+);
 
 class EarningsScreen extends ConsumerWidget {
   const EarningsScreen({super.key});
@@ -41,22 +49,47 @@ class EarningsScreen extends ConsumerWidget {
         },
         child: FriendContentWidth(
           child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-            padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 8, FriendLayout.horizontal, 32),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: const EdgeInsets.fromLTRB(
+              FriendLayout.horizontal,
+              8,
+              FriendLayout.horizontal,
+              32,
+            ),
             children: [
               earningsAsync.when(
                 loading: () => const _LoadingCard(),
-                error: (e, _) => CandyCard(child: Text(tr("Couldn't load earnings."), style: theme.textTheme.bodyMedium)),
+                error: (e, _) => CandyCard(
+                  child: Text(
+                    tr("Couldn't load earnings."),
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
                 data: (data) => _EarningsCard(data: data),
               ),
               const SizedBox(height: FriendLayout.sectionGap),
               FriendSectionLabel(tr('Recent payouts')),
               payoutsAsync.when(
                 loading: () => const SizedBox(height: 80),
-                error: (e, _) => Text(tr("Couldn't load payouts."), style: theme.textTheme.bodySmall),
+                error: (e, _) => Text(
+                  tr("Couldn't load payouts."),
+                  style: theme.textTheme.bodySmall,
+                ),
                 data: (list) => list.isEmpty
-                    ? CandyCard(child: Text(tr('No payouts yet.'), style: theme.textTheme.bodySmall))
-                    : FriendListGroup(dividerIndent: 16, children: [for (final p in list) _PayoutTile(payout: p)]),
+                    ? CandyCard(
+                        child: Text(
+                          tr('No payouts yet.'),
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      )
+                    : FriendListGroup(
+                        dividerIndent: 16,
+                        children: [
+                          for (final p in list) _PayoutTile(payout: p),
+                        ],
+                      ),
               ),
             ],
           ),
@@ -69,20 +102,26 @@ class EarningsScreen extends ConsumerWidget {
 /// Asks how much to withdraw (prefilled with everything available) and
 /// sends the request. The server checks it against the real balance.
 class _RequestPayoutButton extends ConsumerStatefulWidget {
-  const _RequestPayoutButton({required this.availableCents, required this.currency});
+  const _RequestPayoutButton({
+    required this.availableCents,
+    required this.currency,
+  });
 
   final int availableCents;
   final String currency;
 
   @override
-  ConsumerState<_RequestPayoutButton> createState() => _RequestPayoutButtonState();
+  ConsumerState<_RequestPayoutButton> createState() =>
+      _RequestPayoutButtonState();
 }
 
 class _RequestPayoutButtonState extends ConsumerState<_RequestPayoutButton> {
   bool _busy = false;
 
   Future<void> _request() async {
-    final ctrl = TextEditingController(text: (widget.availableCents / 100).floor().toString());
+    final ctrl = TextEditingController(
+      text: (widget.availableCents / 100).floor().toString(),
+    );
     final amount = await showDialog<int>(
       context: context,
       builder: (c) => AlertDialog(
@@ -91,13 +130,24 @@ class _RequestPayoutButtonState extends ConsumerState<_RequestPayoutButton> {
           controller: ctrl,
           autofocus: true,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: trx('Amount (${widget.currency})', 'መጠን (${widget.currency})')),
+          decoration: InputDecoration(
+            labelText: trx(
+              'Amount (${widget.currency})',
+              'መጠን (${widget.currency})',
+            ),
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c), child: Text(tr('Cancel'))),
+          TextButton(
+            onPressed: () => Navigator.pop(c),
+            child: Text(tr('Cancel')),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(minimumSize: const Size(0, 44)),
-            onPressed: () => Navigator.pop(c, ((double.tryParse(ctrl.text.trim()) ?? 0) * 100).round()),
+            onPressed: () => Navigator.pop(
+              c,
+              ((double.tryParse(ctrl.text.trim()) ?? 0) * 100).round(),
+            ),
             child: Text(tr('Request')),
           ),
         ],
@@ -108,11 +158,15 @@ class _RequestPayoutButtonState extends ConsumerState<_RequestPayoutButton> {
     String message = tr('Payout request submitted for review.');
     var ok = true;
     try {
-      await ref.read(dioProvider).post('/professional/payouts', data: {'amount_cents': amount});
+      await ref
+          .read(dioProvider)
+          .post('/professional/payouts', data: {'amount_cents': amount});
     } on DioException catch (e) {
       ok = false;
       final data = e.response?.data;
-      message = data is Map && data['message'] is String ? data['message'] as String : tr("Couldn't request a payout.");
+      message = data is Map && data['message'] is String
+          ? data['message'] as String
+          : tr("Couldn't request a payout.");
     } catch (_) {
       ok = false;
       message = tr("Couldn't request a payout.");
@@ -123,24 +177,48 @@ class _RequestPayoutButtonState extends ConsumerState<_RequestPayoutButton> {
       ref.invalidate(_payoutsProvider);
       ref.invalidate(_earningsProvider);
     }
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
-  Widget build(BuildContext context) => FriendGlowButton(
-        label: tr('Request payout'),
-        expanded: true,
-        busy: _busy,
-        onPressed: widget.availableCents > 0 ? _request : null,
-      );
+  Widget build(BuildContext context) => SizedBox(
+    width: double.infinity,
+    child: FilledButton(
+      style: FilledButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: FriendColors.primary,
+        disabledBackgroundColor: Colors.white.withValues(alpha: 0.4),
+        disabledForegroundColor: Colors.white,
+      ),
+      onPressed: widget.availableCents > 0 && !_busy ? _request : null,
+      child: _busy
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Text(tr('Request payout')),
+    ),
+  );
 }
 
 class _LoadingCard extends StatelessWidget {
   const _LoadingCard();
   @override
   Widget build(BuildContext context) => const CandyCard(
-        child: SizedBox(height: 200, child: Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2)))),
-      );
+    child: SizedBox(
+      height: 200,
+      child: Center(
+        child: SizedBox(
+          width: 22,
+          height: 22,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    ),
+  );
 }
 
 class _EarningsCard extends StatelessWidget {
@@ -154,88 +232,152 @@ class _EarningsCard extends StatelessWidget {
     final available = (data['available_cents'] as num? ?? 0).toInt();
     final currency = data['currency'] as String? ?? 'ETB';
     final bySource = (data['by_source'] as Map?) ?? const {};
-    final series = (data['series'] as List? ?? const []).cast<Map<String, dynamic>>();
+    final series = (data['series'] as List? ?? const [])
+        .cast<Map<String, dynamic>>();
 
     // Twelve weekly totals, oldest first.
     final weeks = List<double>.filled(12, 0);
     for (var i = 0; i < series.length; i++) {
-      final bucket = (i * 12 ~/ (series.isEmpty ? 1 : series.length)).clamp(0, 11);
+      final bucket = (i * 12 ~/ (series.isEmpty ? 1 : series.length)).clamp(
+        0,
+        11,
+      );
       weeks[bucket] += ((series[i]['cents'] as num?)?.toDouble() ?? 0) / 100;
     }
     final maxWeek = weeks.fold<double>(0, (a, b) => b > a ? b : a);
 
     Widget source(String label, Object? cents) => Row(
-          children: [
-            Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
-            Text(formatMoney(cents as num?, currency), style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textPrimary, fontFeatures: friendTabular)),
-          ],
-        );
+      children: [
+        Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
+        Text(
+          formatMoney(cents as num?, currency),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: FriendColors.textPrimary,
+            fontFeatures: friendTabular,
+          ),
+        ),
+      ],
+    );
 
-    return CandyCard(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(tr('Available to withdraw'), style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textMuted)),
-          const SizedBox(height: 4),
-          Text(formatMoney(available, currency), style: theme.textTheme.displaySmall?.copyWith(fontFeatures: friendTabular)),
-          const SizedBox(height: 4),
-          Text(tr('After the platform fee'), style: theme.textTheme.labelSmall),
-          const SizedBox(height: 20),
-          source(tr('Sessions'), bySource['sessions']),
-          const SizedBox(height: 6),
-          source(tr('Groups'), bySource['groups']),
-          const SizedBox(height: 6),
-          source(tr('Gifts'), bySource['gifts']),
-          const Divider(height: 32),
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        FriendGradientCard(
+          gradient: FriendGradients.sunrise,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(child: Text(tr('Booked, last 12 weeks'), style: theme.textTheme.titleSmall)),
-              Text(formatMoney(totalCents, currency), style: theme.textTheme.titleSmall?.copyWith(fontFeatures: friendTabular)),
+              Text(
+                tr('Available to withdraw'),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.9),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                formatMoney(available, currency),
+                style: theme.textTheme.displaySmall?.copyWith(
+                  color: Colors.white,
+                  fontFeatures: friendTabular,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                tr('After the platform fee'),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+              ),
+              const SizedBox(height: 18),
+              _RequestPayoutButton(
+                availableCents: available,
+                currency: currency,
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 120,
-            child: maxWeek <= 0
-                ? Center(child: Text(tr('Nothing booked in this period yet.'), style: theme.textTheme.bodySmall))
-                : BarChart(
-                    BarChartData(
-                      maxY: maxWeek * 1.15,
-                      alignment: BarChartAlignment.spaceBetween,
-                      barTouchData: BarTouchData(enabled: false),
-                      titlesData: const FlTitlesData(show: false),
-                      gridData: const FlGridData(show: false),
-                      borderData: FlBorderData(show: false),
-                      barGroups: [
-                        for (var i = 0; i < 12; i++)
-                          BarChartGroupData(
-                            x: i,
-                            barRods: [
-                              BarChartRodData(
-                                toY: weeks[i] <= 0 ? maxWeek * 0.02 : weeks[i],
-                                width: 14,
-                                color: weeks[i] <= 0 ? FriendColors.recessed : (i == 11 ? FriendColors.primary : FriendColors.primaryContainer),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ],
-                          ),
-                      ],
+        ),
+        const SizedBox(height: 12),
+        CandyCard(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              source(tr('Sessions'), bySource['sessions']),
+              const SizedBox(height: 6),
+              source(tr('Groups'), bySource['groups']),
+              const SizedBox(height: 6),
+              source(tr('Gifts'), bySource['gifts']),
+              const Divider(height: 32),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      tr('Booked, last 12 weeks'),
+                      style: theme.textTheme.titleSmall,
                     ),
                   ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Text(tr('12 weeks ago'), style: theme.textTheme.labelSmall),
-              const Spacer(),
-              Text(tr('This week'), style: theme.textTheme.labelSmall),
+                  Text(
+                    formatMoney(totalCents, currency),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontFeatures: friendTabular,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 120,
+                child: maxWeek <= 0
+                    ? Center(
+                        child: Text(
+                          tr('Nothing booked in this period yet.'),
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      )
+                    : BarChart(
+                        BarChartData(
+                          maxY: maxWeek * 1.15,
+                          alignment: BarChartAlignment.spaceBetween,
+                          barTouchData: BarTouchData(enabled: false),
+                          titlesData: const FlTitlesData(show: false),
+                          gridData: const FlGridData(show: false),
+                          borderData: FlBorderData(show: false),
+                          barGroups: [
+                            for (var i = 0; i < 12; i++)
+                              BarChartGroupData(
+                                x: i,
+                                barRods: [
+                                  BarChartRodData(
+                                    toY: weeks[i] <= 0
+                                        ? maxWeek * 0.02
+                                        : weeks[i],
+                                    width: 14,
+                                    color: weeks[i] <= 0
+                                        ? FriendColors.recessed
+                                        : (i == 11
+                                              ? FriendColors.orange
+                                              : FriendColors.aqua),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Text(tr('12 weeks ago'), style: theme.textTheme.labelSmall),
+                  const Spacer(),
+                  Text(tr('This week'), style: theme.textTheme.labelSmall),
+                ],
+              ),
             ],
           ),
-          const SizedBox(height: 20),
-          _RequestPayoutButton(availableCents: available, currency: currency),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -265,8 +407,17 @@ class _PayoutTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(formatMoney(cents, currency), style: theme.textTheme.titleSmall?.copyWith(fontFeatures: friendTabular)),
-                if (createdAt != null) Text(trDate('d MMM y', createdAt.toLocal()), style: theme.textTheme.bodySmall),
+                Text(
+                  formatMoney(cents, currency),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontFeatures: friendTabular,
+                  ),
+                ),
+                if (createdAt != null)
+                  Text(
+                    trDate('d MMM y', createdAt.toLocal()),
+                    style: theme.textTheme.bodySmall,
+                  ),
               ],
             ),
           ),

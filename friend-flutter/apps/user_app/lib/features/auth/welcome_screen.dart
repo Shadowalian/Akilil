@@ -8,7 +8,6 @@ import '../../l10n/app_locale.dart';
 import '../../l10n/language_toggle.dart';
 import '../../l10n/tr.dart';
 import '../../router.dart';
-import '../brand/brand_assets.dart';
 
 /// First screen. Says what Akilil is in one line, shows the three kinds of
 /// people you can reach, and offers one clear way in.
@@ -28,86 +27,113 @@ class WelcomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      body: SafeArea(
-        child: FriendContentWidth(
-          maxWidth: 480,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    BrandAssets.logo(),
-                    const Spacer(),
-                    const LanguageToggle(compact: true),
-                  ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          DecoratedBox(
+            decoration: const BoxDecoration(
+              gradient: FriendGradients.sunrise,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: FriendContentWidth(
+                maxWidth: 480,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const AkililMark(size: 26, ring: Colors.white, core: FriendColors.accent),
+                          const SizedBox(width: 8),
+                          Text(tr('Akilil'), style: theme.textTheme.titleMedium?.copyWith(color: Colors.white)),
+                          const Spacer(),
+                          const LanguageToggle(compact: true),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
+                      Semantics(
+                        header: true,
+                        child: Text(s.welcomeHeadline, style: theme.textTheme.displayMedium?.copyWith(color: Colors.white)),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        s.welcomeSubtitle,
+                        style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.92)),
+                      ),
+                    ],
+                  ),
                 ),
-                const Spacer(flex: 2),
-                Align(alignment: AlignmentDirectional.centerStart, child: BrandAssets.mark(size: 48)),
-                const SizedBox(height: 28),
-                Semantics(
-                  header: true,
-                  child: Text(s.welcomeHeadline, style: theme.textTheme.displayMedium),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  s.welcomeSubtitle,
-                  style: theme.textTheme.bodyLarge?.copyWith(color: FriendColors.textSecondary),
-                ),
-                const SizedBox(height: 32),
-                for (final (pillar, title, subtitle) in pillars)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      children: [
-                        FriendIconTile(icon: pillar.icon, color: pillar.color, size: 40),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+          ),
+          Expanded(
+            child: SafeArea(
+              top: false,
+              child: FriendContentWidth(
+                maxWidth: 480,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final (pillar, title, subtitle) in pillars)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 18),
+                          child: Row(
                             children: [
-                              Text(title, style: theme.textTheme.titleSmall),
-                              const SizedBox(height: 1),
-                              Text(subtitle, style: theme.textTheme.bodySmall),
+                              FriendIconTile(icon: pillar.icon, color: pillar.color, size: 44),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(title, style: theme.textTheme.titleSmall),
+                                    const SizedBox(height: 1),
+                                    Text(subtitle, style: theme.textTheme.bodySmall),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                const Spacer(flex: 3),
-                Row(
-                  children: [
-                    const Icon(Icons.verified_user_outlined, size: 16, color: FriendColors.textMuted),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '${s.welcomeVerifiedBold} ${s.welcomeVerifiedRest}',
-                        style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textMuted),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          const Icon(Icons.verified_user_rounded, size: 16, color: FriendColors.green),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '${s.welcomeVerifiedBold} ${s.welcomeVerifiedRest}',
+                              style: theme.textTheme.bodySmall,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                FriendGlowButton(
-                  label: s.getStarted,
-                  expanded: true,
-                  onPressed: () => context.go(AppRoutes.onboarding),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 48,
-                  child: TextButton(
-                    onPressed: () => context.go(AppRoutes.login),
-                    style: TextButton.styleFrom(foregroundColor: FriendColors.textPrimary),
-                    child: Text(s.alreadyHaveAccountLink),
+                      const SizedBox(height: 16),
+                      FriendGlowButton(
+                        label: s.getStarted,
+                        expanded: true,
+                        onPressed: () => context.go(AppRoutes.onboarding),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 48,
+                        child: TextButton(
+                          onPressed: () => context.go(AppRoutes.login),
+                          style: TextButton.styleFrom(foregroundColor: FriendColors.textPrimary),
+                          child: Text(s.alreadyHaveAccountLink),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

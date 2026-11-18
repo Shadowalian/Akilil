@@ -12,3 +12,6 @@ Artisan::command('inspire', function () {
 Schedule::command('friend:vents:purge-expired')
     ->everyFiveMinutes()
     ->withoutOverlapping();
+
+// Drop expired API tokens (lifetime set by SANCTUM_TOKEN_LIFETIME_MINUTES).
+Schedule::command('sanctum:prune-expired --hours=24')->daily();

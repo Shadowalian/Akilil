@@ -13,7 +13,10 @@ return [
      * "test call" endpoint). Never enable in production: real
      * professionals must pass credential review before taking clients.
      */
-    'demo_mode' => (bool) env('AKILIL_DEMO_MODE', false),
+    'demo_mode' => (bool) env('AKILIL_DEMO_MODE', false) && env('APP_ENV') !== 'production',
+
+    // Development only: use the test payment gateway even if keys exist.
+    'payment_fake' => env('FRIEND_PAYMENT_FAKE') === '1',
 
     /* ---- Age & family ---------------------------------------------- */
 

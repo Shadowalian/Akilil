@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    // Card payments. Leave empty until a provider is live: production then
+    // refuses payments rather than faking them.
+    'stripe' => [
+        'key' => env('STRIPE_KEY', ''),
+        'secret' => env('STRIPE_SECRET', ''),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET', ''),
+    ],
+
 ];

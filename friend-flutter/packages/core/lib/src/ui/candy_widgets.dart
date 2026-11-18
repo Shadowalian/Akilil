@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/design_tokens.dart';
-import '../util/i18n.dart';
 
 // ─── Canvas ─────────────────────────────────────────────────────────────────
 
@@ -294,7 +293,7 @@ typedef FriendCard = CandyCard;
 /// A group of rows inside one card, separated by inset hairlines —
 /// the pattern used for settings, menus and detail lists.
 class FriendListGroup extends StatelessWidget {
-  const FriendListGroup({super.key, required this.children, this.dividerIndent = 56});
+  const FriendListGroup({super.key, required this.children, this.dividerIndent = 64});
 
   final List<Widget> children;
   final double dividerIndent;
@@ -346,6 +345,7 @@ class FriendMenuTile extends StatelessWidget {
     this.onTap,
     this.trailing,
     this.destructive = false,
+    this.color,
   });
 
   final IconData icon;
@@ -354,6 +354,10 @@ class FriendMenuTile extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget? trailing;
   final bool destructive;
+
+  /// Icon colour. When omitted, one of the cheerful colours is picked from
+  /// the icon, so the same row is always the same colour.
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -367,8 +371,15 @@ class FriendMenuTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              Icon(icon, size: 22, color: destructive ? FriendColors.error : FriendColors.textSecondary),
-              const SizedBox(width: 18),
+              FriendIconTile(
+                icon: icon,
+                size: 34,
+                soft: true,
+                color: destructive
+                    ? FriendColors.error
+                    : color ?? FriendColors.vivid[icon.codePoint % FriendColors.vivid.length],
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,8 +418,8 @@ class FriendIconChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final button = Material(
-      color: filled ? FriendColors.ink : FriendColors.surface,
-      shape: CircleBorder(side: BorderSide(color: filled ? FriendColors.ink : FriendColors.border)),
+      color: filled ? FriendColors.selected : FriendColors.surface,
+      shape: CircleBorder(side: BorderSide(color: filled ? FriendColors.selected : FriendColors.border)),
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onPressed,
@@ -479,13 +490,26 @@ class FriendGlowButton extends StatelessWidget {
             style: OutlinedButton.styleFrom(minimumSize: size, foregroundColor: fg),
             child: content,
           )
-        : FilledButton(
-            onPressed: enabled ? tap : null,
-            style: FilledButton.styleFrom(
-              minimumSize: size,
-              disabledBackgroundColor: busy ? FriendColors.primary : null,
+        : DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: enabled || busy ? FriendGradients.action : null,
+              color: enabled || busy ? null : FriendColors.recessed,
+              borderRadius: BorderRadius.circular(FriendRadii.medium),
+              boxShadow: enabled
+                  ? const [BoxShadow(color: Color(0x40F26A1B), blurRadius: 14, offset: Offset(0, 6))]
+                  : null,
             ),
-            child: content,
+            child: FilledButton(
+              onPressed: enabled ? tap : null,
+              style: FilledButton.styleFrom(
+                minimumSize: size,
+                backgroundColor: Colors.transparent,
+                disabledBackgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                disabledForegroundColor: busy ? Colors.white : FriendColors.textMuted,
+              ),
+              child: content,
+            ),
           );
 
     return _Pressable(onTap: enabled ? tap : null, child: button);
@@ -540,11 +564,12 @@ class FriendAvatar extends StatelessWidget {
   final bool verified;
 
   static const _tones = [
-    (Color(0xFFE6EFEE), Color(0xFF0D5C63)),
-    (Color(0xFFEFECF4), Color(0xFF55477A)),
-    (Color(0xFFF7EEDF), Color(0xFF8A5517)),
-    (Color(0xFFF7EAE2), Color(0xFF8F4524)),
-    (Color(0xFFE5F2EA), Color(0xFF2F6B47)),
+    (Color(0xFFFFEDD5), Color(0xFFC2410C)), // orange
+    (Color(0xFFD9F6F9), Color(0xFF0E7C8C)), // aqua
+    (Color(0xFFEDE7FC), Color(0xFF5B3FB8)), // lavender
+    (Color(0xFFDCFCE7), Color(0xFF15803D)), // green
+    (Color(0xFFFEF3C7), Color(0xFF92400E)), // sunny
+    (Color(0xFFFCE7F3), Color(0xFFBE185D)), // pink
   ];
 
   @override
@@ -652,24 +677,79 @@ class FriendFeatureTile extends StatelessWidget {
   }
 }
 
-/// A rounded square holding an icon, tinted by [color].
+/// A rounded square holding an icon in solid, cheerful colour. Light
+/// colours (yellow, amber) get a dark icon so it stays visible.
 class FriendIconTile extends StatelessWidget {
-  const FriendIconTile({super.key, required this.icon, this.color = FriendColors.primary, this.size = 40});
+  const FriendIconTile({super.key, required this.icon, this.color = FriendColors.orange, this.size = 40, this.soft = false});
 
   final IconData icon;
   final Color color;
   final double size;
 
+  /// A pale tint with a coloured icon, for quieter places.
+  final bool soft;
+
   @override
   Widget build(BuildContext context) {
+    final light = color.computeLuminance() > 0.45;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: Color.alphaBlend(color.withValues(alpha: 0.1), FriendColors.surface),
-        borderRadius: BorderRadius.circular(size * 0.28),
+        color: soft ? Color.alphaBlend(color.withValues(alpha: 0.14), FriendColors.surface) : color,
+        borderRadius: BorderRadius.circular(size * 0.3),
       ),
-      child: Icon(icon, size: size * 0.5, color: color),
+      child: Icon(
+        icon,
+        size: size * 0.52,
+        color: soft ? Color.alphaBlend(FriendColors.ink.withValues(alpha: 0.15), color) : (light ? FriendColors.ink : Colors.white),
+      ),
+    );
+  }
+}
+
+/// Hero surface with a gradient and white text, for the one thing on a
+/// screen that matters most (the next session, a balance, a welcome).
+class FriendGradientCard extends StatelessWidget {
+  const FriendGradientCard({
+    super.key,
+    required this.child,
+    this.gradient = FriendGradients.calm,
+    this.onTap,
+    this.padding = const EdgeInsets.all(20),
+  });
+
+  final Widget child;
+  final Gradient gradient;
+  final VoidCallback? onTap;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(FriendRadii.xl);
+    return _Pressable(
+      onTap: onTap,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: radius,
+          boxShadow: const [BoxShadow(color: Color(0x261F2A37), blurRadius: 18, offset: Offset(0, 8))],
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: radius,
+            child: Padding(
+              padding: padding,
+              child: DefaultTextStyle.merge(
+                style: const TextStyle(color: Colors.white),
+                child: IconTheme.merge(data: const IconThemeData(color: Colors.white), child: child),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -893,7 +973,6 @@ class _DockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = selected ? FriendColors.textPrimary : FriendColors.textMuted;
     return Semantics(
       selected: selected,
       button: true,
@@ -905,16 +984,22 @@ class _DockButton extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 160),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              width: selected ? 52 : 36,
+              height: 30,
+              decoration: BoxDecoration(
+                color: selected ? FriendColors.primaryLight : Colors.transparent,
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: Icon(
                 selected ? item.selectedIcon : item.icon,
-                key: ValueKey(selected),
-                size: 23,
-                color: selected ? FriendColors.primary : fg,
+                size: 22,
+                color: selected ? FriendColors.primary : FriendColors.textMuted,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Text(
               item.label,
               maxLines: 1,
@@ -923,7 +1008,7 @@ class _DockButton extends StatelessWidget {
                 fontSize: FriendTypeScale.micro,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 height: 1.1,
-                color: fg,
+                color: selected ? FriendColors.primary : FriendColors.textMuted,
               ),
             ),
           ],

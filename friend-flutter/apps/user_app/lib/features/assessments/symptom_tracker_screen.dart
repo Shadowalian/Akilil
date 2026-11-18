@@ -59,12 +59,12 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
     if (type == 'gad7') {
       if (score <= 4) return (tr('Minimal Anxiety'), tr('Your symptoms reflect minimal nervous tension.'), FriendColors.green);
       if (score <= 9) return (tr('Mild Anxiety'), tr('Mild anxiety. Breathing exercises and thought records can help.'), FriendColors.primaryDeep);
-      if (score <= 14) return (tr('Moderate Anxiety'), tr('Moderate anxiety. Talking with a professional regularly is likely to help.'), FriendColors.accent);
+      if (score <= 14) return (tr('Moderate Anxiety'), tr('Moderate anxiety. Talking with a professional regularly is likely to help.'), FriendColors.warning);
       return (tr('Severe Anxiety'), tr('Severe anxiety. Please book a session with a licensed professional soon.'), FriendColors.error);
     } else {
       if (score <= 4) return (tr('Minimal Depression'), tr('No significant depressive patterns indicated.'), FriendColors.green);
       if (score <= 9) return (tr('Mild Depression'), tr('Mild low mood. Daily physical movement and gratitude logging can help lift energy.'), FriendColors.primaryDeep);
-      if (score <= 14) return (tr('Moderate Depression'), tr('Moderate depression symptoms. Continued regular counseling sessions recommended.'), FriendColors.accent);
+      if (score <= 14) return (tr('Moderate Depression'), tr('Moderate depression symptoms. Continued regular counseling sessions recommended.'), FriendColors.warning);
       if (score <= 19) return (tr('Moderately Severe'), tr('Moderately severe. Please book a session with a licensed professional.'), FriendColors.accentDeep);
       return (tr('Severe Depression'), tr('Severe. Please speak with a licensed professional as soon as you can.'), FriendColors.error);
     }

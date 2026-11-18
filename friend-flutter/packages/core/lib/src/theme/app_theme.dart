@@ -19,9 +19,9 @@ class FriendAppTheme {
       onPrimary: FriendColors.onPrimary,
       primaryContainer: FriendColors.primaryLight,
       onPrimaryContainer: FriendColors.onPrimaryContainer,
-      secondary: FriendColors.primary,
+      secondary: FriendColors.aqua,
       onSecondary: FriendColors.onPrimary,
-      secondaryContainer: FriendColors.primaryLight,
+      secondaryContainer: FriendColors.aquaLight,
       onSecondaryContainer: FriendColors.onPrimaryContainer,
       tertiary: FriendColors.accent,
       onTertiary: FriendColors.onAccent,
@@ -43,7 +43,7 @@ class FriendAppTheme {
       scrim: Color(0x6617191C),
       inverseSurface: FriendColors.ink,
       onInverseSurface: Colors.white,
-      inversePrimary: Color(0xFF8FC9CD),
+      inversePrimary: FriendColors.orange,
       surfaceTint: Colors.transparent,
     );
     return _build(cs);
@@ -190,7 +190,7 @@ class FriendAppTheme {
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: FriendColors.ink,
+          backgroundColor: FriendColors.selected,
           foregroundColor: Colors.white,
           disabledBackgroundColor: FriendColors.recessed,
           disabledForegroundColor: FriendColors.textMuted,
@@ -233,7 +233,7 @@ class FriendAppTheme {
       ),
 
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: FriendColors.ink,
+        backgroundColor: FriendColors.selected,
         foregroundColor: Colors.white,
         elevation: 2,
         focusElevation: 2,
@@ -282,13 +282,13 @@ class FriendAppTheme {
 
       chipTheme: ChipThemeData(
         backgroundColor: FriendColors.surface,
-        selectedColor: FriendColors.ink,
-        secondarySelectedColor: FriendColors.ink,
+        selectedColor: FriendColors.selected,
+        secondarySelectedColor: FriendColors.selected,
         disabledColor: FriendColors.recessed,
         checkmarkColor: Colors.white,
         showCheckmark: false,
         side: WidgetStateBorderSide.resolveWith((s) => BorderSide(
-              color: s.contains(WidgetState.selected) ? FriendColors.ink : FriendColors.borderStrong,
+              color: s.contains(WidgetState.selected) ? FriendColors.selected : FriendColors.borderStrong,
             )),
         shape: const StadiumBorder(),
         // Selected chips are ink, so their label must flip to white.
@@ -301,14 +301,14 @@ class FriendAppTheme {
         labelPadding: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         color: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? FriendColors.ink : FriendColors.surface),
+            s.contains(WidgetState.selected) ? FriendColors.selected : FriendColors.surface),
         iconTheme: const IconThemeData(size: 16),
       ),
 
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith((s) =>
-              s.contains(WidgetState.selected) ? FriendColors.ink : FriendColors.surface),
+              s.contains(WidgetState.selected) ? FriendColors.selected : FriendColors.surface),
           foregroundColor: WidgetStateProperty.resolveWith((s) =>
               s.contains(WidgetState.selected) ? Colors.white : FriendColors.textPrimary),
           side: const WidgetStatePropertyAll(BorderSide(color: FriendColors.borderStrong)),
@@ -322,7 +322,7 @@ class FriendAppTheme {
       switchTheme: SwitchThemeData(
         thumbColor: const WidgetStatePropertyAll(Colors.white),
         trackColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? FriendColors.primary : FriendColors.surfaceVariant),
+            s.contains(WidgetState.selected) ? FriendColors.green : FriendColors.surfaceVariant),
         trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
         thumbIcon: const WidgetStatePropertyAll(null),
       ),
@@ -362,7 +362,7 @@ class FriendAppTheme {
         unselectedLabelColor: FriendColors.textMuted,
         labelStyle: text.titleSmall,
         unselectedLabelStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w500),
-        indicatorColor: FriendColors.ink,
+        indicatorColor: FriendColors.selected,
         indicatorSize: TabBarIndicatorSize.label,
         dividerColor: FriendColors.divider,
         overlayColor: const WidgetStatePropertyAll(Colors.transparent),
@@ -372,7 +372,7 @@ class FriendAppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: FriendColors.ink,
         contentTextStyle: text.bodyMedium?.copyWith(color: Colors.white),
-        actionTextColor: const Color(0xFF8FC9CD),
+        actionTextColor: FriendColors.accent,
         elevation: 0,
         insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         shape: RoundedRectangleBorder(borderRadius: controlRadius),

@@ -72,7 +72,10 @@ class WalletController extends Controller
      */
     public function fakeConfirm(Request $request, string $reference): JsonResponse
     {
-        if (! config('app.debug')) {
+        // Only on a developer machine or in tests, and only while the fake
+        // gateway is the one in use. Debug mode alone is not enough.
+        if (! app()->environment(['local', 'testing'])
+            || ! app(\App\Services\Payments\PaymentGateway::class) instanceof \App\Services\Payments\FakeGateway) {
             abort(404);
         }
         $tx = $this->wallets->completeTopup($reference, [

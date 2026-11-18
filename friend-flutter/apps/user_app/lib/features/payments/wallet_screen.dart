@@ -253,36 +253,28 @@ class _BalanceHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    final theme = Theme.of(context);
+    return FriendGradientCard(
+      gradient: FriendGradients.sunrise,
       padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: FriendColors.surface,
-        borderRadius: BorderRadius.circular(FriendRadii.medium),
-        border: Border.all(color: FriendColors.border),
-        boxShadow: FriendElevation.card,
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textSecondary),
+          Row(
+            children: [
+              const Icon(Icons.account_balance_wallet_rounded, size: 18),
+              const SizedBox(width: 8),
+              Text(label, style: theme.textTheme.labelMedium?.copyWith(color: Colors.white.withValues(alpha: 0.9))),
+            ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(
-                amount,
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: FriendColors.textPrimary),
-              ),
+              Text(amount, style: theme.textTheme.displayMedium?.copyWith(color: Colors.white, fontFeatures: friendTabular)),
               const SizedBox(width: 8),
-              Text(
-                currency,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textSecondary),
-              ),
+              Text(currency, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white.withValues(alpha: 0.9))),
             ],
           ),
         ],
@@ -292,11 +284,7 @@ class _BalanceHero extends StatelessWidget {
 }
 
 class _AmountChip extends StatelessWidget {
-  const _AmountChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+  const _AmountChip({required this.label, required this.selected, required this.onTap});
 
   final String label;
   final bool selected;
@@ -304,27 +292,7 @@ class _AmountChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: selected ? FriendColors.primaryLight : FriendColors.surface,
-      borderRadius: BorderRadius.circular(FriendRadii.pill),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(FriendRadii.pill),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(FriendRadii.pill),
-            border: Border.all(
-              color: selected ? FriendColors.primary : FriendColors.border,
-            ),
-          ),
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: selected ? FriendColors.primaryDeep : FriendColors.textSecondary),
-          ),
-        ),
-      ),
-    );
+    return FriendStitchFilterPill(label: label, selected: selected, onTap: onTap);
   }
 }
 

@@ -226,7 +226,7 @@ class ExploreRevolveCards extends ConsumerWidget {
     final items = [
       (Icons.groups_outlined, s.community, s.circlesVents, FriendColors.primary,
           '/community'),
-      (Icons.edit_note_outlined, s.journal, s.privateNotes, FriendColors.accent,
+      (Icons.edit_note_outlined, s.journal, s.privateNotes, FriendColors.accentDeep,
           '/journal'),
       (Icons.account_balance_wallet_outlined, s.wallet, s.balanceTopUps,
           FriendColors.wood, '/wallet'),

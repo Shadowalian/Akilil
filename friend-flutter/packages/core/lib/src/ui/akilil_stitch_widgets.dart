@@ -399,10 +399,10 @@ class FriendStitchFilterPill extends StatelessWidget {
       selected: selected,
       button: true,
       child: Material(
-        color: selected ? FriendColors.ink : FriendColors.surface,
+        color: selected ? FriendColors.selected : FriendColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: radius,
-          side: BorderSide(color: selected ? FriendColors.ink : FriendColors.borderStrong),
+          side: BorderSide(color: selected ? FriendColors.selected : FriendColors.borderStrong),
         ),
         child: InkWell(
           onTap: () {

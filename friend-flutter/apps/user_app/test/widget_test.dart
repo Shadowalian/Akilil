@@ -29,12 +29,12 @@ void main() {
     expect(formatMoney(0), '0');
   });
 
-  test('selected chips have a white label on the ink fill', () {
+  test('selected chips have a white label on the aqua fill', () {
     final theme = FriendAppTheme.light().chipTheme;
     final color = theme.labelStyle!.color;
     expect(color, isA<WidgetStateColor>());
     final resolved = (color! as WidgetStateColor).resolve({WidgetState.selected});
     expect(resolved, Colors.white);
-    expect(theme.color!.resolve({WidgetState.selected}), FriendColors.ink);
+    expect(theme.color!.resolve({WidgetState.selected}), FriendColors.selected);
   });
 }
