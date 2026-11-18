@@ -60,7 +60,7 @@ class PayoutController extends Controller
         $payout = Payout::create([
             'professional_user_id' => $user->id,
             'amount_cents'         => (int) $request->input('amount_cents'),
-            'currency'             => $user->professionalProfile?->currency ?: 'USD',
+            'currency'             => $user->professionalProfile?->currency ?: config('akilil.currency'),
             'platform_fee_cents'   => 0,
             'status'               => 'scheduled',
             'gateway'              => null,

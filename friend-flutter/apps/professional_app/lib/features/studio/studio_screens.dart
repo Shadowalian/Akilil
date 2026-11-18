@@ -1,9 +1,9 @@
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 void _toast(BuildContext context, String message) =>
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
@@ -34,27 +34,27 @@ class RecipesScreen extends ConsumerWidget {
     final async = ref.watch(myRecipesProvider);
     return Scaffold(
       backgroundColor: FriendColors.background,
-      appBar: AppBar(title: const Text('My recipes')),
+      appBar: AppBar(title: Text(tr('My recipes'))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           await context.push('/recipes/new');
           ref.invalidate(myRecipesProvider);
         },
         icon: const Icon(Icons.add_rounded),
-        label: const Text('New recipe'),
+        label: Text(tr('New recipe')),
       ),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => FriendEmptyState(
           icon: Icons.restaurant_menu_rounded,
-          title: 'Recipes are for chefs',
+          title: tr('Recipes are for chefs'),
           message: e is DioException ? apiErrorMessage(e.response?.data) : null,
         ),
         data: (list) => list.isEmpty
-            ? const FriendEmptyState(
+            ? FriendEmptyState(
                 icon: Icons.restaurant_menu_rounded,
-                title: 'No recipes yet',
-                message: 'Clients need a published recipe to book you, so they can shop before cooking with you.',
+                title: tr('No recipes yet'),
+                message: tr('Clients need a published recipe to book you, so they can shop before cooking with you.'),
               )
             : ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
@@ -208,12 +208,12 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
         await _dio.put('/recipes/${widget.recipeId}', data: payload);
       }
       if (!mounted) return;
-      _toast(context, publish ? 'Published' : 'Saved');
+      _toast(context, publish ? 'Published' : tr('Saved'));
       context.pop();
     } on DioException catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      _toast(context, apiErrorMessage(e.response?.data, 'Could not save'));
+      _toast(context, apiErrorMessage(e.response?.data, tr('Could not save')));
     }
   }
 
@@ -231,7 +231,7 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      appBar: AppBar(title: Text(widget.recipeId == null ? 'New recipe' : 'Edit recipe')),
+      appBar: AppBar(title: Text(widget.recipeId == null ? 'New recipe' : tr('Edit recipe'))),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -240,14 +240,14 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: _saving ? null : () => _save(publish: false),
-                  child: Text(_status == 'published' ? 'Save' : 'Save draft'),
+                  child: Text(_status == 'published' ? 'Save' : tr('Save draft')),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: FilledButton(
                   onPressed: _saving ? null : () => _save(publish: true),
-                  child: Text(_status == 'published' ? 'Update' : 'Publish'),
+                  child: Text(_status == 'published' ? 'Update' : tr('Publish')),
                 ),
               ),
             ],
@@ -257,35 +257,35 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          TextField(controller: _title, decoration: const InputDecoration(labelText: 'Dish name')),
+          TextField(controller: _title, decoration: InputDecoration(labelText: tr('Dish name'))),
           const SizedBox(height: 10),
           TextField(
             controller: _description,
             maxLines: 3,
-            decoration: const InputDecoration(labelText: 'What people will learn'),
+            decoration: InputDecoration(labelText: tr('What people will learn')),
           ),
           const SizedBox(height: 10),
           Row(children: [
-            num(_servings, 'Serves'),
+            num(_servings, tr('Serves')),
             const SizedBox(width: 8),
-            num(_prep, 'Prep min'),
+            num(_prep, tr('Prep min')),
             const SizedBox(width: 8),
-            num(_cook, 'Cook min'),
+            num(_cook, tr('Cook min')),
           ]),
           const SizedBox(height: 10),
           TextField(
             controller: _allergens,
-            decoration: const InputDecoration(labelText: 'Allergens (comma separated)', hintText: 'gluten, nuts'),
+            decoration: InputDecoration(labelText: tr('Allergens (comma separated)'), hintText: tr('gluten, nuts')),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _equipment,
-            decoration: const InputDecoration(labelText: 'Equipment (comma separated)', hintText: 'large pot, mitad'),
+            decoration: InputDecoration(labelText: tr('Equipment (comma separated)'), hintText: tr('large pot, mitad')),
           ),
           const SizedBox(height: 20),
-          Text('Ingredients', style: theme.textTheme.titleMedium),
+          Text(tr('Ingredients'), style: theme.textTheme.titleMedium),
           Text(
-            'This is the shopping list participants see. It locks 24 hours before a session that uses it.',
+            tr('This is the shopping list participants see. It locks 24 hours before a session that uses it.'),
             style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
           ),
           for (var i = 0; i < _ingredients.length; i++)
@@ -299,11 +299,11 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
                       Expanded(
                         child: TextField(
                           controller: _ingredients[i].name,
-                          decoration: InputDecoration(labelText: 'Ingredient ${i + 1}'),
+                          decoration: InputDecoration(labelText: trx('Ingredient ${i + 1}', 'ግብዓት ${i + 1}')),
                         ),
                       ),
                       IconButton(
-                        tooltip: 'Remove',
+                        tooltip: tr('Remove'),
                         icon: const Icon(Icons.close_rounded),
                         onPressed: () => setState(() => _ingredients.removeAt(i).dispose()),
                       ),
@@ -314,7 +314,7 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
                         width: 84,
                         child: TextField(
                           controller: _ingredients[i].quantity,
-                          decoration: const InputDecoration(labelText: 'Amount'),
+                          decoration: InputDecoration(labelText: tr('Amount')),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -322,12 +322,12 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
                         width: 96,
                         child: TextField(
                           controller: _ingredients[i].unit,
-                          decoration: const InputDecoration(labelText: 'Unit'),
+                          decoration: InputDecoration(labelText: tr('Unit')),
                         ),
                       ),
                       const Spacer(),
                       FilterChip(
-                        label: const Text('Optional'),
+                        label: Text(tr('Optional')),
                         showCheckmark: false,
                         selected: _ingredients[i].optional,
                         onSelected: (v) => setState(() => _ingredients[i].optional = v),
@@ -339,7 +339,7 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
                       padding: const EdgeInsets.only(right: 8),
                       child: TextField(
                         controller: _ingredients[i].substitute,
-                        decoration: const InputDecoration(labelText: 'Substitute if hard to find (optional)'),
+                        decoration: InputDecoration(labelText: tr('Substitute if hard to find (optional)')),
                       ),
                     ),
                   ],
@@ -349,10 +349,10 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
           TextButton.icon(
             onPressed: () => setState(() => _ingredients.add(_IngredientRow())),
             icon: const Icon(Icons.add_rounded),
-            label: const Text('Add ingredient'),
+            label: Text(tr('Add ingredient')),
           ),
           const SizedBox(height: 12),
-          Text('Method', style: theme.textTheme.titleMedium),
+          Text(tr('Method'), style: theme.textTheme.titleMedium),
           for (var i = 0; i < _steps.length; i++)
             Padding(
               padding: const EdgeInsets.only(top: 8),
@@ -360,9 +360,9 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
                 controller: _steps[i],
                 maxLines: null,
                 decoration: InputDecoration(
-                  labelText: 'Step ${i + 1}',
+                  labelText: trx('Step ${i + 1}', 'ደረጃ ${i + 1}'),
                   suffixIcon: IconButton(
-                    tooltip: 'Remove',
+                    tooltip: tr('Remove'),
                     icon: const Icon(Icons.close_rounded),
                     onPressed: () => setState(() => _steps.removeAt(i).dispose()),
                   ),
@@ -372,7 +372,7 @@ class _RecipeEditorScreenState extends ConsumerState<RecipeEditorScreen> {
           TextButton.icon(
             onPressed: () => setState(() => _steps.add(TextEditingController())),
             icon: const Icon(Icons.add_rounded),
-            label: const Text('Add step'),
+            label: Text(tr('Add step')),
           ),
         ],
       ),
@@ -389,7 +389,7 @@ Future<int?> pickPublishedRecipe(BuildContext context, WidgetRef ref) async {
   } catch (_) {}
   if (!context.mounted) return null;
   if (recipes.isEmpty) {
-    _toast(context, 'Publish a recipe first — cooking sessions need one.');
+    _toast(context, tr('Publish a recipe first — cooking sessions need one.'));
     context.push('/recipes');
     return null;
   }
@@ -399,7 +399,7 @@ Future<int?> pickPublishedRecipe(BuildContext context, WidgetRef ref) async {
       child: ListView(
         shrinkWrap: true,
         children: [
-          const ListTile(title: Text('Which recipe will you cook?')),
+          ListTile(title: Text(tr('Which recipe will you cook?'))),
           for (final r in recipes)
             ListTile(
               leading: const Icon(Icons.restaurant_menu_rounded),
@@ -440,24 +440,24 @@ class LiveStudioScreen extends ConsumerWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (d) => AlertDialog(
-        title: Text(isChef ? 'Schedule a live cook-along' : 'New live broadcast'),
+        title: Text(isChef ? 'Schedule a live cook-along' : tr('New live broadcast')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: title, autofocus: true, decoration: const InputDecoration(labelText: 'Title')),
+            TextField(controller: title, autofocus: true, decoration: InputDecoration(labelText: tr('Title'))),
             const SizedBox(height: 8),
             Text(
               isChef
-                  ? 'Viewers need time to shop, so cook-alongs are announced at least 24 hours ahead with their recipe.'
-                  : 'Go live now, or pick a time so people can plan to join.',
+                  ? tr('Viewers need time to shop, so cook-alongs are announced at least 24 hours ahead with their recipe.')
+                  : tr('Go live now, or pick a time so people can plan to join.'),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(d), child: const Text('Cancel')),
-          if (!isChef) TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('Go live now')),
-          FilledButton(onPressed: () => Navigator.pop(d, true), child: const Text('Schedule')),
+          TextButton(onPressed: () => Navigator.pop(d), child: Text(tr('Cancel'))),
+          if (!isChef) TextButton(onPressed: () => Navigator.pop(d, false), child: Text(tr('Go live now'))),
+          FilledButton(onPressed: () => Navigator.pop(d, true), child: Text(tr('Schedule'))),
         ],
       ),
     );
@@ -486,7 +486,7 @@ class LiveStudioScreen extends ConsumerWidget {
       if (!context.mounted) return;
       if (!ok) context.push('/live/${res.data?['stream']?['id']}/host');
     } on DioException catch (e) {
-      if (context.mounted) _toast(context, apiErrorMessage(e.response?.data, 'Could not create broadcast'));
+      if (context.mounted) _toast(context, apiErrorMessage(e.response?.data, tr('Could not create broadcast')));
     }
   }
 
@@ -498,28 +498,28 @@ class LiveStudioScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      appBar: AppBar(title: const Text('Go live')),
+      appBar: AppBar(title: Text(tr('Go live'))),
       floatingActionButton: canGoLive
           ? FloatingActionButton.extended(
               onPressed: () => _create(context, ref, profile),
               icon: const Icon(Icons.sensors_rounded),
-              label: const Text('New broadcast'),
+              label: Text(tr('New broadcast')),
             )
           : null,
       body: !canGoLive && profile.isNotEmpty
-          ? const FriendEmptyState(
+          ? FriendEmptyState(
               icon: Icons.lock_outline_rounded,
-              title: 'Live is for spiritual guides and chefs',
-              message: 'Clinical sessions are private and are never broadcast.',
+              title: tr('Live is for spiritual guides and chefs'),
+              message: tr('Clinical sessions are private and are never broadcast.'),
             )
           : async.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (_, _) => const FriendEmptyState(icon: Icons.cloud_off_outlined, title: "Couldn't load broadcasts"),
               data: (list) => list.isEmpty
-                  ? const FriendEmptyState(
+                  ? FriendEmptyState(
                       icon: Icons.sensors_rounded,
-                      title: 'No broadcasts yet',
-                      message: 'Go live to teach, reflect or cook with many people at once. Viewers can send gifts.',
+                      title: tr('No broadcasts yet'),
+                      message: tr('Go live to teach, reflect or cook with many people at once. Viewers can send gifts.'),
                     )
                   : RefreshIndicator(
                       onRefresh: () async => ref.invalidate(_myStreamsProvider),
@@ -533,7 +533,7 @@ class LiveStudioScreen extends ConsumerWidget {
                                 subtitle: Text([
                                   (s['status'] ?? '').toString(),
                                   if (DateTime.tryParse('${s['scheduled_at']}') case final d?)
-                                    DateFormat('EEE MMM d · h:mm a').format(d.toLocal()),
+                                    trDate('EEE MMM d · h:mm a', d.toLocal()),
                                   if (s['status'] == 'ended')
                                     '${s['total_viewers']} viewers · gifts ${formatMoney(s['gifts_total_cents'] as num?)}',
                                 ].join(' · ')),
@@ -543,7 +543,7 @@ class LiveStudioScreen extends ConsumerWidget {
                                           await context.push('/live/${s['id']}/host');
                                           ref.invalidate(_myStreamsProvider);
                                         },
-                                        child: Text(s['status'] == 'live' ? 'Rejoin' : 'Start'),
+                                        child: Text(s['status'] == 'live' ? 'Rejoin' : tr('Start')),
                                       )
                                     : null,
                               ),
@@ -599,11 +599,11 @@ class _LiveHostScreenState extends ConsumerState<LiveHostScreen> {
     final sure = await showDialog<bool>(
       context: context,
       builder: (d) => AlertDialog(
-        title: const Text('End the broadcast?'),
-        content: const Text('Everyone watching will be disconnected.'),
+        title: Text(tr('End the broadcast?')),
+        content: Text(tr('Everyone watching will be disconnected.')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('Keep going')),
-          FilledButton(onPressed: () => Navigator.pop(d, true), child: const Text('End')),
+          TextButton(onPressed: () => Navigator.pop(d, false), child: Text(tr('Keep going'))),
+          FilledButton(onPressed: () => Navigator.pop(d, true), child: Text(tr('End'))),
         ],
       ),
     );
@@ -629,7 +629,7 @@ class _LiveHostScreenState extends ConsumerState<LiveHostScreen> {
           icon: Icons.sensors_off_rounded,
           title: "Can't go live yet",
           message: _error,
-          ctaLabel: 'Try again',
+          ctaLabel: tr('Try again'),
           onCta: _start,
         ),
       );
@@ -648,7 +648,7 @@ class _LiveHostScreenState extends ConsumerState<LiveHostScreen> {
         jwt: session['token'] as String?,
         displayName: (stream['host'] as Map?)?['name']?.toString(),
         isHost: true,
-        hostName: ((stream['host'] as Map?)?['name'] ?? 'You').toString(),
+        hostName: ((stream['host'] as Map?)?['name'] ?? tr('You')).toString(),
         title: (stream['title'] ?? '').toString(),
         recipeTitle: (stream['recipe'] as Map?)?['title']?.toString(),
         onClose: () => context.pop(),
@@ -724,7 +724,7 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
         'family_rate_cents': _cents(_family.text),
       });
       if (!mounted) return;
-      _toast(context, 'Saved');
+      _toast(context, tr('Saved'));
       context.pop();
     } on DioException catch (e) {
       if (mounted) _toast(context, apiErrorMessage(e.response?.data));
@@ -760,14 +760,14 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      appBar: AppBar(title: const Text('Practice profile')),
+      appBar: AppBar(title: Text(tr('Practice profile'))),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         children: [
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Accepting new clients'),
-            subtitle: const Text('Turn off to pause new bookings'),
+            title: Text(tr('Accepting new clients')),
+            subtitle: Text(tr('Turn off to pause new bookings')),
             value: _accepting,
             onChanged: (v) => setState(() => _accepting = v),
           ),
@@ -775,46 +775,46 @@ class _CareSettingsScreenState extends ConsumerState<CareSettingsScreen> {
             controller: _bio,
             maxLines: 4,
             maxLength: 600,
-            decoration: const InputDecoration(labelText: 'About you', alignLabelWithHint: true),
+            decoration: InputDecoration(labelText: tr('About you'), alignLabelWithHint: true),
           ),
           TextField(
             controller: _rate,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Price per session ($_currency)'),
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(labelText: trx('Price per session ($_currency)', 'የአንድ ቆይታ ዋጋ ($_currency)')),
           ),
-          const SizedBox(height: 20),
-          Text('Session formats', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          chips(const {
-            'individual': 'Individual',
-            'couples': 'Couples / marriage',
-            'family': 'Family',
-            'child': 'Children',
-            'teen': 'Teens',
+          SizedBox(height: 20),
+          Text(tr('Session formats'), style: theme.textTheme.titleMedium),
+          SizedBox(height: 8),
+          chips({
+            'individual': tr('Individual'),
+            'couples': tr('Couples / marriage'),
+            'family': tr('Family'),
+            'child': tr('Children'),
+            'teen': tr('Teens'),
           }, _formats),
-          const SizedBox(height: 20),
-          Text('Age groups', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          chips(const {'children': 'Children (0–12)', 'teens': 'Teens (13–17)', 'adults': 'Adults'}, _ages),
+          SizedBox(height: 20),
+          Text(tr('Age groups'), style: theme.textTheme.titleMedium),
+          SizedBox(height: 8),
+          chips({'children': tr('Children (0–12)'), 'teens': tr('Teens (13–17)'), 'adults': tr('Adults')}, _ages),
           const SizedBox(height: 8),
           Text(
-            'Only offer what you are trained and licensed for. Sessions for minors are always booked and paid for by a parent or guardian.',
+            tr('Only offer what you are trained and licensed for. Sessions for minors are always booked and paid for by a parent or guardian.'),
             style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
           ),
           const SizedBox(height: 20),
           TextField(
             controller: _couples,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Couples session price ($_currency)', hintText: 'Same as individual'),
+            decoration: InputDecoration(labelText: trx('Couples session price ($_currency)', 'የጥንዶች ቆይታ ዋጋ ($_currency)'), hintText: tr('Same as individual')),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _family,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Family session price ($_currency)', hintText: 'Same as individual'),
+            decoration: InputDecoration(labelText: trx('Family session price ($_currency)', 'የቤተሰብ ቆይታ ዋጋ ($_currency)'), hintText: tr('Same as individual')),
           ),
           const SizedBox(height: 24),
-          FilledButton(onPressed: _formats.isEmpty || _ages.isEmpty ? null : _save, child: const Text('Save')),
+          FilledButton(onPressed: _formats.isEmpty || _ages.isEmpty ? null : _save, child: Text(tr('Save'))),
         ],
       ),
     );

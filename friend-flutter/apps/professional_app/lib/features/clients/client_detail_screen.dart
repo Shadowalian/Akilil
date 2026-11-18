@@ -1,9 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -56,14 +55,10 @@ final _clientDossierProvider = FutureProvider.autoDispose
   };
 });
 
-/// Patient clinical dossier — Stitch layout over client + session note data.
+/// A client's record: who they are, what they shared, your session notes,
+/// action items and their safety plan. Private to the professional.
 class ClientDetailScreen extends ConsumerStatefulWidget {
-  const ClientDetailScreen({
-    super.key,
-    required this.user,
-    required this.sessionCount,
-    this.lastSessionAt,
-  });
+  const ClientDetailScreen({super.key, required this.user, required this.sessionCount, this.lastSessionAt});
 
   final Map<String, dynamic> user;
   final int sessionCount;
@@ -75,7 +70,7 @@ class ClientDetailScreen extends ConsumerStatefulWidget {
 
 class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
   bool _busy = false;
-  final Set<int> _expandedSoap = {0};
+  final Set<int> _expanded = {0};
 
   int? get _clientId => (widget.user['id'] as num?)?.toInt();
 
@@ -83,354 +78,216 @@ class _ClientDetailScreenState extends ConsumerState<ClientDetailScreen> {
     final id = _clientId;
     if (id == null) return;
     setState(() => _busy = true);
-    var message = 'Conversation ready in Messages.';
+    var message = tr('Conversation ready in Messages.');
     try {
-      await ref.read(dioProvider).post('/conversations', data: {
-        'participant_user_id': id,
-      });
+      await ref.read(dioProvider).post('/conversations', data: {'participant_user_id': id});
     } on DioException catch (e) {
       final data = e.response?.data;
-      message = data is Map && data['message'] is String
-          ? data['message'] as String
-          : "Couldn't open a conversation.";
+      message = data is Map && data['message'] is String ? data['message'] as String : tr("Couldn't open a conversation.");
     } catch (_) {
-      message = "Couldn't open a conversation.";
+      message = tr("Couldn't open a conversation.");
     }
     if (!mounted) return;
     setState(() => _busy = false);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _addClinicalNote(Map<String, dynamic>? latestAppt) {
-    final id = latestAppt?['id'];
-    if (id == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Complete a session first to attach notes.')),
-      );
+  /// Notes belong to a session that has happened; never a future booking.
+  void _addNote(List<Map<String, dynamic>> appts) {
+    final now = DateTime.now();
+    final done = appts.where((a) {
+      final when = DateTime.tryParse(a['scheduled_at'] as String? ?? '');
+      final status = a['status'] as String? ?? '';
+      return status == 'completed' || status == 'in_progress' || (when != null && when.isBefore(now) && status != 'cancelled');
+    });
+    final target = done.isEmpty ? null : done.first;
+    if (target == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Complete a session first to attach notes.'))));
       return;
     }
-    context.push('/sessions/$id/notes');
+    context.push('/sessions/${target['id']}/notes');
   }
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.user['name'] as String? ?? 'Anonymous';
+    final theme = Theme.of(context);
+    final name = widget.user['name'] as String? ?? tr('Anonymous');
     final clientId = _clientId;
     final pro = ref.watch(currentUserProvider);
-    final headerInset = MediaQuery.paddingOf(context).top + 56;
 
     if (clientId == null) {
-      return const Scaffold(body: Center(child: Text('Invalid client.')));
+      return Scaffold(body: FriendEmptyState(icon: Icons.person_off_outlined, title: tr('Invalid client.')));
     }
-
     final dossier = ref.watch(_clientDossierProvider(clientId));
 
-    return ColoredBox(
+    return Material(
       color: FriendColors.background,
-      child: Stack(
+      child: Column(
         children: [
-          dossier.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => Center(
-              child: Text(
-                "Couldn't load dossier.",
-                style: Theme.of(context).textTheme.bodyLarge,
+          ProStitchDossierHeader(onBack: () => Navigator.of(context).maybePop(), avatarInitial: pro?.name),
+          Expanded(
+            child: dossier.when(
+              loading: () => const Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+              error: (_, __) => FriendEmptyState(
+                icon: Icons.cloud_off_outlined,
+                title: tr("Couldn't load this record."),
+                ctaLabel: tr('Try again'),
+                onCta: () => ref.invalidate(_clientDossierProvider(clientId)),
               ),
-            ),
-            data: (data) {
-              final appts =
-                  (data['appointments'] as List).cast<Map<String, dynamic>>();
-              final notesMap = data['notes'] as Map<int, List<Map<String, dynamic>>>;
-              final latestNote = _latestNote(appts, notesMap);
-              final intake = appts.isNotEmpty
-                  ? appts.last['client_note'] as String?
-                  : null;
-              final last = widget.lastSessionAt ??
-                  (appts.isNotEmpty
-                      ? DateTime.tryParse(appts.first['scheduled_at'] as String? ?? '')
-                      : null);
-
-              return ListView(
-                padding: EdgeInsets.fromLTRB(
-                  FriendLayout.horizontal,
-                  headerInset + 8,
-                  FriendLayout.horizontal,
-                  160,
-                ),
-                children: [
-                  _ProfileRibbon(
-                    name: name,
-                    sessionCount: widget.sessionCount,
-                    lastSessionAt: last,
-                    intakeFocus: intake,
-                  ),
-                  const SizedBox(height: 16),
-                  _DiagnosticCard(
-                    presentation: intake?.isNotEmpty == true
-                        ? intake!
-                        : 'They have not left a note when booking.',
-                    modality: _formatSummary(appts),
-                  ),
-                  const SizedBox(height: 16),
-                  _SoapHistorySection(
-                    appointments: appts.take(6).toList(),
-                    notesMap: notesMap,
-                    expanded: _expandedSoap,
-                    onToggle: (index) {
-                      setState(() {
-                        if (_expandedSoap.contains(index)) {
-                          _expandedSoap.remove(index);
-                        } else {
-                          _expandedSoap.add(index);
-                        }
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _WorksheetsSection(actionItems: latestNote?['action_items']),
-                  const SizedBox(height: 16),
-                  _SafetyPlanCard(plan: ref.watch(_safetyPlanProvider(clientId)).valueOrNull),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: _busy ? null : _message,
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: Text(_busy ? 'Opening…' : 'Message client'),
-                  ),
-                ],
-              );
-            },
-          ),
-          ProStitchDossierHeader(
-            onBack: () => Navigator.of(context).maybePop(),
-            avatarInitial: pro?.name,
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: dossier.maybeWhen(
               data: (data) {
-                final appts =
-                    (data['appointments'] as List).cast<Map<String, dynamic>>();
-                final latest = appts.isNotEmpty ? appts.first : null;
-                return _DossierActionBar(
-                  onAddNote: () => _addClinicalNote(latest),
-                  onCarePlan: _busy ? null : _message,
+                final appts = (data['appointments'] as List).cast<Map<String, dynamic>>();
+                final notesMap = data['notes'] as Map<int, List<Map<String, dynamic>>>;
+                final latestNote = _latestNote(appts, notesMap);
+                final intake = appts.isNotEmpty ? (appts.last['client_note'] as String?)?.trim() : null;
+                final first = appts.isNotEmpty ? DateTime.tryParse(appts.last['scheduled_at'] as String? ?? '')?.toLocal() : null;
+                final completed = appts.where((a) => a['status'] == 'completed').length;
+
+                return FriendContentWidth(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 20, FriendLayout.horizontal, 32),
+                    children: [
+                      Row(
+                        children: [
+                          FriendAvatar(size: 60, initials: personInitial(name)),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(name, style: theme.textTheme.headlineMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                const SizedBox(height: 2),
+                                Text(
+                                  [
+                                    trx('$completed completed', '$completed የተጠናቀቁ'),
+                                    if (first != null) trx('since ${trDate('MMM y', first)}', 'ከ${trDate('MMM y', first)} ጀምሮ'),
+                                  ].join(' · '),
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      FriendSectionLabel(tr('What they shared when booking')),
+                      CandyCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              intake?.isNotEmpty == true ? intake! : tr('They have not left a note when booking.'),
+                              style: intake?.isNotEmpty == true
+                                  ? theme.textTheme.bodyMedium
+                                  : theme.textTheme.bodySmall,
+                            ),
+                            const Divider(height: 28),
+                            Row(
+                              children: [
+                                const Icon(Icons.event_note_outlined, size: 18, color: FriendColors.textSecondary),
+                                const SizedBox(width: 10),
+                                Expanded(child: Text(_formatSummary(appts), style: theme.textTheme.bodySmall)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: FriendLayout.sectionGap),
+                      FriendSectionLabel(tr('Session notes')),
+                      _NotesList(
+                        appointments: appts.take(6).toList(),
+                        notesMap: notesMap,
+                        expanded: _expanded,
+                        onToggle: (i) => setState(() => _expanded.contains(i) ? _expanded.remove(i) : _expanded.add(i)),
+                      ),
+                      const SizedBox(height: FriendLayout.sectionGap),
+                      FriendSectionLabel(tr('Action items')),
+                      _ActionItems(actionItems: latestNote?['action_items']),
+                      const SizedBox(height: FriendLayout.sectionGap),
+                      FriendSectionLabel(tr('Their safety plan')),
+                      _SafetyPlanCard(plan: ref.watch(_safetyPlanProvider(clientId)).valueOrNull),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.lock_outline_rounded, size: 14, color: FriendColors.textMuted),
+                          const SizedBox(width: 6),
+                          Text(tr('Visible only to you'), style: theme.textTheme.labelSmall),
+                        ],
+                      ),
+                    ],
+                  ),
                 );
               },
-              orElse: () => const SizedBox.shrink(),
             ),
+          ),
+          dossier.maybeWhen(
+            data: (data) {
+              final appts = (data['appointments'] as List).cast<Map<String, dynamic>>();
+              return FriendGlassBar(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 12, FriendLayout.horizontal, 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: FriendGlowButton(
+                          label: tr('Message'),
+                          icon: Icons.chat_bubble_outline_rounded,
+                          secondary: true,
+                          expanded: true,
+                          busy: _busy,
+                          onPressed: _message,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FriendGlowButton(
+                          label: tr('Add note'),
+                          icon: Icons.edit_note_rounded,
+                          expanded: true,
+                          onPressed: () => _addNote(appts),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
           ),
         ],
       ),
     );
   }
 
-  /// "Couples · cooking: Doro wot · 6 sessions" — from the real bookings.
+  /// "Couples, Family · cooked: Doro wot · 6 booked" — from the real bookings.
   String _formatSummary(List<Map<String, dynamic>> appts) {
     final formats = {for (final a in appts) (a['care_format'] as String? ?? 'individual')};
     final recipes = {for (final a in appts) if (a['recipe'] is Map) (a['recipe'] as Map)['title']};
-    final parts = [
-      formats.map((f) => f[0].toUpperCase() + f.substring(1)).join(', '),
-      if (recipes.isNotEmpty) 'cooked: ${recipes.join(', ')}',
-      '${appts.length} booked',
-    ];
-    return parts.join(' · ');
+    return [
+      formats.map((f) => switch (f) {
+            'couples' => tr('Couples'),
+            'family' => tr('Family'),
+            'child' => tr('Children'),
+            'teen' => tr('Teens'),
+            _ => tr('Individual'),
+          }).join(', '),
+      if (recipes.isNotEmpty) trx('cooked: ${recipes.join(', ')}', 'ያበሰሉት፦ ${recipes.join('፣ ')}'),
+      trx('${appts.length} booked', '${appts.length} ቀጠሮዎች'),
+    ].join(' · ');
   }
 
-  Map<String, dynamic>? _latestNote(
-    List<Map<String, dynamic>> appts,
-    Map<int, List<Map<String, dynamic>>> notesMap,
-  ) {
+  Map<String, dynamic>? _latestNote(List<Map<String, dynamic>> appts, Map<int, List<Map<String, dynamic>>> notesMap) {
     for (final a in appts) {
-      final id = (a['id'] as num?)?.toInt();
-      if (id == null) continue;
-      final notes = notesMap[id];
+      final notes = notesMap[(a['id'] as num?)?.toInt()];
       if (notes != null && notes.isNotEmpty) return notes.first;
     }
     return null;
   }
 }
 
-class _ProfileRibbon extends StatelessWidget {
-  const _ProfileRibbon({
-    required this.name,
-    required this.sessionCount,
-    this.lastSessionAt,
-    this.intakeFocus,
-  });
-
-  final String name;
-  final int sessionCount;
-  final DateTime? lastSessionAt;
-  final String? intakeFocus;
-
-  @override
-  Widget build(BuildContext context) {
-    final memberSince = lastSessionAt != null
-        ? DateFormat('MMM yyyy').format(lastSessionAt!)
-        : 'Active member';
-    return ProStitchCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  FriendAvatar(
-                    size: 56,
-                    initials: personInitial(name),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: FriendColors.secondaryFixed,
-                        border: Border.all(color: FriendColors.surfaceLowest, width: 2),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      '$sessionCount ${sessionCount == 1 ? 'session' : 'sessions'}',
-                      style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
-                    ),
-                    Text(
-                      'Client since $memberSince',
-                      style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DiagnosticCard extends StatelessWidget {
-  const _DiagnosticCard({
-    required this.presentation,
-    required this.modality,
-  });
-
-  final String presentation;
-  final String modality;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProStitchCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.psychology, size: 18, color: FriendColors.primary),
-              const SizedBox(width: 6),
-              const ProStitchMicroLabel('Overview'),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: FriendColors.primaryLight,
-                  borderRadius: BorderRadius.circular(FriendRadii.small),
-                ),
-                child: Text(
-                  'Active',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: FriendColors.primaryDeep,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const ProStitchMicroLabel('What they shared when booking'),
-          Text(
-            presentation,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: FriendColors.recessed,
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'SESSIONS SO FAR',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
-                    color: FriendColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.auto_fix_high, size: 18, color: FriendColors.primary),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        modality,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SoapHistorySection extends StatelessWidget {
-  const _SoapHistorySection({
-    required this.appointments,
-    required this.notesMap,
-    required this.expanded,
-    required this.onToggle,
-  });
+class _NotesList extends StatelessWidget {
+  const _NotesList({required this.appointments, required this.notesMap, required this.expanded, required this.onToggle});
 
   final List<Map<String, dynamic>> appointments;
   final Map<int, List<Map<String, dynamic>>> notesMap;
@@ -439,60 +296,28 @@ class _SoapHistorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     if (appointments.isEmpty) {
-      return ProStitchCard(
-        child: Text(
-          'No session history yet.',
-          style: GoogleFonts.inter(color: FriendColors.textSecondary),
-        ),
-      );
+      return CandyCard(child: Text(tr('No session history yet.'), style: theme.textTheme.bodySmall));
     }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return FriendListGroup(
+      dividerIndent: 16,
       children: [
-        Row(
-          children: [
-            const Icon(Icons.history_edu, size: 18, color: FriendColors.primary),
-            const SizedBox(width: 6),
-            Text(
-              'SOAP Session History',
-              style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w700),
-            ),
-            const Spacer(),
-            Text(
-              'Showing ${appointments.length.clamp(0, 2)} of ${appointments.length}',
-              style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        for (var i = 0; i < appointments.length && i < 4; i++)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: _SoapCard(
-              index: i,
-              appointment: appointments[i],
-              notes: notesMap[(appointments[i]['id'] as num?)?.toInt()] ?? const [],
-              expanded: expanded.contains(i),
-              onToggle: () => onToggle(i),
-            ),
+        for (var i = 0; i < appointments.length; i++)
+          _NoteRow(
+            appointment: appointments[i],
+            notes: notesMap[(appointments[i]['id'] as num?)?.toInt()] ?? const [],
+            expanded: expanded.contains(i),
+            onToggle: () => onToggle(i),
           ),
       ],
     );
   }
 }
 
-class _SoapCard extends StatelessWidget {
-  const _SoapCard({
-    required this.index,
-    required this.appointment,
-    required this.notes,
-    required this.expanded,
-    required this.onToggle,
-  });
+class _NoteRow extends StatelessWidget {
+  const _NoteRow({required this.appointment, required this.notes, required this.expanded, required this.onToggle});
 
-  final int index;
   final Map<String, dynamic> appointment;
   final List<Map<String, dynamic>> notes;
   final bool expanded;
@@ -500,320 +325,119 @@ class _SoapCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final when = DateTime.tryParse(appointment['scheduled_at'] as String? ?? '');
+    final theme = Theme.of(context);
+    final when = DateTime.tryParse(appointment['scheduled_at'] as String? ?? '')?.toLocal();
     final note = notes.isNotEmpty ? notes.first : null;
-    final subjective = note?['notes'] as String? ?? appointment['client_note'] as String?;
-    final plan = _formatActionItems(note?['action_items']);
+    final text = (note?['notes'] as String?)?.trim();
+    final plan = _actionText(note?['action_items']);
+    final hasNote = text != null && text.isNotEmpty;
+    final status = appointment['status'] as String?;
+    final duration = appointment['duration_minutes'] ?? 50;
 
-    return ProStitchCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Session #${index + 1}',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: FriendColors.surfaceContainer,
-                            borderRadius: BorderRadius.circular(FriendRadii.pill),
-                          ),
-                          child: Text(
-                            _statusLabel(appointment['status'] as String?),
-                            style: GoogleFonts.inter(fontSize: 10),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (when != null)
-                      Text(
-                        // Literal text must stay outside the pattern: 'mins' would be read as minute/second codes.
-                        '${DateFormat('MMM d, yyyy').format(when.toLocal())} • ${appointment['duration_minutes'] ?? 50} min',
-                        style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
-                      ),
-                  ],
+    return InkWell(
+      onTap: hasNote ? onToggle : null,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    when == null ? tr('Session') : '${trDate('EEE d MMM y', when)} · ${trx('$duration min', '$duration ደቂቃ')}',
+                    style: theme.textTheme.titleSmall,
+                  ),
                 ),
+                FriendStatusChip(label: _statusLabel(status), color: _statusColor(status)),
+              ],
+            ),
+            const SizedBox(height: 6),
+            if (!hasNote)
+              Text(tr('No note written for this session.'), style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textMuted))
+            else ...[
+              Text(
+                text,
+                maxLines: expanded ? null : 2,
+                overflow: expanded ? null : TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textPrimary),
+              ),
+              if (expanded && plan != null) ...[
+                const SizedBox(height: 10),
+                Text(tr('Plan'), style: theme.textTheme.labelMedium),
+                const SizedBox(height: 2),
+                Text(plan, style: theme.textTheme.bodySmall),
+              ],
+              const SizedBox(height: 6),
+              Text(
+                expanded ? tr('Show less') : tr('Show full note'),
+                style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.primary, fontWeight: FontWeight.w600),
               ),
             ],
-          ),
-          if (expanded && subjective?.isNotEmpty == true) ...[
-            const SizedBox(height: 12),
-            _SoapBlock(letter: 'S', label: 'Subjective', text: subjective!, color: FriendColors.primary),
-            if (plan != null)
-              _SoapBlock(letter: 'P', label: 'Plan', text: plan, color: FriendColors.primaryContainer),
-          ] else if (!expanded && subjective?.isNotEmpty == true) ...[
-            const SizedBox(height: 10),
-            Text(
-              subjective!,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
-            ),
           ],
-          if (subjective?.isNotEmpty == true)
-            TextButton.icon(
-              onPressed: onToggle,
-              icon: Icon(expanded ? Icons.expand_less : Icons.expand_more),
-              label: Text(expanded ? 'Collapse Detailed SOAP' : 'Expand Detailed SOAP'),
-            ),
-        ],
+        ),
       ),
     );
   }
 
-  String? _formatActionItems(dynamic raw) {
+  static String? _actionText(dynamic raw) {
     if (raw is List && raw.isNotEmpty) return raw.join(', ');
     if (raw is String && raw.isNotEmpty) return raw;
     return null;
   }
 }
 
-class _SoapBlock extends StatelessWidget {
-  const _SoapBlock({
-    required this.letter,
-    required this.label,
-    required this.text,
-    required this.color,
-  });
-
-  final String letter;
-  final String label;
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: FriendColors.recessed,
-        borderRadius: BorderRadius.circular(FriendRadii.small),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  letter,
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: FriendColors.onPrimary,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                label.toUpperCase(),
-                style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            text,
-            style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary, height: 1.4),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _WorksheetsSection extends StatelessWidget {
-  const _WorksheetsSection({this.actionItems});
+class _ActionItems extends StatelessWidget {
+  const _ActionItems({this.actionItems});
 
   final dynamic actionItems;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final items = actionItems is List
-        ? (actionItems as List).cast<String>()
-        : actionItems is String
+        ? (actionItems as List).map((e) => '$e').where((e) => e.trim().isNotEmpty).toList()
+        : actionItems is String && (actionItems as String).trim().isNotEmpty
             ? [actionItems as String]
             : const <String>[];
-
-    return ProStitchCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.task_alt, size: 18, color: FriendColors.primary),
-              const SizedBox(width: 6),
-              Text(
-                'Assigned Worksheets & Somatics',
-                style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              const Spacer(),
-              Text(
-                '${items.isEmpty ? 0 : items.length} Active',
-                style: GoogleFonts.inter(fontSize: 10, color: FriendColors.textMuted),
-              ),
-            ],
+    if (items.isEmpty) {
+      return CandyCard(child: Text(tr('Action items from saved session notes appear here.'), style: theme.textTheme.bodySmall));
+    }
+    return FriendListGroup(
+      dividerIndent: 48,
+      children: [
+        for (final item in items)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                const Icon(Icons.radio_button_unchecked_rounded, size: 18, color: FriendColors.textMuted),
+                const SizedBox(width: 14),
+                Expanded(child: Text(item, style: theme.textTheme.bodyMedium)),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          if (items.isEmpty)
-            Text(
-              'Action items from saved session notes appear here.',
-              style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
-            )
-          else
-            for (final item in items)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: FriendColors.recessed,
-                    borderRadius: BorderRadius.circular(FriendRadii.card),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: FriendColors.surfaceLowest,
-                          borderRadius: BorderRadius.circular(FriendRadii.small),
-                        ),
-                        child: const Icon(Icons.description_outlined, color: FriendColors.accent),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          item,
-                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: FriendColors.secondaryFixed.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(FriendRadii.pill),
-                        ),
-                        child: Text(
-                          'Assigned',
-                          style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DossierActionBar extends StatelessWidget {
-  const _DossierActionBar({
-    required this.onAddNote,
-    required this.onCarePlan,
-  });
-
-  final VoidCallback onAddNote;
-  final VoidCallback? onCarePlan;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProStitchGlassBar(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: onAddNote,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add note'),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(0, 48),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(FriendRadii.pill),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: onCarePlan,
-                    icon: const Icon(Icons.chat_bubble_outline_rounded),
-                    label: const Text('Message'),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(0, 48),
-                      backgroundColor: FriendColors.surfaceContainer,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(FriendRadii.pill),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.lock_outline, size: 14, color: FriendColors.accent),
-                const SizedBox(width: 6),
-                Text(
-                  'VISIBLE ONLY TO YOU',
-                  style: GoogleFonts.inter(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.6,
-                    color: FriendColors.textMuted,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: MediaQuery.paddingOf(context).bottom),
-          ],
-        ),
-      ),
+      ],
     );
   }
 }
 
 String _statusLabel(String? status) => switch (status) {
-      'completed' => 'Completed',
-      'confirmed' => 'Upcoming',
-      'in_progress' => 'In progress',
-      'cancelled' => 'Cancelled',
-      'no_show' => 'No-show',
-      _ => 'Booked',
+      'completed' => tr('Completed'),
+      'confirmed' => tr('Upcoming'),
+      'in_progress' => tr('In progress'),
+      'cancelled' => tr('Cancelled'),
+      'no_show' => tr('No-show'),
+      _ => tr('Booked'),
     };
 
+Color _statusColor(String? status) => switch (status) {
+      'completed' => FriendColors.textSecondary,
+      'confirmed' => FriendColors.success,
+      'in_progress' => FriendColors.live,
+      'cancelled' || 'no_show' => FriendColors.error,
+      _ => FriendColors.warning,
+    };
 
 /// Read-only view of the client's own safety plan.
 class _SafetyPlanCard extends StatelessWidget {
@@ -828,47 +452,43 @@ class _SafetyPlanCard extends StatelessWidget {
     final people = ((p?['people'] as List?) ?? const [])
         .map((e) => '${(e as Map)['name']}${(e['phone'] ?? '').toString().isEmpty ? '' : ' · ${e['phone']}'}')
         .toList();
-    final empty = p == null ||
-        [list('warning_signs'), list('coping'), people, list('environment')].every((l) => l.isEmpty);
+    final empty = p == null || [list('warning_signs'), list('coping'), people, list('environment')].every((l) => l.isEmpty);
+
+    if (empty) {
+      return CandyCard(
+        child: Text(
+          tr('They have not written one yet. If it fits your work together, you could build it with them in a session.'),
+          style: theme.textTheme.bodySmall,
+        ),
+      );
+    }
 
     Widget part(String title, List<String> items) => items.isEmpty
         ? const SizedBox.shrink()
         : Padding(
-            padding: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.only(bottom: 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: theme.textTheme.labelLarge),
-                for (final i in items) Text('• $i', style: theme.textTheme.bodyMedium),
+                Text(title, style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textMuted)),
+                const SizedBox(height: 4),
+                for (final i in items)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text('•  $i', style: theme.textTheme.bodyMedium),
+                  ),
               ],
             ),
           );
 
-    return ProStitchCard(
+    return CandyCard(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Row(
-            children: [
-              Icon(Icons.health_and_safety_outlined, size: 18, color: FriendColors.primary),
-              SizedBox(width: 6),
-              ProStitchMicroLabel('Their safety plan'),
-            ],
-          ),
-          if (empty)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                'They have not written one yet. If it fits your work together, you could build it with them in a session.',
-                style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
-              ),
-            )
-          else ...[
-            part('Warning signs', list('warning_signs')),
-            part('Things that help', list('coping')),
-            part('People they can call', people),
-            part('Making things safer', list('environment')),
-          ],
+          part(tr('Warning signs'), list('warning_signs')),
+          part(tr('Things that help'), list('coping')),
+          part(tr('People they can call'), people),
+          part(tr('Making things safer'), list('environment')),
         ],
       ),
     );

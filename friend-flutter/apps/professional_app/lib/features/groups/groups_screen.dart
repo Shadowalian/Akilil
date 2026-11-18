@@ -1,9 +1,9 @@
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../studio/studio_screens.dart';
 
@@ -23,20 +23,20 @@ class GroupsScreen extends ConsumerWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('New therapy group'),
+        title: Text(tr('New therapy group')),
         content: TextField(
           controller: titleCtrl,
-          decoration: const InputDecoration(labelText: 'Group title'),
+          decoration: InputDecoration(labelText: tr('Group title')),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(tr('Cancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Create'),
+            child: Text(tr('Create')),
           ),
         ],
       ),
@@ -55,7 +55,7 @@ class GroupsScreen extends ConsumerWidget {
     } on DioException catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.response?.data?['message'] ?? 'Create failed')),
+        SnackBar(content: Text(e.response?.data?['message'] ?? tr('Create failed'))),
       );
     }
   }
@@ -64,22 +64,22 @@ class GroupsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(_proGroupsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Groups')),
+      appBar: AppBar(title: Text(tr('Groups'))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _createGroup(context, ref),
         icon: const Icon(Icons.add),
-        label: const Text('New group'),
+        label: Text(tr('New group')),
       ),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => const Center(child: Text("Couldn't load groups.")),
         data: (list) {
           if (list.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
                 child: Text(
-                  'Create a group for multi-person sessions. Clients can join when it is open.',
+                  tr('Create a group for multi-person sessions. Clients can join when it is open.'),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -96,7 +96,7 @@ class GroupsScreen extends ConsumerWidget {
                 final members = g['member_count'] ?? 0;
                 return Card(
                   child: ListTile(
-                    title: Text(g['title'] as String? ?? 'Group'),
+                    title: Text(g['title'] as String? ?? tr('Group')),
                     subtitle: Text(
                       '${g['status']} · $members members'
                       '${g['is_open'] == true ? ' · open' : ''}',
@@ -190,12 +190,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     } on DioException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(apiErrorMessage(e.response?.data, 'Could not schedule'))),
+        SnackBar(content: Text(apiErrorMessage(e.response?.data, tr('Could not schedule')))),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Schedule failed: $e')),
+        SnackBar(content: Text(tr("Couldn't schedule. Check your connection and try again."))),
       );
     }
   }
@@ -214,7 +214,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Archive failed: $e')),
+        SnackBar(content: Text(tr("Couldn't archive. Check your connection and try again."))),
       );
     }
   }
@@ -229,10 +229,10 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     if (_error != null || _group == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: Center(child: Text(_error ?? 'Missing group')),
+        body: Center(child: Text(_error ?? tr('Missing group'))),
       );
     }
-    final title = _group!['title'] as String? ?? 'Group';
+    final title = _group!['title'] as String? ?? tr('Group');
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
@@ -248,34 +248,34 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
         children: [
           Text(
             _group!['description'] as String? ??
-                'Open group therapy room. Schedule a meeting, then Start for members to Join.',
+                tr('Open group therapy room. Schedule a meeting, then Start for members to Join.'),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
           FriendGlowButton(
-            label: _group?['is_cooking_class'] == true ? 'Schedule a class' : 'Start a meeting',
+            label: _group?['is_cooking_class'] == true ? 'Schedule a class' : tr('Start a meeting'),
             icon: Icons.event,
             expanded: true,
             onPressed: _scheduleMeeting,
           ),
           const SizedBox(height: 20),
-          Text('Meetings', style: Theme.of(context).textTheme.titleLarge),
+          Text(tr('Meetings'), style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           if (_meetings.isEmpty)
-            const Text('No meetings yet.')
+            Text(tr('No meetings yet.'))
           else
             for (final m in _meetings)
               Card(
                 child: ListTile(
-                  title: Text(m['title'] as String? ?? 'Meeting'),
+                  title: Text(m['title'] as String? ?? tr('Meeting')),
                   subtitle: Text(
-                    '${DateFormat('EEE MMM d · h:mm a').format(DateTime.parse(m['scheduled_at'] as String).toLocal())} · ${m['status']}',
+                    '${trDate('EEE MMM d · h:mm a', DateTime.parse(m['scheduled_at'] as String).toLocal())} · ${m['status']}',
                   ),
                   trailing: (m['status'] == 'scheduled' || m['status'] == 'live')
                       ? FilledButton(
                           onPressed: () =>
                               _startMeeting((m['id'] as num).toInt()),
-                          child: Text(m['status'] == 'live' ? 'Rejoin' : 'Start'),
+                          child: Text(m['status'] == 'live' ? 'Rejoin' : tr('Start')),
                         )
                       : null,
                 ),
@@ -332,7 +332,7 @@ class _GroupMeetingHostScreenState
       setState(() {
         _roomUrl = session['room_url'] as String?;
         _jwt = session['token'] as String?;
-        _displayName = res.data?['display_name'] as String? ?? 'Akilil';
+        _displayName = res.data?['display_name'] as String? ?? tr('Akilil');
         _starting = false;
       });
     } on DioException catch (e) {
@@ -359,7 +359,7 @@ class _GroupMeetingHostScreenState
           icon: Icons.videocam_off_outlined,
           title: "Couldn't open video",
           message: _error,
-          ctaLabel: 'Retry',
+          ctaLabel: tr('Retry'),
           onCta: _open,
         ),
       );
@@ -376,7 +376,7 @@ class _GroupMeetingHostScreenState
         jwt: _jwt,
         displayName: _displayName,
         mode: JitsiRoomMode.group,
-        title: 'Group session',
+        title: tr('Group session'),
         onLeave: () {
           if (widget.asHost) {
             // Closing the room as host ends the meeting and books earnings.

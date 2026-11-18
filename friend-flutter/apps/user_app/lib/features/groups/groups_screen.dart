@@ -26,6 +26,10 @@ class ClientGroupsScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(FriendLayout.horizontal - 12, 8, FriendLayout.horizontal, 8),
+            child: Align(alignment: Alignment.centerLeft, child: FriendBackButton()),
+          ),
           FriendPageHeader(
             eyebrow: tr('Together'),
             title: tr('Group therapy'),
@@ -35,9 +39,11 @@ class ClientGroupsScreen extends ConsumerWidget {
             child: async.when(
               loading: () =>
                   const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              error: (_, __) => const FriendEmptyState(
+              error: (_, __) => FriendEmptyState(
                 icon: Icons.cloud_off_outlined,
-                title: "Couldn't load groups",
+                title: tr("Couldn't load groups"),
+                ctaLabel: tr('Try again'),
+                onCta: () => ref.invalidate(_clientGroupsProvider),
               ),
               data: (list) {
                 if (list.isEmpty) {
@@ -61,7 +67,7 @@ class ClientGroupsScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              g['title'] as String? ?? 'Group',
+                              g['title'] as String? ?? tr('Group'),
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             if ((g['description'] as String?)?.isNotEmpty ==
@@ -84,14 +90,16 @@ class ClientGroupsScreen extends ConsumerWidget {
                                 ),
                                 const Spacer(),
                                 if (isMember)
-                                  FriendGlowButton(
-                                    label: tr('Open'),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),
+                                    child: Text(tr('Open')),
                                     onPressed: () =>
                                         context.go('/groups/${g['id']}'),
                                   )
                                 else
-                                  FriendGlowButton(
-                                    label: tr('Join group'),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),
+                                    child: Text(tr('Join group')),
                                     onPressed: () async {
                                       try {
                                         final dio = ref.read(dioProvider);

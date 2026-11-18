@@ -48,42 +48,24 @@ class CrisisScreen extends ConsumerWidget {
     }
   }
 
-  /// Numbers that work in Ethiopia. Deliberately short: in a crisis, fewer
-  /// choices is kinder. Review with a local clinical advisor before launch.
+  /// Help outside Ethiopia. The Ethiopian numbers sit at the top of the
+  /// screen. Review with a local clinical advisor before launch.
   static List<Map<String, dynamic>> get _resources => <Map<String, dynamic>>[
-    {
-      'name': tr('Ambulance'),
-      'desc': tr('Medical emergency, overdose or serious injury.'),
-      'action_type': 'call',
-      'action_target': '907',
-      'badge': tr('Call 907'),
-      'icon': 'phone_in_talk_rounded',
-    },
-    {
-      'name': tr('Police'),
-      'desc': tr('If you or someone else is in immediate danger.'),
-      'action_type': 'call',
-      'action_target': '991',
-      'badge': tr('Call 991'),
-      'icon': 'shield_rounded',
-    },
-    {
-      'name': tr('Outside Ethiopia?'),
-      'desc': tr('Find a free, confidential helpline in your country.'),
-      'action_type': 'url',
-      'action_target': 'https://findahelpline.com',
-      'badge': tr('Worldwide'),
-      'icon': 'public_rounded',
-    },
-  ];
+        {
+          'name': tr('Outside Ethiopia?'),
+          'desc': tr('Find a free, confidential helpline in your country.'),
+          'action_type': 'url',
+          'action_target': 'https://findahelpline.com',
+          'badge': tr('Worldwide'),
+          'icon': 'public_rounded',
+        },
+      ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final resources = _resources;
     final s = ref.watch(stringsProvider);
     final plan = ref.watch(safetyPlanProvider);
     final person = plan.people.isEmpty ? null : plan.people.first;
-    final planDone = plan.stepsDone;
 
     return FriendPageScaffold(
       eyebrow: s.crisis,
@@ -93,70 +75,54 @@ class CrisisScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _PrimaryCtaCard(
-            title: s.talkToListenerNow,
-            subtitle: s.listenersAvailableFree,
-            onTap: () => context.push(AppRoutes.home),
-          ),
-          const SizedBox(height: 14),
-          _HelpRequestCard(),
-          const SizedBox(height: 14),
           _EmergencyCard(
-            title: s.emergencyServices,
-            number: s.localEmergencyNumber,
-            callLabel: s.call,
-            onCall: () => _handleAction(
-              context,
-              {'action_type': 'call', 'action_target': s.localEmergencyNumber},
-            ),
-          ),
-          const SizedBox(height: 14),
-          if (person != null)
-            _ContactCard(
-              name: person.name,
-              role: s.trustedContact,
-              phone: person.phone,
-              onCall: person.phone.isNotEmpty
-                  ? () => _handleAction(context, {'action_type': 'call', 'action_target': person.phone})
-                  : null,
-            )
-          else
-            _ToolkitCard(
-              title: tr('Add someone you trust'),
-              subtitle: tr('So their number is one tap away when you need it'),
-              icon: Icons.person_add_alt_1_rounded,
-              onTap: () => context.push(AppRoutes.safetyPlan),
-            ),
-          const SizedBox(height: 14),
-          _ToolkitCard(
-            title: s.breatheWithMe,
-            subtitle: s.guidedGrounding,
-            icon: Icons.air_rounded,
-            onTap: () => BoxBreathingDialog.show(context),
-          ),
-          const SizedBox(height: 14),
-          _ToolkitCard(
-            title: s.mySafetyPlan,
-            subtitle: s.safetyPlanStepsComplete(planDone, 4),
-            icon: Icons.shield_outlined,
-            onTap: () => context.push(AppRoutes.safetyPlan),
-          ),
-          const SizedBox(height: 28),
-          Text(
-            s.verifiedCrisisLifelines,
-            style: const TextStyle(
-              fontFamily: 'Geist',
-              fontSize: FriendTypeScale.headlineSmall,
-              fontWeight: FontWeight.w800,
-              color: FriendColors.textPrimary,
-            ),
+            onCall: (number) => _handleAction(context, {'action_type': 'call', 'action_target': number}),
           ),
           const SizedBox(height: 12),
-          for (final res in resources) ...[
-            _CrisisResourceCard(
-              resource: res,
-              onTap: () => _handleAction(context, res),
-            ),
+          _HelpRequestCard(),
+          const SizedBox(height: FriendLayout.sectionGap),
+          FriendSectionLabel(tr('Other ways to get support')),
+          FriendListGroup(
+            children: [
+              FriendMenuTile(
+                icon: Icons.person_search_outlined,
+                title: tr('Find someone to talk to'),
+                subtitle: tr('See who has open times today'),
+                onTap: () => context.go(AppRoutes.home),
+              ),
+              if (person != null)
+                FriendMenuTile(
+                  icon: Icons.call_outlined,
+                  title: person.name,
+                  subtitle: person.phone.isNotEmpty ? '${s.trustedContact} · ${person.phone}' : s.trustedContact,
+                  onTap: person.phone.isNotEmpty
+                      ? () => _handleAction(context, {'action_type': 'call', 'action_target': person.phone})
+                      : () => context.push(AppRoutes.safetyPlan),
+                )
+              else
+                FriendMenuTile(
+                  icon: Icons.person_add_alt_1_outlined,
+                  title: tr('Add someone you trust'),
+                  subtitle: tr('So their number is one tap away when you need it'),
+                  onTap: () => context.push(AppRoutes.safetyPlan),
+                ),
+              FriendMenuTile(
+                icon: Icons.air_rounded,
+                title: s.breatheWithMe,
+                subtitle: s.guidedGrounding,
+                onTap: () => BoxBreathingDialog.show(context),
+              ),
+              FriendMenuTile(
+                icon: Icons.shield_outlined,
+                title: s.mySafetyPlan,
+                subtitle: s.safetyPlanStepsComplete(plan.stepsDone, 4),
+                onTap: () => context.push(AppRoutes.safetyPlan),
+              ),
+            ],
+          ),
+          const SizedBox(height: FriendLayout.sectionGap),
+          for (final res in _resources) ...[
+            _CrisisResourceCard(resource: res, onTap: () => _handleAction(context, res)),
             const SizedBox(height: 10),
           ],
         ],
@@ -165,257 +131,48 @@ class CrisisScreen extends ConsumerWidget {
   }
 }
 
-class _PrimaryCtaCard extends StatelessWidget {
-  const _PrimaryCtaCard({
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
+/// The first thing on the screen: the two Ethiopian emergency numbers.
+class _EmergencyCard extends StatelessWidget {
+  const _EmergencyCard({required this.onCall});
 
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
+  final ValueChanged<String> onCall;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: FriendColors.primary,
-      borderRadius: BorderRadius.circular(FriendRadii.medium),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Row(
+    final theme = Theme.of(context);
+    Widget button(String label, String number) => Expanded(
+          child: FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: FriendColors.error, minimumSize: const Size(0, 56)),
+            onPressed: () => onCall(number),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(label, style: theme.textTheme.labelMedium?.copyWith(color: Colors.white70)),
+                Text(number, style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontFeatures: friendTabular)),
+              ],
+            ),
+          ),
+        );
+    return CandyCard(
+      tint: FriendColors.error,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(tr('In danger right now?'), style: theme.textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Text(
+            tr('If you might hurt yourself or someone else, call now or go to the nearest hospital.'),
+            style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.onErrorContainer),
+          ),
+          const SizedBox(height: 14),
+          Row(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontFamily: 'Geist',
-                        fontSize: FriendTypeScale.bodyLarge,
-                        fontWeight: FontWeight.w800,
-                        color: FriendColors.onPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontFamily: 'Geist',
-                        fontSize: FriendTypeScale.bodySmall,
-                        color: FriendColors.onPrimary.withValues(alpha: 0.85),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.arrow_forward_rounded,
-                  color: FriendColors.onPrimary),
+              button(tr('Ambulance'), '907'),
+              const SizedBox(width: 10),
+              button(tr('Police'), '991'),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EmergencyCard extends StatelessWidget {
-  const _EmergencyCard({
-    required this.title,
-    required this.number,
-    required this.callLabel,
-    required this.onCall,
-  });
-
-  final String title;
-  final String number;
-  final String callLabel;
-  final VoidCallback onCall;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: FriendColors.errorContainer,
-        borderRadius: BorderRadius.circular(FriendRadii.medium),
-        border: Border.all(color: FriendColors.error.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.caption,
-                    fontWeight: FontWeight.w700,
-                    color: FriendColors.onErrorContainer,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  number,
-                  style: const TextStyle(
-                    fontFamily: 'Geist Mono',
-                    fontSize: FriendTypeScale.headlineSmall,
-                    fontWeight: FontWeight.w800,
-                    color: FriendColors.onErrorContainer,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          FilledButton(
-            onPressed: onCall,
-            style: FilledButton.styleFrom(
-              backgroundColor: FriendColors.error,
-              foregroundColor: FriendColors.onPrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(FriendRadii.pill),
-              ),
-            ),
-            child: Text(
-              callLabel,
-              style: const TextStyle(
-                fontFamily: 'Geist',
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ContactCard extends StatelessWidget {
-  const _ContactCard({
-    required this.name,
-    required this.role,
-    required this.phone,
-    this.onCall,
-  });
-
-  final String name;
-  final String role;
-  final String? phone;
-  final VoidCallback? onCall;
-
-  @override
-  Widget build(BuildContext context) {
-    return CandyCard(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: FriendColors.primaryLight,
-            child: Text(
-              name.isNotEmpty ? name[0].toUpperCase() : '?',
-              style: const TextStyle(
-                fontFamily: 'Geist',
-                fontWeight: FontWeight.w800,
-                color: FriendColors.primary,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.bodyLarge,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(
-                  role,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.bodySmall,
-                    color: FriendColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (onCall != null)
-            IconButton(
-              onPressed: onCall,
-              icon: const Icon(Icons.call_rounded, color: FriendColors.primary),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ToolkitCard extends StatelessWidget {
-  const _ToolkitCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return CandyCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: FriendColors.apricot,
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Icon(icon, color: FriendColors.accentDeep),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.bodyLarge,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.bodySmall,
-                    color: FriendColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: FriendColors.textMuted),
         ],
       ),
     );
@@ -455,15 +212,7 @@ class _CrisisResourceCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: FriendColors.recessed,
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Icon(icon, color: FriendColors.primaryDeep, size: 22),
-          ),
+          FriendIconTile(icon: icon, color: FriendColors.error, size: 44),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -474,44 +223,17 @@ class _CrisisResourceCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         name,
-                        style: const TextStyle(
-                          fontFamily: 'Geist',
-                          fontSize: FriendTypeScale.bodyLarge,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
                     if (badge.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: FriendColors.primaryLight,
-                          borderRadius: BorderRadius.circular(FriendRadii.pill),
-                        ),
-                        child: Text(
-                          badge,
-                          style: const TextStyle(
-                            fontFamily: 'Geist',
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: FriendColors.primaryDeep,
-                          ),
-                        ),
-                      ),
+                      FriendStatusChip(label: badge, color: FriendColors.error),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
                   desc,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.bodySmall,
-                    height: 1.35,
-                    color: FriendColors.textSecondary,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                 ),
               ],
             ),
@@ -545,8 +267,7 @@ class _HelpRequestCard extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return CandyCard(
-      tint: FriendColors.primary,
-      accentStripe: true,
+      
       onTap: () => showHelpRequestSheet(context, ref),
       child: Row(
         children: [

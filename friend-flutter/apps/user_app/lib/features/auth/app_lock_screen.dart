@@ -2,14 +2,13 @@ import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:core/core.dart';
 
 import '../../router.dart';
 import '../auth/app_lock_controller.dart';
 import '../auth/auth_controller.dart';
-import '../brand/figma_assets.dart';
+import '../brand/brand_assets.dart';
 
 /// Full-screen lock overlay shown whenever [appLockProvider] is `true`.
 ///
@@ -99,227 +98,127 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen>
   @override
   Widget build(BuildContext context) {
     final lock = ref.read(appLockProvider.notifier);
+    final theme = Theme.of(context);
     final user = ref.watch(currentUserProvider);
-    final name = user?.name.trim().split(' ').first ?? 'there';
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'A';
+    final name = user?.name.trim().split(' ').first ?? '';
+    final showPassword = _showPassword || !lock.biometricsAvailable;
 
     return Scaffold(
       backgroundColor: FriendColors.background,
-      body: Stack(
-        children: [
-          // Background atmosphere
-          const Positioned.fill(child: FriendAtmosphere()),
-
-          // Content
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 24),
-
-                    // Avatar
-                    FriendAvatar(size: 80, initials: initial),
-                    const SizedBox(height: 16),
-
-                    Text(
-                      trx('Welcome back, $name', 'እንኳን ደህና ተመለሱ፣ $name'),
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.urbanist(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.6,
-                        color: FriendColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      tr('Verify it\'s you to continue'),
-                      style: GoogleFonts.urbanist(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: FriendColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 48),
-
-                    // Biometric button (if available)
-                    if (lock.biometricsAvailable && !_showPassword) ...[
-                      ScaleTransition(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 380),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(child: BrandAssets.mark(size: 44)),
+                  const SizedBox(height: 24),
+                  Text(
+                    name.isEmpty ? tr('Welcome back') : trx('Welcome back, $name', 'እንኳን ደህና ተመለሱ፣ $name'),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    tr("Verify it's you to continue"),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
+                  ),
+                  const SizedBox(height: 40),
+                  if (!showPassword) ...[
+                    Center(
+                      child: ScaleTransition(
                         scale: _scale,
-                        child: GestureDetector(
-                          onTap: _busy ? null : _tryBiometrics,
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [Color(0xFF2AADCF), FriendColors.primary],
+                        child: Semantics(
+                          button: true,
+                          label: tr('Tap to use Face ID or Fingerprint'),
+                          child: Material(
+                            color: FriendColors.surface,
+                            shape: const CircleBorder(side: BorderSide(color: FriendColors.border)),
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: _busy ? null : _tryBiometrics,
+                              child: SizedBox(
+                                width: 88,
+                                height: 88,
+                                child: _busy
+                                    ? const Center(
+                                        child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)),
+                                      )
+                                    : const Icon(Icons.fingerprint_rounded, size: 44, color: FriendColors.primary),
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: FriendColors.primary.withValues(alpha: 0.35),
-                                  blurRadius: 28,
-                                  spreadRadius: 4,
-                                ),
-                              ],
                             ),
-                            child: _busy
-                                ? const Center(
-                                    child: SizedBox(
-                                      width: 28,
-                                      height: 28,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                : const Icon(
-                                    Icons.fingerprint_rounded,
-                                    size: 52,
-                                    color: Colors.white,
-                                  ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Text(
-                        tr('Tap to use Face ID or Fingerprint'),
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: FriendColors.textMuted,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      tr('Tap to use Face ID or Fingerprint'),
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textMuted),
+                    ),
+                    const SizedBox(height: 24),
+                    TextButton(
+                      onPressed: () => setState(() {
+                        _showPassword = true;
+                        _error = null;
+                      }),
+                      child: Text(tr('Use password instead')),
+                    ),
+                  ] else ...[
+                    TextField(
+                      controller: _passCtrl,
+                      obscureText: _obscure,
+                      autofocus: true,
+                      onSubmitted: (_) => _submitPassword(),
+                      decoration: InputDecoration(
+                        labelText: tr('Enter your password'),
+                        suffixIcon: IconButton(
+                          tooltip: _obscure ? tr('Show password') : tr('Hide password'),
+                          icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 20),
+                          onPressed: () => setState(() => _obscure = !_obscure),
                         ),
                       ),
-                      const SizedBox(height: 32),
-                      TextButton(
+                    ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 12),
+                      Text(_error!, style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.error)),
+                    ],
+                    const SizedBox(height: 16),
+                    FriendGlowButton(label: tr('Unlock'), expanded: true, busy: _busy, onPressed: _submitPassword),
+                    if (lock.biometricsAvailable) ...[
+                      const SizedBox(height: 8),
+                      TextButton.icon(
                         onPressed: () => setState(() {
-                          _showPassword = true;
+                          _showPassword = false;
                           _error = null;
                         }),
-                        child: Text(
-                          tr('Use password instead'),
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: FriendColors.primary,
-                            decoration: TextDecoration.underline,
-                            decorationColor: FriendColors.primary,
-                          ),
-                        ),
+                        icon: const Icon(Icons.fingerprint_rounded, size: 18),
+                        label: Text(tr('Use biometrics')),
                       ),
                     ],
-
-                    // Password field (shown when biometrics unavailable or user chose it)
-                    if (_showPassword || !lock.biometricsAvailable) ...[
-                      CandyCard(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              tr('Enter your password'),
-                              style: GoogleFonts.urbanist(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: FriendColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _passCtrl,
-                              obscureText: _obscure,
-                              autofocus: true,
-                              onSubmitted: (_) => _submitPassword(),
-                              decoration: InputDecoration(
-                                hintText: '••••••••',
-                                prefixIcon: FigmaAssets.lock(size: 20),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscure
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off_outlined,
-                                    size: 20,
-                                    color: FriendColors.textMuted,
-                                  ),
-                                  onPressed: () =>
-                                      setState(() => _obscure = !_obscure),
-                                ),
-                              ),
-                            ),
-                            if (_error != null) ...[
-                              const SizedBox(height: 12),
-                              Text(
-                                _error!,
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: FriendColors.error,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 20),
-                            FriendGlowButton(
-                              label: _busy ? 'Verifying…' : tr('Unlock'),
-                              icon: Icons.lock_open_rounded,
-                              expanded: true,
-                              onPressed: _busy ? null : _submitPassword,
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (lock.biometricsAvailable) ...[
-                        const SizedBox(height: 20),
-                        TextButton.icon(
-                          onPressed: () => setState(() {
-                            _showPassword = false;
-                            _error = null;
-                          }),
-                          icon: const Icon(Icons.fingerprint_rounded, size: 18),
-                          label: Text(
-                            tr('Use biometrics'),
-                            style: GoogleFonts.urbanist(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-
-                    const SizedBox(height: 48),
-
-                    // Sign in with different account
-                    TextButton(
-                      onPressed: () async {
-                        await ref.read(authControllerProvider).logout();
-                        if (!context.mounted) return;
-                        ref.read(appLockProvider.notifier).unlockWithPassword();
-                        context.go(AppRoutes.login);
-                      },
-                      child: Text(
-                        tr('Sign in with a different account'),
-                        style: GoogleFonts.urbanist(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: FriendColors.textMuted,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
                   ],
-                ),
+                  const SizedBox(height: 40),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: FriendColors.textSecondary),
+                    onPressed: () async {
+                      await ref.read(authControllerProvider).logout();
+                      if (!context.mounted) return;
+                      ref.read(appLockProvider.notifier).unlockWithPassword();
+                      context.go(AppRoutes.login);
+                    },
+                    child: Text(tr('Sign in with a different account')),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

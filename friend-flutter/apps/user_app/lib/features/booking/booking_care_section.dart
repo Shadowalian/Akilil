@@ -214,8 +214,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (showWho) ...[
-          Text(tr('Who is this session for?'), style: theme.textTheme.titleSmall),
-          const SizedBox(height: 10),
+          FriendSectionLabel(tr('Who is this session for?')),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -241,9 +240,9 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
         ],
         if (!_loading && _problem != null) ...[
           const SizedBox(height: 10),
-          Text(_problem!, style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.accentDeep)),
+          Text(_problem!, style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.warning)),
         ],
-        const SizedBox(height: 24),
+        const SizedBox(height: FriendLayout.sectionGap),
       ],
     );
   }
@@ -286,7 +285,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
               if (mounted) _load();
             },
             icon: const Icon(Icons.add_rounded, size: 18),
-            label: Text(_dependents.isEmpty ? 'Add my child' : tr('Add another child')),
+            label: Text(_dependents.isEmpty ? tr('Add my child') : tr('Add another child')),
           ),
         ),
       ],
@@ -300,13 +299,13 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
         TextField(
           controller: _partnerName,
           textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(labelText: "Partner's name"),
+          decoration: InputDecoration(labelText: tr("Partner's name")),
         ),
         const SizedBox(height: 10),
         TextField(
           controller: _partnerEmail,
           keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(labelText: "Partner's email (optional)"),
+          decoration: InputDecoration(labelText: tr("Partner's email (optional)")),
         ),
         const SizedBox(height: 8),
         Text(
@@ -381,8 +380,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(tr('What will you cook?'), style: theme.textTheme.titleSmall),
-        const SizedBox(height: 4),
+        FriendSectionLabel(tr('What will you cook?')),
         Text(
           trx(
             'You cook along at home, so you need the ingredients ready. Pick a time at least $lead hours away to leave time for shopping.',
@@ -399,8 +397,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: CandyCard(
-                tint: selected ? FriendColors.accent : null,
-                accentStripe: selected,
+                tint: selected ? FriendColors.primary : null,
                 padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
                 onTap: () {
                   setState(() => _recipeId = id);
@@ -410,7 +407,7 @@ class _BookingCareSectionState extends ConsumerState<BookingCareSection> {
                   children: [
                     Icon(
                       selected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
-                      color: selected ? FriendColors.accentDeep : FriendColors.textMuted,
+                      color: selected ? FriendColors.primary : FriendColors.textMuted,
                     ),
                     const SizedBox(width: 12),
                     Expanded(

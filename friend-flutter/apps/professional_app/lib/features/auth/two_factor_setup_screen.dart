@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -53,7 +54,7 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
     if (_secret == null) return;
     final code = _code.text.trim();
     if (code.length != 6) {
-      setState(() => _codeError = 'Enter the 6-digit code.');
+      setState(() => _codeError = tr('Enter the 6-digit code.'));
       return;
     }
     setState(() { _busy = true; _codeError = null; });
@@ -74,7 +75,7 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
           context: context,
           barrierDismissible: false,
           builder: (dCtx) => AlertDialog(
-            title: const Text('Save your recovery codes'),
+            title: Text(tr('Save your recovery codes')),
             content: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -95,7 +96,7 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
                   Clipboard.setData(ClipboardData(text: _recoveryCodes.join('\n')));
                   Navigator.pop(dCtx);
                 },
-                child: const Text('Copy & close'),
+                child: Text(tr('Copy & close')),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(dCtx),
@@ -122,7 +123,7 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Two-factor authentication')),
+      appBar: AppBar(title: Text(tr('Two-factor authentication'))),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -138,11 +139,11 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
                       children: [
                         proBrandMark(size: 48),
                         const SizedBox(height: 16),
-                        Text('Secure your account', style: theme.textTheme.headlineMedium),
+                        Text(tr('Secure your account'), style: theme.textTheme.headlineMedium),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Scan the QR code in Google Authenticator, 1Password, '
-                          'or Authy, then enter the 6-digit code below.',
+                        Text(
+                          tr('Scan the QR code in Google Authenticator, 1Password, '
+                          'or Authy, then enter the 6-digit code below.'),
                         ),
                         const SizedBox(height: 24),
                         if (_otpauthUrl != null)
@@ -167,7 +168,7 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
                             onTap: () {
                               Clipboard.setData(ClipboardData(text: _secret!));
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Secret copied')),
+                                SnackBar(content: Text(tr('Secret copied'))),
                               );
                             },
                             child: Container(
@@ -179,7 +180,7 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
                               ),
                               child: Text(
                                 _secret!,
-                                style: const TextStyle(fontFamily: 'monospace', fontSize: 14),
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
                           ),
@@ -189,8 +190,8 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
                           controller: _code,
                           keyboardType: TextInputType.number,
                           maxLength: 6,
-                          decoration: const InputDecoration(
-                            labelText: '6-digit code',
+                          decoration: InputDecoration(
+                            labelText: tr('6-digit code'),
                             counterText: '',
                           ),
                         ),
@@ -204,7 +205,7 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
                         const SizedBox(height: 16),
                         FilledButton(
                           onPressed: _busy ? null : _confirm,
-                          child: const Text('Confirm and enable'),
+                          child: Text(tr('Confirm and enable')),
                         ),
                       ],
                     ),

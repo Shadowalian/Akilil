@@ -92,7 +92,7 @@ class MoodAnalyticsScreen extends ConsumerWidget {
                         reservedSize: 28,
                         getTitlesWidget: (v, _) => Text(
                           v.toInt().toString(),
-                          style: const TextStyle(fontSize: 11),
+                          style: Theme.of(context).textTheme.labelSmall,
                         ),
                       ),
                     ),
@@ -109,7 +109,7 @@ class MoodAnalyticsScreen extends ConsumerWidget {
                           final d = DateTime.tryParse(series[i]['date'] as String? ?? '');
                           return Text(
                             d == null ? '' : trDate('M/d', d),
-                            style: const TextStyle(fontSize: 11),
+                            style: Theme.of(context).textTheme.labelSmall,
                           );
                         },
                       ),

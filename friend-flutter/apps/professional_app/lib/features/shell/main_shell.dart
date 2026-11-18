@@ -1,20 +1,21 @@
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'pro_stitch_chrome.dart';
 
-/// Bottom-nav shell — Stitch glass dock + clinical canvas.
+/// Tab shell: content above, docked tab bar below.
 class MainShell extends StatelessWidget {
-  const MainShell({super.key, required this.child});
+  MainShell({super.key, required this.child});
   final Widget child;
 
-  static const _tabs = <_NavTab>[
-    _NavTab('/', 'Today'),
-    _NavTab('/sessions', 'Sessions'),
-    _NavTab('/groups', 'Groups'),
-    _NavTab('/availability', 'Schedule'),
-    _NavTab('/profile', 'Profile'),
+  static List<_NavTab> get _tabs => <_NavTab>[
+    _NavTab('/', tr('Today')),
+    _NavTab('/sessions', tr('Sessions')),
+    _NavTab('/groups', tr('Groups')),
+    _NavTab('/availability', tr('Schedule')),
+    _NavTab('/profile', tr('Profile')),
   ];
 
   int _indexFor(String location) {
@@ -39,20 +40,13 @@ class MainShell extends StatelessWidget {
         location.contains('/room');
     return Material(
       color: FriendColors.background,
-      child: Stack(
-        fit: StackFit.expand,
+      child: Column(
         children: [
-          const FriendAtmosphere(),
-          Positioned.fill(child: child),
+          Expanded(child: child),
           if (!hideNav)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: ProStitchBottomNav(
-                selectedIndex: index,
-                onSelected: (i) => context.go(_tabs[i].path),
-              ),
+            ProStitchBottomNav(
+              selectedIndex: index,
+              onSelected: (i) => context.go(_tabs[i].path),
             ),
         ],
       ),

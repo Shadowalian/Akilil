@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import 'package:core/core.dart';
 
@@ -47,60 +46,39 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  final List<String> _eveningSlots = ['7:15 PM', '8:30 PM (Standby)'];
+  void _toast(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
 
   Future<void> _toggleWalkIn(bool value) async {
     try {
-      final dio = ref.read(dioProvider);
-      await dio.put('/me/professional-profile', data: {
-        'offers_free_listening': value,
-      });
+      await ref.read(dioProvider).put('/me/professional-profile', data: {'offers_free_listening': value});
       ref.invalidate(_dashboardProvider);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            value ? 'Online walk-in activated.' : 'Walk-in paused.',
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not update: $e')),
-      );
+      _toast(value ? tr('Walk-ins are on. Clients can request you now.') : tr('Walk-in paused.'));
+    } catch (_) {
+      _toast(tr("Couldn't update. Check your connection and try again."));
     }
   }
 
   Future<void> _respondListening(int id, bool accept) async {
     try {
-      final dio = ref.read(dioProvider);
-      await dio.post('/appointments/$id/${accept ? 'accept' : 'decline'}');
+      await ref.read(dioProvider).post('/appointments/$id/${accept ? 'accept' : 'decline'}');
       ref.invalidate(_dashboardProvider);
       if (!mounted) return;
       if (accept) {
         context.go('/sessions/$id/host');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Request declined.')),
-        );
+        _toast(tr('Request declined.'));
       }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed: $e')),
-      );
+    } catch (_) {
+      _toast(tr("Couldn't update. Check your connection and try again."));
     }
   }
 
   void _openDossier(Map<String, dynamic> client, int sessionCount) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ClientDetailScreen(
-          user: client,
-          sessionCount: sessionCount,
-        ),
-      ),
+      MaterialPageRoute<void>(builder: (_) => ClientDetailScreen(user: client, sessionCount: sessionCount)),
     );
   }
 
@@ -108,377 +86,96 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final async = ref.watch(_dashboardProvider);
     final user = ref.watch(currentUserProvider);
-    final headerInset = MediaQuery.paddingOf(context).top + 56;
+    final theme = Theme.of(context);
 
-    return async.when(
-      loading: () => Stack(
-        children: [
-          const Center(child: CircularProgressIndicator()),
-          ProStitchCommandHeader(
-            avatarInitial: user?.name,
-            onAvatarTap: () => context.go('/profile'),
-          ),
-        ],
-      ),
-      error: (_, __) => Stack(
-        children: [
-          Center(
-            child: Text(
-              "Couldn't load command center.",
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ),
-          ProStitchCommandHeader(
-            avatarInitial: user?.name,
-            onAvatarTap: () => context.go('/profile'),
-          ),
-        ],
-      ),
-      data: (data) {
-        final upcoming = (data['appointments'] as List).cast<Map<String, dynamic>>();
-        final pendingAll = (data['pending'] as List).cast<Map<String, dynamic>>();
-        final listeningRequests = pendingAll
-            .where((a) =>
-                (a['kind'] as String? ?? '') == 'listening_request' &&
-                (a['status'] as String? ?? '') == 'pending')
-            .toList();
-        final earnings = data['earnings_mtd'] as Map<String, dynamic>;
-        final onboarding = data['onboarding'] as Map<String, dynamic>;
-        final profile = data['profile'] as Map<String, dynamic>;
-        final offersWalkIn = profile['offers_free_listening'] == true;
-        final userName = user?.name ?? 'Clinician';
-        final title = _clinicianTitle(profile);
-        final todayCount = _sessionsToday(upcoming);
-        final queue = _consultationQueue(upcoming);
-        final coherence = _coherenceLabel(profile);
+    final header = ProStitchCommandHeader(avatarInitial: user?.name, onAvatarTap: () => context.go('/profile'));
 
-        return Stack(
-          children: [
-            RefreshIndicator(
-              color: FriendColors.primary,
-              onRefresh: () async => ref.invalidate(_dashboardProvider),
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(
-                  FriendLayout.horizontal,
-                  headerInset + 8,
-                  FriendLayout.horizontal,
-                  FriendLayout.dockClearance + 16,
-                ),
-                children: [
-                  _IdentityCard(
-                    name: userName,
-                    title: title,
-                    verified: profile['badge_active'] == true ||
-                        profile['verification_status'] == 'verified',
-                    walkInEnabled: offersWalkIn,
-                    crisisFlags: listeningRequests.length,
-                    onWalkInChanged: _toggleWalkIn,
-                  ),
-                  const SizedBox(height: 20),
-                  _MetricsStrip(
-                    todaySessions: todayCount,
-                    mtdEarnings: earnings,
-                    coherence: coherence,
-                    onEarningsTap: () => context.go('/earnings'),
-                  ),
-                  if (listeningRequests.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    _ListeningSection(
-                      requests: listeningRequests,
-                      onAccept: (id) => _respondListening(id, true),
-                      onDecline: (id) => _respondListening(id, false),
-                    ),
-                  ],
-                  const SizedBox(height: 20),
-                  _QueueSection(
-                    queue: queue,
-                    onLaunchMeet: (id) => context.go('/sessions/$id/host'),
-                    onDossier: (client, count) => _openDossier(client, count),
-                  ),
-                  const SizedBox(height: 20),
-                  _EveningWindowsSection(
-                    slots: _eveningSlots,
-                    onAddSlot: () {
-                      setState(() {
-                        final hour = 7 + _eveningSlots.length;
-                        _eveningSlots.insert(
-                          _eveningSlots.length - 1,
-                          '${hour % 12}:${15 + _eveningSlots.length * 15} PM',
-                        );
-                      });
-                    },
-                    onRemoveSlot: (slot) =>
-                        setState(() => _eveningSlots.remove(slot)),
-                    onTune: () => context.go('/availability'),
-                  ),
-                  const SizedBox(height: 20),
-                  _OnboardingNudge(onboarding: onboarding),
-                  const SizedBox(height: 20),
-                  const _PeerSupervisionCard(),
-                ],
-              ),
-            ),
-            ProStitchCommandHeader(
-              avatarInitial: user?.name,
-              onAvatarTap: () => context.go('/profile'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-String _clinicianTitle(Map<String, dynamic> profile) {
-  final category = profile['category'];
-  if (category is Map && category['name'] is String) {
-    return category['name'] as String;
-  }
-  final bio = profile['bio'] as String?;
-  if (bio != null && bio.isNotEmpty) {
-    return bio.length > 48 ? '${bio.substring(0, 48)}…' : bio;
-  }
-  return 'Licensed practitioner';
-}
-
-int _sessionsToday(List<Map<String, dynamic>> appts) {
-  final now = DateTime.now();
-  var count = 0;
-  for (final a in appts) {
-    if (a['status'] == 'cancelled') continue;
-    final when = DateTime.tryParse(a['scheduled_at'] as String? ?? '');
-    if (when == null) continue;
-    if (when.year == now.year && when.month == now.month && when.day == now.day) {
-      count++;
-    }
-  }
-  return count;
-}
-
-List<Map<String, dynamic>> _consultationQueue(List<Map<String, dynamic>> appts) {
-  final now = DateTime.now().subtract(const Duration(minutes: 30));
-  final list = <Map<String, dynamic>>[];
-  for (final a in appts) {
-    if (a['status'] == 'cancelled') continue;
-    final when = DateTime.tryParse(a['scheduled_at'] as String? ?? '');
-    if (when == null || when.isBefore(now)) continue;
-    list.add(a);
-  }
-  list.sort((a, b) {
-    final ta = DateTime.parse(a['scheduled_at'] as String);
-    final tb = DateTime.parse(b['scheduled_at'] as String);
-    return ta.compareTo(tb);
-  });
-  return list;
-}
-
-String _coherenceLabel(Map<String, dynamic> profile) {
-  final rating = (profile['rating_avg'] as num?)?.toDouble();
-  if (rating != null && rating > 0) {
-    return '${(rating / 5 * 100).round()}%';
-  }
-  return '—';
-}
-
-String _formatMtd(Map<String, dynamic> earnings) {
-  final cents = (earnings['total_cents'] as int? ?? 0) / 100;
-  final currency = earnings['currency'] as String? ?? 'ETB';
-  if (cents >= 1000) {
-    return '${(cents / 1000).toStringAsFixed(1)}k $currency';
-  }
-  return '${cents.toStringAsFixed(0)} $currency';
-}
-
-class _IdentityCard extends StatelessWidget {
-  const _IdentityCard({
-    required this.name,
-    required this.title,
-    required this.verified,
-    required this.walkInEnabled,
-    required this.crisisFlags,
-    required this.onWalkInChanged,
-  });
-
-  final String name;
-  final String title;
-  final bool verified;
-  final bool walkInEnabled;
-  final int crisisFlags;
-  final ValueChanged<bool> onWalkInChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProStitchCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  FriendAvatar(
-                    size: 56,
-                    initials: personInitial(name),
-                    verified: verified,
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: FriendColors.secondaryFixedDim,
-                        border: Border.all(color: FriendColors.surfaceLowest, width: 2),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            name,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: FriendColors.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (verified) ...[
-                          const SizedBox(width: 4),
-                          const Icon(Icons.verified, size: 18, color: FriendColors.primary),
-                        ],
-                      ],
-                    ),
-                    Text(
-                      title,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: FriendColors.textSecondary,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                visualDensity: VisualDensity.compact,
-                onPressed: () {},
-                icon: const Icon(Icons.edit_note_outlined, size: 22),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: FriendColors.recessed,
-                  borderRadius: BorderRadius.circular(FriendRadii.pill),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: FriendColors.accent,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      crisisFlags == 0 ? 'No safety flags' : '$crisisFlags safety flags to review',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: FriendColors.accent,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const ProStitchMicroLabel('Online Walk-in'),
-                  Switch.adaptive(
-                    value: walkInEnabled,
-                    activeTrackColor: FriendColors.primary,
-                    onChanged: onWalkInChanged,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MetricsStrip extends StatelessWidget {
-  const _MetricsStrip({
-    required this.todaySessions,
-    required this.mtdEarnings,
-    required this.coherence,
-    this.onEarningsTap,
-  });
-
-  final int todaySessions;
-  final Map<String, dynamic> mtdEarnings;
-  final String coherence;
-  final VoidCallback? onEarningsTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
+        header,
         Expanded(
-          child: _MetricTile(
-            icon: Icons.event_available_outlined,
-            tag: 'Today',
-            value: '$todaySessions',
-            caption: 'Sessions today',
-            onTap: onEarningsTap,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _MetricTile(
-            icon: Icons.account_balance_wallet_outlined,
-            tag: 'Month',
-            value: _formatMtd(mtdEarnings).split(' ').first,
-            caption: '${mtdEarnings['currency'] ?? 'ETB'} earned',
-            onTap: onEarningsTap,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _MetricTile(
-            icon: Icons.sensors_rounded,
-            tag: 'Live',
-            value: 'Go',
-            caption: 'Broadcast',
-            valueColor: FriendColors.accent,
-            onTap: () => context.push('/live'),
+          child: async.when(
+            loading: () => const Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+            error: (_, __) => FriendEmptyState(
+              icon: Icons.cloud_off_outlined,
+              title: tr("Couldn't load your day"),
+              message: tr('Check your connection and try again.'),
+              ctaLabel: tr('Try again'),
+              onCta: () => ref.invalidate(_dashboardProvider),
+            ),
+            data: (data) {
+              final upcoming = (data['appointments'] as List).cast<Map<String, dynamic>>();
+              final pendingAll = (data['pending'] as List).cast<Map<String, dynamic>>();
+              final listeningRequests = pendingAll
+                  .where((a) => a['kind'] == 'listening_request' && a['status'] == 'pending')
+                  .toList();
+              final earnings = data['earnings_mtd'] as Map<String, dynamic>;
+              final onboarding = data['onboarding'] as Map<String, dynamic>;
+              final profile = data['profile'] as Map<String, dynamic>;
+              final offersWalkIn = profile['offers_free_listening'] == true;
+              final firstName = _shortName(user?.name ?? '');
+              final queue = _consultationQueue(upcoming);
+              final rating = (profile['rating_avg'] as num?)?.toDouble() ?? 0;
+              final ratingCount = (profile['rating_count'] as num?)?.toInt() ?? 0;
+
+              return RefreshIndicator(
+                color: FriendColors.primary,
+                backgroundColor: FriendColors.surface,
+                onRefresh: () async => ref.invalidate(_dashboardProvider),
+                child: FriendContentWidth(
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 20, FriendLayout.horizontal, 32),
+                    children: [
+                      Text(trDate('EEEE, d MMMM', DateTime.now()), style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textMuted)),
+                      const SizedBox(height: 4),
+                      Semantics(
+                        header: true,
+                        child: Text(
+                          firstName.isEmpty ? _greeting() : '${_greeting()}, $firstName',
+                          style: theme.textTheme.headlineLarge,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _StatsCard(
+                        today: _sessionsToday(upcoming),
+                        earned: _formatMtd(earnings),
+                        rating: ratingCount > 0 ? rating.toStringAsFixed(1) : '—',
+                        onEarnings: () => context.go('/earnings'),
+                      ),
+                      const SizedBox(height: 12),
+                      _WalkInCard(enabled: offersWalkIn, onChanged: _toggleWalkIn),
+                      if (listeningRequests.isNotEmpty) ...[
+                        const SizedBox(height: FriendLayout.sectionGap),
+                        _ListeningSection(
+                          requests: listeningRequests,
+                          onAccept: (id) => _respondListening(id, true),
+                          onDecline: (id) => _respondListening(id, false),
+                        ),
+                      ],
+                      const SizedBox(height: FriendLayout.sectionGap),
+                      _QueueSection(
+                        queue: queue,
+                        onLaunchMeet: (id) => context.go('/sessions/$id/host'),
+                        onDossier: _openDossier,
+                        onAll: () => context.go('/sessions'),
+                      ),
+                      _OnboardingNudge(onboarding: onboarding),
+                      const SizedBox(height: FriendLayout.sectionGap),
+                      FriendSectionLabel(tr('Shortcuts')),
+                      FriendListGroup(
+                        children: [
+                          FriendMenuTile(icon: Icons.sensors_rounded, title: tr('Go live'), subtitle: tr('Broadcast a reflection or cook-along'), onTap: () => context.push('/live')),
+                          FriendMenuTile(icon: Icons.calendar_month_outlined, title: tr('Weekly hours'), subtitle: tr('When clients can book you'), onTap: () => context.go('/availability')),
+                          FriendMenuTile(icon: Icons.people_outline_rounded, title: tr('Clients'), onTap: () => context.go('/clients')),
+                          FriendMenuTile(icon: Icons.payments_outlined, title: tr('Earnings'), onTap: () => context.go('/earnings')),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -486,160 +183,178 @@ class _MetricsStrip extends StatelessWidget {
   }
 }
 
-class _MetricTile extends StatelessWidget {
-  const _MetricTile({
-    required this.icon,
-    required this.tag,
-    required this.value,
-    required this.caption,
-    this.onTap,
-    this.valueColor,
-  });
+/// "Dr. Hanna Tesfaye" → "Dr. Hanna"; "Selam Bekele" → "Selam".
+String _shortName(String full) {
+  final parts = full.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+  if (parts.isEmpty) return '';
+  const titles = {'dr', 'dr.', 'abba', 'aba', 'chef', 'w/ro', 'ato', 'pastor', 'sheikh', 'prof', 'prof.'};
+  if (parts.length > 1 && titles.contains(parts.first.toLowerCase())) return '${parts[0]} ${parts[1]}';
+  return parts.first;
+}
 
-  final IconData icon;
-  final String tag;
-  final String value;
-  final String caption;
-  final VoidCallback? onTap;
-  final Color? valueColor;
+String _greeting() {
+  final h = DateTime.now().hour;
+  if (h < 12) return tr('Good morning');
+  if (h < 17) return tr('Good afternoon');
+  return tr('Good evening');
+}
+
+int _sessionsToday(List<Map<String, dynamic>> appts) {
+  final now = DateTime.now();
+  return appts.where((a) {
+    if (a['status'] == 'cancelled') return false;
+    final when = DateTime.tryParse(a['scheduled_at'] as String? ?? '')?.toLocal();
+    return when != null && DateUtils.isSameDay(when, now);
+  }).length;
+}
+
+List<Map<String, dynamic>> _consultationQueue(List<Map<String, dynamic>> appts) {
+  final cutoff = DateTime.now().subtract(const Duration(minutes: 30));
+  final list = appts.where((a) {
+    if (a['status'] == 'cancelled') return false;
+    final when = DateTime.tryParse(a['scheduled_at'] as String? ?? '');
+    return when != null && !when.isBefore(cutoff);
+  }).toList()
+    ..sort((a, b) => DateTime.parse(a['scheduled_at'] as String).compareTo(DateTime.parse(b['scheduled_at'] as String)));
+  return list;
+}
+
+String _formatMtd(Map<String, dynamic> earnings) {
+  final major = (earnings['total_cents'] as num? ?? 0) / 100;
+  return major >= 10000 ? '${(major / 1000).toStringAsFixed(1)}k' : major.toStringAsFixed(0);
+}
+
+String _formatLabel(Map<String, dynamic> appt) {
+  if (appt['recipe'] is Map) return trx('Cooking · ${(appt['recipe'] as Map)['title']}', 'ምግብ ዝግጅት · ${(appt['recipe'] as Map)['title']}');
+  if (appt['kind'] == 'listening_request') return tr('Walk-in');
+  return switch (appt['care_format'] as String? ?? 'individual') {
+    'couples' => tr('Couples session'),
+    'family' => tr('Family session'),
+    'child' => tr('Child session'),
+    'teen' => tr('Teen session'),
+    _ => tr('One-to-one session'),
+  };
+}
+
+class _StatsCard extends StatelessWidget {
+  const _StatsCard({required this.today, required this.earned, required this.rating, required this.onEarnings});
+
+  final int today;
+  final String earned;
+  final String rating;
+  final VoidCallback onEarnings;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: FriendColors.surfaceLowest,
-      borderRadius: BorderRadius.circular(FriendRadii.card),
-      elevation: 0,
-      shadowColor: FriendColors.ink.withValues(alpha: 0.04),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(FriendRadii.card),
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(FriendRadii.card),
-            boxShadow: FriendElevation.card,
-          ),
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final theme = Theme.of(context);
+    Widget cell(String value, String label, {VoidCallback? onTap}) => Expanded(
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Column(
                 children: [
-                  Icon(icon, size: 18, color: FriendColors.primary),
-                  ProStitchMicroLabel(tag),
+                  Text(value, style: theme.textTheme.titleLarge?.copyWith(fontFeatures: friendTabular)),
+                  const SizedBox(height: 2),
+                  Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelSmall),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                value,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.5,
-                  color: valueColor ?? FriendColors.textPrimary,
-                ),
-              ),
-              Text(
-                caption,
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  color: FriendColors.textSecondary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+            ),
           ),
+        );
+    return CandyCard(
+      padding: EdgeInsets.zero,
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            cell('$today', tr('Sessions today')),
+            const VerticalDivider(width: 1),
+            cell(earned, tr('ETB earned, 30 days'), onTap: onEarnings),
+            const VerticalDivider(width: 1),
+            cell(rating, tr('Rating')),
+          ],
         ),
       ),
     );
   }
 }
 
+class _WalkInCard extends StatelessWidget {
+  const _WalkInCard({required this.enabled, required this.onChanged});
+
+  final bool enabled;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return CandyCard(
+      padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+      child: Row(
+        children: [
+          Icon(Icons.hearing_rounded, color: enabled ? FriendColors.success : FriendColors.textSecondary),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(tr('Available for walk-ins'), style: theme.textTheme.titleSmall),
+                const SizedBox(height: 2),
+                Text(
+                  enabled ? tr('Clients can ask you for a free listening session now.') : tr('Turn on to take free listening requests.'),
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          Switch(value: enabled, onChanged: onChanged),
+        ],
+      ),
+    );
+  }
+}
+
 class _QueueSection extends StatelessWidget {
-  const _QueueSection({
-    required this.queue,
-    required this.onLaunchMeet,
-    required this.onDossier,
-  });
+  const _QueueSection({required this.queue, required this.onLaunchMeet, required this.onDossier, required this.onAll});
 
   final List<Map<String, dynamic>> queue;
   final void Function(String id) onLaunchMeet;
   final void Function(Map<String, dynamic> client, int count) onDossier;
+  final VoidCallback onAll;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Text(
-              'Up next',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: FriendColors.primaryLight,
-                borderRadius: BorderRadius.circular(FriendRadii.pill),
-              ),
-              child: Text(
-                'Today',
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: FriendColors.primaryDeep,
-                ),
-              ),
-            ),
-            const Spacer(),
-            Text(
-              'Timeline',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: FriendColors.primary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
+        FriendSectionLabel(tr('Up next'), action: queue.length > 1 ? tr('All sessions') : null, onAction: onAll),
         if (queue.isEmpty)
-          ProStitchCard(
-            child: Column(
+          CandyCard(
+            child: Row(
               children: [
-                Icon(Icons.event_available, size: 40, color: FriendColors.textMuted),
-                const SizedBox(height: 8),
-                Text(
-                  'No upcoming consultations',
-                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Bookings from clients will appear here.',
-                  style: TextStyle(color: FriendColors.textSecondary),
+                const Icon(Icons.event_available_outlined, color: FriendColors.textMuted),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tr('No upcoming consultations'), style: Theme.of(context).textTheme.titleSmall),
+                      const SizedBox(height: 2),
+                      Text(tr('Bookings from clients will appear here.'), style: Theme.of(context).textTheme.bodySmall),
+                    ],
+                  ),
                 ),
               ],
             ),
           )
         else ...[
-          _ActiveQueueCard(
-            appt: queue.first,
-            onLaunchMeet: onLaunchMeet,
-            onDossier: onDossier,
-          ),
+          _ActiveQueueCard(appt: queue.first, onLaunchMeet: onLaunchMeet, onDossier: onDossier),
           if (queue.length > 1) ...[
-            const SizedBox(height: 10),
-            for (final a in queue.skip(1).take(4))
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _CompactQueueCard(appt: a, onDossier: onDossier),
-              ),
+            const SizedBox(height: 12),
+            FriendListGroup(
+              dividerIndent: 68,
+              children: [for (final a in queue.skip(1).take(4)) _CompactQueueRow(appt: a, onDossier: onDossier)],
+            ),
           ],
         ],
       ],
@@ -648,11 +363,7 @@ class _QueueSection extends StatelessWidget {
 }
 
 class _ActiveQueueCard extends StatelessWidget {
-  const _ActiveQueueCard({
-    required this.appt,
-    required this.onLaunchMeet,
-    required this.onDossier,
-  });
+  const _ActiveQueueCard({required this.appt, required this.onLaunchMeet, required this.onDossier});
 
   final Map<String, dynamic> appt;
   final void Function(String id) onLaunchMeet;
@@ -660,153 +371,87 @@ class _ActiveQueueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final startsAt = DateTime.parse(appt['scheduled_at'] as String).toLocal();
     final guest = (appt['client'] as Map<String, dynamic>?) ?? const {};
-    final name = guest['name'] as String? ?? 'Client';
+    final name = guest['name'] as String? ?? tr('Client');
     final id = '${appt['id']}';
+    final duration = (appt['duration_minutes'] as num?)?.toInt() ?? 50;
     final mins = startsAt.difference(DateTime.now()).inMinutes;
+    final soon = mins <= 15;
     final startsLabel = mins <= 0
-        ? 'Now'
+        ? tr('Now')
         : mins < 60
-            ? 'In $mins min'
+            ? trx('In $mins min', 'በ$mins ደቂቃ ውስጥ')
             : mins < 24 * 60
-                ? 'In ${mins ~/ 60}h ${mins % 60}m'
-                : DateFormat('EEE').format(startsAt);
-    final note = appt['client_note'] as String?;
+                ? trx('In ${mins ~/ 60}h ${mins % 60}m', 'በ${mins ~/ 60} ሰዓት ${mins % 60} ደቂቃ ውስጥ')
+                : trDate('EEE d MMM', startsAt);
+    final note = (appt['client_note'] as String?)?.trim();
 
-    return ProStitchCard(
-      elevated: true,
+    return CandyCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              ProStitchLivePill(label: startsLabel),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${DateFormat('h:mm a').format(startsAt)} · ${appt['duration_minutes'] ?? 50} min',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(fontSize: 12, color: FriendColors.textSecondary),
-                ),
-              ),
-              const Icon(Icons.lock_outline, size: 16, color: FriendColors.primary),
-              const SizedBox(width: 4),
-              const ProStitchMicroLabel('Private'),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 24,
-                child: Text(personInitial(name)),
-              ),
-              const SizedBox(width: 12),
+              FriendAvatar(size: 44, initials: personInitial(name)),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(name, style: theme.textTheme.titleMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 2),
                     Text(
-                      name,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      appt['recipe'] is Map ? 'Cooking · ${(appt['recipe'] as Map)['title']}' : '${appt['care_format'] ?? 'individual'} session',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: FriendColors.textSecondary,
-                      ),
+                      '${_formatLabel(appt)} · ${trDate('h:mm a', startsAt)} · ${trx('$duration min', '$duration ደቂቃ')}',
+                      style: theme.textTheme.bodySmall,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
+              if (soon) const FriendLivePulse(size: 7),
             ],
           ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: FriendColors.recessed,
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const ProStitchMicroLabel('Client note'),
-                      Text(
-                        note?.isNotEmpty == true ? note! : 'No note from client',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const ProStitchMicroLabel('After session'),
-                      Row(
-                        children: [
-                          Icon(Icons.check_circle, size: 14, color: FriendColors.accent),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              'Write your session note',
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          const SizedBox(height: 10),
+          Text(
+            startsLabel,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: soon ? FriendColors.live : FriendColors.textSecondary,
+              fontWeight: FontWeight.w600,
             ),
           ),
+          if (note != null && note.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: FriendColors.recessed, borderRadius: BorderRadius.circular(FriendRadii.medium)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(tr('Client note'), style: theme.textTheme.labelSmall),
+                  const SizedBox(height: 2),
+                  Text(note, style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textPrimary), maxLines: 3, overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
-                child: FilledButton.icon(
-                  onPressed: () => onLaunchMeet(id),
-                  icon: const Icon(Icons.videocam),
-                  label: const Text('Launch Akilil Meet'),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(0, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(FriendRadii.pill),
-                    ),
-                  ),
-                ),
+                child: FriendGlowButton(label: tr('Client record'), secondary: true, expanded: true, onPressed: () => onDossier(guest, 1)),
               ),
-              const SizedBox(width: 8),
-              OutlinedButton(
-                onPressed: () => onDossier(guest, 1),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(48, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(FriendRadii.pill),
-                  ),
-                  backgroundColor: FriendColors.recessed,
+              const SizedBox(width: 10),
+              Expanded(
+                child: FriendGlowButton(
+                  label: tr('Start'),
+                  icon: Icons.videocam_rounded,
+                  expanded: true,
+                  onPressed: () => onLaunchMeet(id),
                 ),
-                child: const Icon(Icons.folder_shared_outlined),
               ),
             ],
           ),
@@ -816,168 +461,48 @@ class _ActiveQueueCard extends StatelessWidget {
   }
 }
 
-class _CompactQueueCard extends StatelessWidget {
-  const _CompactQueueCard({
-    required this.appt,
-    required this.onDossier,
-  });
+class _CompactQueueRow extends StatelessWidget {
+  const _CompactQueueRow({required this.appt, required this.onDossier});
 
   final Map<String, dynamic> appt;
   final void Function(Map<String, dynamic> client, int count) onDossier;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final startsAt = DateTime.parse(appt['scheduled_at'] as String).toLocal();
     final guest = (appt['client'] as Map<String, dynamic>?) ?? const {};
-    final name = guest['name'] as String? ?? 'Client';
-    final note = appt['client_note'] as String?;
-
-    return ProStitchCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                child: Text(personInitial(name)),
+    final name = guest['name'] as String? ?? tr('Client');
+    return InkWell(
+      onTap: () => onDossier(guest, 1),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            FriendAvatar(size: 36, initials: personInitial(name)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: theme.textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(_formatLabel(appt), style: theme.textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                ],
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
-                    Text(
-                      '${DateFormat('h:mm a').format(startsAt)} • ${note ?? 'Upcoming session'}',
-                      style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: FriendColors.recessed,
-                  borderRadius: BorderRadius.circular(FriendRadii.pill),
-                ),
-                child: Text(
-                  'Paid',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: FriendColors.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: ProStitchMicroLabel(
-                  appt['kind'] == 'listening_request' ? 'Walk-in' : 'Booked session',
-                ),
-              ),
-              TextButton(
-                onPressed: () => onDossier(guest, 1),
-                child: const Text('Review Notes'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EveningWindowsSection extends StatelessWidget {
-  const _EveningWindowsSection({
-    required this.slots,
-    required this.onAddSlot,
-    required this.onRemoveSlot,
-    required this.onTune,
-  });
-
-  final List<String> slots;
-  final VoidCallback onAddSlot;
-  final ValueChanged<String> onRemoveSlot;
-  final VoidCallback onTune;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProStitchCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Evening Open Windows',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      'Instant slots visible to network triage',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: FriendColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(onPressed: onTune, icon: const Icon(Icons.tune)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (var i = 0; i < slots.length; i++)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: InputChip(
-                      label: Text(slots[i]),
-                      avatar: const Icon(Icons.schedule, size: 16),
-                      onDeleted: slots[i].contains('Standby') ? null : () => onRemoveSlot(slots[i]),
-                      backgroundColor: i == 0
-                          ? FriendColors.secondaryFixed
-                          : FriendColors.recessed,
-                    ),
-                  ),
-                ActionChip(
-                  label: const Text('Open Extra Slot'),
-                  avatar: const Icon(Icons.add, size: 16),
-                  onPressed: onAddSlot,
-                  backgroundColor: FriendColors.primaryLight,
-                ),
-              ],
             ),
-          ),
-        ],
+            Text(
+              DateUtils.isSameDay(startsAt, DateTime.now()) ? trDate('h:mm a', startsAt) : trDate('EEE h:mm a', startsAt),
+              style: theme.textTheme.labelMedium?.copyWith(fontFeatures: friendTabular),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _ListeningSection extends StatelessWidget {
-  const _ListeningSection({
-    required this.requests,
-    required this.onAccept,
-    required this.onDecline,
-  });
+  const _ListeningSection({required this.requests, required this.onAccept, required this.onDecline});
 
   final List<Map<String, dynamic>> requests;
   final void Function(int id) onAccept;
@@ -985,39 +510,45 @@ class _ListeningSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Walk-in requests',
-          style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 8),
+        FriendSectionLabel(tr('Walk-in requests')),
         for (final a in requests)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: ProStitchCard(
-              padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.only(bottom: 10),
+            child: CandyCard(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    (a['client'] as Map?)?['name'] as String? ?? 'Client',
-                    style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
-                  ),
-                  if ((a['client_note'] as String?)?.isNotEmpty == true)
-                    Text(a['client_note'] as String),
-                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      FilledButton(
-                        onPressed: () => onAccept((a['id'] as num).toInt()),
-                        child: const Text('Accept & join'),
-                      ),
+                      const FriendLivePulse(size: 6, color: FriendColors.success),
                       const SizedBox(width: 8),
-                      OutlinedButton(
-                        onPressed: () => onDecline((a['id'] as num).toInt()),
-                        child: const Text('Decline'),
+                      Expanded(
+                        child: Text((a['client'] as Map?)?['name'] as String? ?? tr('Client'), style: theme.textTheme.titleSmall),
+                      ),
+                    ],
+                  ),
+                  if ((a['client_note'] as String?)?.isNotEmpty == true) ...[
+                    const SizedBox(height: 6),
+                    Text(a['client_note'] as String, style: theme.textTheme.bodySmall),
+                  ],
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FriendGlowButton(
+                          label: tr('Decline'),
+                          secondary: true,
+                          expanded: true,
+                          onPressed: () => onDecline((a['id'] as num).toInt()),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FriendGlowButton(label: tr('Accept & join'), expanded: true, onPressed: () => onAccept((a['id'] as num).toInt())),
                       ),
                     ],
                   ),
@@ -1036,63 +567,30 @@ class _OnboardingNudge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pending = (onboarding['pending_steps'] as List? ?? const []).cast<String>();
+    final pending = (onboarding['pending_steps'] as List? ?? const []).map((e) => tr('$e')).toList();
     if (pending.isEmpty) return const SizedBox.shrink();
-    return ProStitchCard(
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: const Icon(Icons.checklist, color: FriendColors.accent),
-        title: const Text('Finish setting up your practice'),
-        subtitle: Text('Remaining: ${pending.join(", ")}'),
-        trailing: const Icon(Icons.chevron_right),
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: CandyCard(
+        tint: FriendColors.warning,
         onTap: () => context.go('/onboarding'),
-      ),
-    );
-  }
-}
-
-class _PeerSupervisionCard extends StatelessWidget {
-  const _PeerSupervisionCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return ProStitchCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: FriendColors.primaryLight,
-                child: const Icon(Icons.psychology, size: 18, color: FriendColors.primaryDeep),
+        child: Row(
+          children: [
+            const Icon(Icons.checklist_rounded, color: FriendColors.warning),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(tr('Finish setting up your practice'), style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 2),
+                  Text(trx('Still to do: ${pending.join(", ")}', 'የሚቀሩ፦ ${pending.join("፣ ")}'), style: Theme.of(context).textTheme.bodySmall),
+                ],
               ),
-              const SizedBox(width: 8),
-              const ProStitchMicroLabel('Clinical Peer Governance'),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: FriendColors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(FriendRadii.pill),
-                ),
-                child: Text(
-                  'CME Credited',
-                  style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Monthly supervision check-in',
-            style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
-          Text(
-            'Schedule peer review through your clinic calendar.',
-            style: GoogleFonts.inter(fontSize: 13, color: FriendColors.textSecondary),
-          ),
-        ],
+            ),
+            const Icon(Icons.chevron_right_rounded, color: FriendColors.textMuted),
+          ],
+        ),
       ),
     );
   }

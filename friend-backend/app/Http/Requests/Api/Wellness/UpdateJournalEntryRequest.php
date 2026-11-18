@@ -13,6 +13,7 @@ class UpdateJournalEntryRequest extends FormRequest
         return [
             'mood_score' => ['sometimes', 'integer', 'min:1', 'max:10'],
             'mood_tags'  => ['sometimes', 'array'],
+            'title'      => ['sometimes', 'nullable', 'string', 'max:200'],
             'content'    => ['sometimes', 'string', 'max:50000'],
             'is_private' => ['sometimes', 'boolean'],
         ];

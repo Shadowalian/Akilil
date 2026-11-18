@@ -35,25 +35,6 @@ final _moodWeekProvider =
 class JournalListScreen extends ConsumerWidget {
   const JournalListScreen({super.key});
 
-  static const _ethiopicFallback = ['NotoSansEthiopic'];
-
-  TextStyle _geist(
-    BuildContext context, {
-    double? size,
-    FontWeight weight = FontWeight.w600,
-    Color? color,
-    double? height,
-  }) {
-    return (Theme.of(context).textTheme.bodyMedium ?? const TextStyle())
-        .copyWith(
-      fontSize: size,
-      fontWeight: weight,
-      color: color ?? FriendColors.textPrimary,
-      height: height,
-      fontFamily: 'Geist',
-      fontFamilyFallback: _ethiopicFallback,
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -100,18 +81,8 @@ class JournalListScreen extends ConsumerWidget {
             onTap: () => context.go('/journal/edit'),
           ),
           const SizedBox(height: 22),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Text(
-              s.recent,
-              style: _geist(
-                context,
-                size: FriendTypeScale.headlineSmall,
-                weight: FontWeight.w800,
-                height: 1.1,
-              ),
-            ),
-          ),
+          const SizedBox(height: 8),
+          FriendSectionLabel(s.recent),
           async.when(
             loading: () => const Center(
               child: Padding(
@@ -129,7 +100,6 @@ class JournalListScreen extends ConsumerWidget {
             data: (list) {
               if (list.isEmpty) {
                 return CandyCard(
-                  tint: FriendColors.accent,
                   child: FriendEmptyState(
                     icon: Icons.edit_note_outlined,
                     title: s.journalEmptyTitle,
@@ -184,40 +154,14 @@ class _JournalHeader extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'Geist',
-              fontFamilyFallback: JournalListScreen._ethiopicFallback,
-              fontSize: FriendTypeScale.headlineLarge,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.8,
-              color: FriendColors.textPrimary,
-              height: 1.05,
-            ),
-          ),
-        ),
+        Expanded(child: Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.headlineLarge))),
         FriendIconChip(
           icon: Icons.insights_outlined,
           tooltip: tr('Mood'),
           onPressed: onInsights,
         ),
         const SizedBox(width: 8),
-        Material(
-          color: FriendColors.accent,
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onNew,
-            child: const SizedBox(
-              width: 46,
-              height: 46,
-              child: Icon(Icons.add_rounded,
-                  color: FriendColors.onAccent, size: 26),
-            ),
-          ),
-        ),
+        FriendIconChip(icon: Icons.add_rounded, tooltip: tr('New entry'), filled: true, onPressed: onNew),
       ],
     );
   }
@@ -285,21 +229,11 @@ class _ThisWeekMoodCard extends StatelessWidget {
     }
 
     return CandyCard(
-      tint: FriendColors.primary,
       padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            strings.thisWeek,
-            style: const TextStyle(
-              fontFamily: 'Geist',
-              fontSize: FriendTypeScale.caption,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.4,
-              color: FriendColors.textSecondary,
-            ),
-          ),
+          Text(strings.thisWeek, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textMuted)),
           const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -308,27 +242,10 @@ class _ThisWeekMoodCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      summary,
-                      style: const TextStyle(
-                        fontFamily: 'Geist',
-                        fontSize: FriendTypeScale.headlineSmall,
-                        fontWeight: FontWeight.w800,
-                        color: FriendColors.textPrimary,
-                        height: 1.1,
-                      ),
-                    ),
+                    Text(summary, style: Theme.of(context).textTheme.titleMedium),
                     if (trendPercent != null) ...[
                       const SizedBox(height: 4),
-                      Text(
-                        strings.moodWeekTrend(trendPercent),
-                        style: const TextStyle(
-                          fontFamily: 'Geist Mono',
-                          fontSize: FriendTypeScale.bodySmall,
-                          color: FriendColors.accentDeep,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text(strings.moodWeekTrend(trendPercent), style: Theme.of(context).textTheme.bodySmall),
                     ],
                   ],
                 ),
@@ -385,7 +302,6 @@ class _PromptCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return CandyCard(
       onTap: onTap,
-      tint: FriendColors.accent,
       padding: const EdgeInsets.all(18),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,32 +310,14 @@ class _PromptCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.caption,
-                    fontWeight: FontWeight.w700,
-                    color: FriendColors.accentDeep,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  prompt,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.bodyLarge,
-                    fontWeight: FontWeight.w600,
-                    height: 1.35,
-                    color: FriendColors.textPrimary,
-                  ),
-                ),
+                Text(label, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textMuted)),
+                const SizedBox(height: 6),
+                Text(prompt, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500, height: 1.4)),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.arrow_forward_ios_rounded,
-              size: 14, color: FriendColors.textMuted),
+          const Icon(Icons.edit_outlined, size: 20, color: FriendColors.textMuted),
         ],
       ),
     );
@@ -442,12 +340,13 @@ class _JournalEntryTile extends StatelessWidget {
     final created =
         DateTime.tryParse(entry['created_at'] as String? ?? '');
   final badge =
-        created != null ? trDate('EEE', created).toUpperCase() : '—';
-    final preview = (entry['body_md'] as String? ?? '')
+        created != null ? trDate('MMM', created.toLocal()) : '';
+    final preview = (entry['content'] as String? ?? '')
         .split('\n')
         .first
         .trim();
 
+    final theme = Theme.of(context);
     return CandyCard(
       onTap: onTap,
       padding: const EdgeInsets.all(16),
@@ -456,21 +355,13 @@ class _JournalEntryTile extends StatelessWidget {
         children: [
           Container(
             width: 44,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: FriendColors.recessed,
-              borderRadius: BorderRadius.circular(FriendRadii.small),
-            ),
-            child: Text(
-              badge,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: 'Geist Mono',
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: FriendColors.textSecondary,
-                letterSpacing: 0.5,
-              ),
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(color: FriendColors.recessed, borderRadius: BorderRadius.circular(FriendRadii.medium)),
+            child: Column(
+              children: [
+                Text(created != null ? '${created.toLocal().day}' : '—', style: theme.textTheme.titleMedium?.copyWith(fontFeatures: friendTabular)),
+                Text(badge, style: theme.textTheme.labelSmall),
+              ],
             ),
           ),
           const SizedBox(width: 14),
@@ -482,48 +373,23 @@ class _JournalEntryTile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        entry['title'] as String? ?? tr('Untitled'),
-                        style: const TextStyle(
-                          fontFamily: 'Geist',
-                          fontSize: FriendTypeScale.bodyLarge,
-                          fontWeight: FontWeight.w700,
-                          color: FriendColors.textPrimary,
-                        ),
+                        (entry['title'] as String?)?.trim().isNotEmpty == true ? entry['title'] as String : tr('Untitled'),
+                        style: theme.textTheme.titleSmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (entry['mood_at_write'] != null)
-                      FreudArt.moodFaceAt(
-                        valence:
-                            ((entry['mood_at_write'] as int) - 1) / 6,
-                        size: 22,
-                      ),
+                    if (entry['mood_score'] is num)
+                      FreudArt.moodFaceAt(valence: (((entry['mood_score'] as num).toInt().clamp(1, 7)) - 1) / 6, size: 22),
                   ],
                 ),
                 if (preview.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    preview,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'Geist',
-                      fontSize: FriendTypeScale.bodySmall,
-                      height: 1.4,
-                      color: FriendColors.textSecondary,
-                    ),
-                  ),
+                  const SizedBox(height: 4),
+                  Text(preview, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall),
                 ],
                 if (sharedLabel != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    sharedLabel!,
-                    style: const TextStyle(
-                      fontFamily: 'Geist',
-                      fontSize: FriendTypeScale.caption,
-                      fontWeight: FontWeight.w600,
-                      color: FriendColors.primary,
-                    ),
-                  ),
+                  const SizedBox(height: 6),
+                  Text(sharedLabel!, style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.primary)),
                 ],
               ],
             ),

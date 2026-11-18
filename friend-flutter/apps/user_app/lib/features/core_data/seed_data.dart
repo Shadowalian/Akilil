@@ -9,7 +9,7 @@ class SeedData {
   static final List<Map<String, dynamic>> worksheets = [
     {
       'id': 'ws-thought-record',
-      'title': 'CBT Thought Record',
+      'title': 'Thought record',
       'category': 'CBT Tools',
       'tag': 'Self-guided',
       'icon': 'edit_note_rounded',
@@ -19,34 +19,34 @@ class SeedData {
       'fields': [
         {
           'id': 'situation',
-          'label': 'Situation / Trigger',
+          'label': 'What happened',
           'placeholder': 'What happened? Where were you? Who was involved?',
         },
         {
           'id': 'automatic_thought',
-          'label': 'Automatic Thought',
+          'label': 'The first thought',
           'placeholder': 'What was the immediate sentence that entered your mind?',
         },
         {
           'id': 'distortion',
-          'label': 'Cognitive Distortion Identified',
+          'label': 'Thinking trap you noticed',
           'type': 'distortion_picker',
         },
         {
           'id': 'evidence_against',
-          'label': 'Evidence Against the Thought',
+          'label': 'Evidence against the thought',
           'placeholder': 'What facts contradict your catastrophic prediction?',
         },
         {
           'id': 'balanced_thought',
-          'label': 'Balanced / Rational Perspective',
+          'label': 'A more balanced view',
           'placeholder': 'What is a realistic, compassionate alternative view?',
         },
       ],
     },
     {
       'id': 'ws-decatastrophizing',
-      'title': 'Anxiety Decatastrophizer',
+      'title': 'When you fear the worst',
       'category': 'Anxiety & Panic',
       'tag': 'Evidence-Based',
       'icon': 'psychology_alt_rounded',
@@ -56,7 +56,7 @@ class SeedData {
       'fields': [
         {
           'id': 'worry',
-          'label': 'What is your core catastrophic worry?',
+          'label': 'What are you most worried will happen?',
           'placeholder': 'e.g. Giving the presentation tomorrow and freezing up.',
         },
         {
@@ -78,7 +78,7 @@ class SeedData {
     },
     {
       'id': 'ws-box-breathing',
-      'title': 'Interactive Box Breathing',
+      'title': 'Box breathing',
       'category': 'Mindfulness',
       'tag': 'Interactive Tool',
       'icon': 'air_rounded',
@@ -89,7 +89,7 @@ class SeedData {
     },
     {
       'id': 'ws-grounding-54321',
-      'title': '5-4-3-2-1 Sensory Grounding',
+      'title': '5-4-3-2-1 grounding',
       'category': 'Anxiety & Panic',
       'tag': 'Somatic Tool',
       'icon': 'spa_rounded',
@@ -121,7 +121,7 @@ class SeedData {
     },
     {
       'id': 'ws-boundaries',
-      'title': 'Boundary Script & Assertiveness Plan',
+      'title': 'Saying no, kindly and clearly',
       'category': 'Boundaries & Relationships',
       'tag': 'Communication',
       'icon': 'shield_outlined',
@@ -131,19 +131,19 @@ class SeedData {
       'fields': [
         {
           'id': 'boundary_situation',
-          'label': 'Where is a boundary needed?',
+          'label': 'Where do you need a limit?',
           'placeholder': 'e.g. Taking weekend work requests from colleagues.',
         },
         {
           'id': 'boundary_script',
-          'label': 'My Assertive Statement Script',
+          'label': 'What I will say',
           'placeholder': '“I value our project, but I do not review emails on weekends. I will gladly review this first thing Monday.”',
         },
       ],
     },
     {
       'id': 'ws-gratitude',
-      'title': 'Daily Gratitude & Positivity Log',
+      'title': 'Three good things',
       'category': 'Depression & Mood',
       'tag': 'Daily Habit',
       'icon': 'favorite_border_rounded',
@@ -200,11 +200,11 @@ class SeedData {
 
   static final List<Map<String, String>> journalPrompts = [
     {
-      'title': 'Challenging Anxious Predictions',
+      'title': 'Challenging anxious predictions',
       'prompt': 'What catastrophic story is your mind telling you today? How can you look at it through the lens of kind curiosity rather than certainty?',
     },
     {
-      'title': 'Honoring Your Capacity',
+      'title': 'Honouring your limits',
       'prompt': 'What is one expectation you can take off your plate today to give your body space to breathe?',
     },
     {
@@ -212,7 +212,7 @@ class SeedData {
       'prompt': 'Imagine yourself one year from now, calm and steady. What gentle advice would they give you about this current storm?',
     },
     {
-      'title': 'The Smallest Anchor',
+      'title': 'The smallest anchor',
       'prompt': 'Describe three micro-moments from the last 24 hours that felt gentle, quiet, or safe.',
     },
   ];

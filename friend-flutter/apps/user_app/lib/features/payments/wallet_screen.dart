@@ -45,7 +45,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   int get _topupCents => _presets[_selectedPreset].$1;
 
-  static const _ethiopicFallback = ['NotoSansEthiopic'];
 
   Future<void> _topUp() async {
     if (_busy) return;
@@ -118,7 +117,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          icon: const Icon(Icons.arrow_back_rounded, size: 24),
           onPressed: () => context.canPop() ? context.pop() : context.go(AppRoutes.home),
         ),
       ),
@@ -138,14 +137,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           children: [
             Text(
               s.wallet,
-              style: const TextStyle(
-                fontFamily: 'Geist',
-                fontFamilyFallback: _ethiopicFallback,
-                fontSize: FriendTypeScale.headlineLarge,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.8,
-                color: FriendColors.textPrimary,
-              ),
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: FriendColors.textPrimary),
             ),
             const SizedBox(height: 20),
             wallet.when(
@@ -187,22 +179,12 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               children: [
                 Text(
                   s.activity,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.headlineSmall,
-                    fontWeight: FontWeight.w800,
-                    color: FriendColors.textPrimary,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
                 ),
                 const Spacer(),
                 Text(
                   s.seeAll,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.bodySmall,
-                    fontWeight: FontWeight.w600,
-                    color: FriendColors.primary,
-                  ),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.primary),
                 ),
               ],
             ),
@@ -249,19 +231,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
           child: FilledButton(
             onPressed: _busy ? null : _topUp,
-            style: FilledButton.styleFrom(
-              backgroundColor: FriendColors.accent,
-              foregroundColor: FriendColors.onAccent,
-              minimumSize: const Size.fromHeight(52),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(FriendRadii.pill),
-              ),
-              textStyle: const TextStyle(
-                fontFamily: 'Geist',
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
-            ),
+            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
             child: Text(_busy ? s.processingTopUp : presetLabel),
           ),
         ),
@@ -297,12 +267,7 @@ class _BalanceHero extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontFamily: 'Geist',
-              fontSize: FriendTypeScale.caption,
-              fontWeight: FontWeight.w600,
-              color: FriendColors.textSecondary,
-            ),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textSecondary),
           ),
           const SizedBox(height: 10),
           Row(
@@ -311,24 +276,12 @@ class _BalanceHero extends StatelessWidget {
             children: [
               Text(
                 amount,
-                style: const TextStyle(
-                  fontFamily: 'Geist',
-                  fontSize: 40,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -1,
-                  color: FriendColors.textPrimary,
-                  height: 1,
-                ),
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: FriendColors.textPrimary),
               ),
               const SizedBox(width: 8),
               Text(
                 currency,
-                style: const TextStyle(
-                  fontFamily: 'Geist',
-                  fontSize: FriendTypeScale.headlineSmall,
-                  fontWeight: FontWeight.w700,
-                  color: FriendColors.accentDeep,
-                ),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textSecondary),
               ),
             ],
           ),
@@ -367,12 +320,7 @@ class _AmountChip extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: TextStyle(
-              fontFamily: 'Geist',
-              fontSize: FriendTypeScale.bodySmall,
-              fontWeight: FontWeight.w700,
-              color: selected ? FriendColors.primaryDeep : FriendColors.textSecondary,
-            ),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: selected ? FriendColors.primaryDeep : FriendColors.textSecondary),
           ),
         ),
       ),
@@ -417,22 +365,13 @@ class _TransactionRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontFamily: 'Geist',
-                    fontSize: FriendTypeScale.bodyLarge,
-                    fontWeight: FontWeight.w700,
-                    color: FriendColors.textPrimary,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
                 ),
                 if (subtitle.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      fontFamily: 'Geist',
-                      fontSize: FriendTypeScale.bodySmall,
-                      color: FriendColors.textSecondary,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                   ),
                 ],
               ],
@@ -440,12 +379,7 @@ class _TransactionRow extends StatelessWidget {
           ),
           Text(
             type.contains('free') ? 'Free' : formatAmount(cents, currency, isCredit),
-            style: TextStyle(
-              fontFamily: 'Geist Mono',
-              fontSize: FriendTypeScale.bodyLarge,
-              fontWeight: FontWeight.w700,
-              color: isCredit ? FriendColors.primary : FriendColors.textPrimary,
-            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(color: isCredit ? FriendColors.primary : FriendColors.textPrimary),
           ),
         ],
       ),

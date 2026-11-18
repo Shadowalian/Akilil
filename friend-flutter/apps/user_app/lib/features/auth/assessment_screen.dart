@@ -2,7 +2,6 @@ import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:core/core.dart';
 
@@ -29,12 +28,15 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
   final _languages = <int>{0};
   final _modalities = <int>{0};
 
-  static List<(IconData, String, String)> get _concernItems => [
-    (Icons.psychology_rounded, tr('Cognitive Overwhelm & Burnout'), tr('Mental exhaustion, chronic strain')),
-    (Icons.monitor_heart_outlined, tr('Grief & Somatic Tension'), tr('Physical holding, bereavement')),
-    (Icons.trending_up_rounded, tr('Life Transitions & Career Pressure'), tr('Relocation, milestones, decisions')),
-    (Icons.diversity_1_outlined, tr('Relationship & Family Dynamics'), tr('Attachment, boundaries, conflict')),
-    (Icons.bedtime_outlined, tr('Sleep Regulation & Restlessness'), tr('Insomnia, nocturnal overactivation')),
+  /// English values are stored and sent to the server; labels are
+  /// translated only when shown.
+  static const List<(IconData, String, String)> _concernItems = [
+    (Icons.battery_alert_outlined, 'Overwhelmed or burnt out', 'Tired all the time, too much on your plate'),
+    (Icons.favorite_border_rounded, 'Grief and loss', 'Losing someone, or something important to you'),
+    (Icons.alt_route_rounded, 'Big changes or work pressure', 'A move, a new role, a hard decision'),
+    (Icons.people_outline_rounded, 'Relationships and family', 'Conflict, distance, or setting limits'),
+    (Icons.bedtime_outlined, 'Sleep and restlessness', 'Trouble falling asleep, or a mind that will not settle'),
+    (Icons.cloud_outlined, 'Anxiety or low mood', 'Worry, sadness, or feeling flat'),
   ];
 
   static List<(String, String)> get _phqOptions => [
@@ -135,6 +137,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
+    final theme = Theme.of(context);
     final questions = _questions(s);
     final isLast = _step == _totalSteps - 1;
 
@@ -148,50 +151,37 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          FriendStitchProgressTrack(
-            step: _step,
-            totalSteps: _totalSteps,
-            stepLabel: _stepLabel,
+          FriendContentWidth(
+            child: FriendStitchProgressTrack(step: _step, totalSteps: _totalSteps, stepLabel: _stepLabel),
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                FriendLayout.horizontal,
-                0,
-                FriendLayout.horizontal,
-                120,
-              ),
-              children: [
-                if (_step <= 1) ...[
-                  const FriendVaultBadge(),
-                  const SizedBox(height: 12),
-                  Text(
-                    tr('Help us find the right person.'),
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: FriendTypeScale.headlineMedium,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
-                      color: FriendColors.textPrimary,
+            child: FriendContentWidth(
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 16, FriendLayout.horizontal, 32),
+                children: [
+                  if (_step == 0) ...[
+                    Semantics(
+                      header: true,
+                      child: Text(tr('Help us find the right person.'), style: theme.textTheme.headlineMedium),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    tr('Your answers help us suggest people who fit. Only you and the professional you book can see them.'),
-                    style: GoogleFonts.inter(
-                      fontSize: FriendTypeScale.bodyMedium,
-                      height: 1.45,
-                      color: FriendColors.textSecondary,
+                    const SizedBox(height: 8),
+                    Text(
+                      tr('Your answers help us suggest people who fit. Only you and the professional you book can see them.'),
+                      style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 12),
+                    const FriendVaultBadge(),
+                    const SizedBox(height: 28),
+                  ],
+                  switch (_step) {
+                    0 => _buildConcernsStep(),
+                    1 => _buildPhqStep(questions[0]),
+                    2 => _buildModalityStep(questions[1]),
+                    _ => _buildConnectionStep(questions[2]),
+                  },
                 ],
-                switch (_step) {
-                  0 => _buildConcernsStep(),
-                  1 => _buildPhqStep(questions[0]),
-                  2 => _buildModalityStep(questions[1]),
-                  _ => _buildConnectionStep(questions[2]),
-                },
-              ],
+              ),
             ),
           ),
           FriendStitchStickyBar(
@@ -205,51 +195,42 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     );
   }
 
+  Widget _question(String title, {String? hint}) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: theme.textTheme.titleLarge),
+          if (hint != null && hint.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(hint, style: theme.textTheme.bodySmall),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _groupLabel(String text) => Padding(
+        padding: const EdgeInsets.only(top: 24, bottom: 10),
+        child: Text(text, style: Theme.of(context).textTheme.titleSmall),
+      );
+
   Widget _buildConcernsStep() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Expanded(
-              child: Text(
-                tr('What brings you to Akilil today?'),
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: FriendTypeScale.headlineSmall,
-                  fontWeight: FontWeight.w600,
-                  color: FriendColors.textPrimary,
-                ),
-              ),
-            ),
-            Text(
-              tr('SELECT ALL'),
-              style: GoogleFonts.inter(
-                fontSize: FriendTypeScale.micro,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.6,
-                color: FriendColors.textMuted,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
+        _question(tr('What brings you to Akilil today?'), hint: tr('Choose as many as you like.')),
         for (var i = 0; i < _concernItems.length; i++) ...[
           FriendIntentChip(
             icon: _concernItems[i].$1,
-            title: _concernItems[i].$2,
-            subtitle: _concernItems[i].$3,
+            title: tr(_concernItems[i].$2),
+            subtitle: tr(_concernItems[i].$3),
             selected: _concerns.contains(i),
-            onTap: () {
-              setState(() {
-                if (_concerns.contains(i)) {
-                  _concerns.remove(i);
-                } else {
-                  _concerns.add(i);
-                }
-              });
-            },
+            onTap: () => setState(() {
+              if (!_concerns.remove(i)) _concerns.add(i);
+            }),
           ),
           if (i < _concernItems.length - 1) const SizedBox(height: 8),
         ],
@@ -261,70 +242,32 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: FriendColors.recessed,
-            borderRadius: BorderRadius.circular(FriendRadii.large),
-            boxShadow: FriendElevation.card,
+        _question(
+          tr('Over the last 2 weeks, how often have you felt down, depressed, or hopeless?'),
+          hint: q.hint,
+        ),
+        for (var i = 0; i < q.options.length && i < _phqOptions.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: FriendPhqRadioOption(
+              label: q.options[i],
+              pointsLabel: _phqOptions[i].$2,
+              selected: _answers[0] == i,
+              onTap: () => setState(() => _answers[0] = i),
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  FriendLivePulse(size: 8),
-                  SizedBox(width: 8),
-                  Text(
-                    tr('A QUICK CHECK-IN'),
-                    style: GoogleFonts.inter(
-                      fontSize: FriendTypeScale.micro,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.6,
-                      color: FriendColors.accent,
-                    ),
-                  ),
-                  Spacer(),
-                  Text(
-                    tr('NOT A DIAGNOSIS'),
-                    style: GoogleFonts.inter(
-                      fontSize: FriendTypeScale.micro,
-                      fontWeight: FontWeight.w600,
-                      color: FriendColors.textMuted,
-                    ),
-                  ),
-                ],
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            const Icon(Icons.info_outline_rounded, size: 16, color: FriendColors.textMuted),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                tr('This is a screening tool, not a diagnosis.'),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textMuted),
               ),
-              SizedBox(height: 12),
-              Text(
-                tr('Over the last 2 weeks, how often have you felt down, depressed, or hopeless?'),
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: FriendTypeScale.headlineSmall,
-                  fontWeight: FontWeight.w600,
-                  color: FriendColors.textPrimary,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                q.hint,
-                style: GoogleFonts.inter(
-                  fontSize: FriendTypeScale.bodySmall,
-                  color: FriendColors.textSecondary,
-                ),
-              ),
-              SizedBox(height: 12),
-              for (var i = 0; i < q.options.length && i < _phqOptions.length; i++)
-                Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: FriendPhqRadioOption(
-                    label: q.options[i],
-                    pointsLabel: _phqOptions[i].$2,
-                    selected: _answers[0] == i,
-                    onTap: () => setState(() => _answers[0] = i),
-                  ),
-                ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
@@ -343,149 +286,51 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
+        _question(
           tr('Who would you like to talk to?'),
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: FriendTypeScale.headlineSmall,
-            fontWeight: FontWeight.w600,
-          ),
+          hint: tr('Tell us what would make you most comfortable. You can change it later.'),
         ),
-        const SizedBox(height: 4),
-        Text(
-          tr('Tell us what would make you most comfortable. You can change it later.'),
-          style: GoogleFonts.inter(
-            fontSize: FriendTypeScale.bodySmall,
-            color: FriendColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          tr('HOW YOU LIKE TO WORK'),
-          style: GoogleFonts.inter(
-            fontSize: FriendTypeScale.caption,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.8,
-            color: FriendColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 8),
+        _groupLabel(tr('How you like to work')),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
             for (var i = 0; i < modalityLabels.length; i++)
-              FriendStitchFilterPill(
-                label: modalityLabels[i],
+              FilterChip(
+                label: Text(modalityLabels[i]),
                 selected: _modalities.contains(i),
-                icon: i == 0 ? Icons.spa_outlined : null,
-                onTap: () {
-                  setState(() {
-                    if (_modalities.contains(i)) {
-                      _modalities.remove(i);
-                    } else {
-                      _modalities.add(i);
-                    }
-                  });
-                },
+                onSelected: (_) => setState(() {
+                  if (!_modalities.remove(i)) _modalities.add(i);
+                }),
               ),
           ],
         ),
-        const SizedBox(height: 16),
-        Text(
-          tr('I WOULD PREFER TO TALK TO'),
-          style: GoogleFonts.inter(
-            fontSize: FriendTypeScale.caption,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.8,
-            color: FriendColors.textSecondary,
-          ),
+        _groupLabel(tr('I would prefer to talk to')),
+        SegmentedButton<int>(
+          showSelectedIcon: false,
+          segments: [
+            for (var i = 0; i < genderLabels.length; i++)
+              ButtonSegment(value: i, label: Text(genderLabels[i], maxLines: 1, overflow: TextOverflow.ellipsis)),
+          ],
+          selected: {_genderPref},
+          onSelectionChanged: (v) => setState(() => _genderPref = v.first),
         ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: FriendColors.surfaceContainer,
-            borderRadius: BorderRadius.circular(FriendRadii.medium),
-          ),
-          child: Row(
-            children: [
-              for (var i = 0; i < genderLabels.length; i++)
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: Material(
-                      color: _genderPref == i
-                          ? FriendColors.surfaceLowest
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(FriendRadii.small),
-                      elevation: _genderPref == i ? 1 : 0,
-                      child: InkWell(
-                        onTap: () => setState(() => _genderPref = i),
-                        borderRadius: BorderRadius.circular(FriendRadii.small),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            genderLabels[i],
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              fontSize: FriendTypeScale.caption,
-                              fontWeight:
-                                  _genderPref == i ? FontWeight.w600 : FontWeight.w500,
-                              color: _genderPref == i
-                                  ? FriendColors.textPrimary
-                                  : FriendColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          tr('LANGUAGES I SPEAK'),
-          style: GoogleFonts.inter(
-            fontSize: FriendTypeScale.caption,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.8,
-            color: FriendColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 8),
+        _groupLabel(tr('Languages I speak')),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
             for (var i = 0; i < langLabels.length; i++)
-              FriendStitchFilterPill(
-                label: langLabels[i],
+              FilterChip(
+                label: Text(langLabels[i]),
                 selected: _languages.contains(i),
-                roundedRect: true,
-                icon: i == 0 ? Icons.translate_rounded : null,
-                onTap: () {
-                  setState(() {
-                    if (_languages.contains(i)) {
-                      _languages.remove(i);
-                    } else {
-                      _languages.add(i);
-                    }
-                  });
-                },
+                onSelected: (_) => setState(() {
+                  if (!_languages.remove(i)) _languages.add(i);
+                }),
               ),
           ],
         ),
-        const SizedBox(height: 16),
-        Text(
-          q.title,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: FriendTypeScale.headlineSmall,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
+        _groupLabel(q.title),
         for (var i = 0; i < q.options.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -504,29 +349,13 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          q.title,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: FriendTypeScale.headlineMedium,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          q.hint,
-          style: GoogleFonts.inter(
-            fontSize: FriendTypeScale.bodyMedium,
-            color: FriendColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 16),
+        _question(q.title, hint: q.hint),
         for (var i = 0; i < q.options.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: FriendIntentChip(
-              icon: Icons.check_circle_outline_rounded,
-              title: q.options[i],
-              subtitle: '',
+            child: FriendPhqRadioOption(
+              label: q.options[i],
+              pointsLabel: '',
               selected: _answers[2] == i,
               onTap: () => setState(() => _answers[2] = i),
             ),

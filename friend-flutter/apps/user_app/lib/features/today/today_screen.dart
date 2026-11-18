@@ -77,34 +77,10 @@ final _pillarCountsProvider =
   return counts;
 });
 
-/// Home (Today) — C03: greeting, next session, mood check-in, explore support.
+/// Home: greeting, the next session, a one-tap mood check-in, shortcuts,
+/// the three kinds of support, and a quiet way to crisis help.
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
-
-  static const _ethiopicFallback = ['NotoSansEthiopic'];
-
-  TextStyle _headline(BuildContext context, {double? size}) {
-    final base = Theme.of(context).textTheme.headlineMedium;
-    return (base ?? const TextStyle()).copyWith(
-      fontSize: size ?? FriendTypeScale.headlineLarge,
-      fontWeight: FontWeight.w800,
-      letterSpacing: -0.7,
-      height: 1.1,
-      color: FriendColors.textPrimary,
-      fontFamily: 'Geist',
-      fontFamilyFallback: _ethiopicFallback,
-    );
-  }
-
-  TextStyle _sectionTitle(BuildContext context) {
-    return (Theme.of(context).textTheme.titleLarge ?? const TextStyle()).copyWith(
-      fontWeight: FontWeight.w800,
-      letterSpacing: -0.5,
-      color: FriendColors.textPrimary,
-      fontFamily: 'Geist',
-      fontFamilyFallback: _ethiopicFallback,
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -114,12 +90,10 @@ class TodayScreen extends ConsumerWidget {
     final s = ref.watch(stringsProvider);
     final lang = ref.watch(localeControllerProvider);
     final user = ref.watch(currentUserProvider);
+    final theme = Theme.of(context);
     final fullName = user?.name.trim() ?? '';
-    final firstName =
-        fullName.isNotEmpty ? fullName.split(' ').first : 'Friend';
-    final greeting = lang == AppLanguage.am
-        ? s.greetingTime()
-        : FriendGreeting.headline();
+    final firstName = fullName.isNotEmpty ? fullName.split(' ').first : '';
+    final greeting = lang == AppLanguage.am ? s.greetingTime() : FriendGreeting.headline();
 
     return FriendTabScaffold(
       onRefresh: () async {
@@ -128,62 +102,87 @@ class TodayScreen extends ConsumerWidget {
         ref.invalidate(_pillarCountsProvider);
       },
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        padding: const EdgeInsets.fromLTRB(FriendLayout.horizontal, 20, FriendLayout.horizontal, 32),
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              FriendAvatar(
-                size: 44,
-                initials:
-                    firstName.isNotEmpty ? firstName[0].toUpperCase() : 'A',
-              ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      greeting,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: FriendColors.textSecondary,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'Geist',
-                            fontFamilyFallback: _ethiopicFallback,
-                          ),
+                      trDate('EEEE, d MMMM', DateTime.now()),
+                      style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textMuted),
                     ),
-                    Text(
-                      firstName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: _headline(context, size: 26),
+                    const SizedBox(height: 4),
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        firstName.isEmpty ? greeting : '$greeting, $firstName',
+                        style: theme.textTheme.headlineLarge,
+                      ),
                     ),
                   ],
                 ),
               ),
-              _RoundIconButton(
-                icon: Icons.search_rounded,
-                tooltip: s.exploreSupport,
-                onPressed: () => context.go(AppRoutes.home),
-              ),
-              const SizedBox(width: 8),
-              _NotificationChip(
+              const SizedBox(width: 12),
+              FriendIconChip(
+                icon: Icons.notifications_none_rounded,
                 tooltip: s.notifications,
                 onPressed: () => context.go(AppRoutes.notifications),
               ),
             ],
           ),
-          const SizedBox(height: 22),
-
+          const SizedBox(height: 28),
           _NextSessionHero(nextAppt: nextAppt),
-          const SizedBox(height: 28),
-
-          _MoodCheckInSection(streak: streak, sectionTitle: _sectionTitle),
-          const SizedBox(height: 28),
-
-          _ExploreSupportSection(
-            counts: pillarCounts,
-            sectionTitle: _sectionTitle,
+          const SizedBox(height: FriendLayout.sectionGap),
+          _MoodCheckInSection(streak: streak),
+          const SizedBox(height: FriendLayout.sectionGap),
+          FriendSectionLabel(tr('Shortcuts')),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.5,
+            children: [
+              _QuickCard(
+                icon: Icons.sensors_rounded,
+                color: FriendColors.live,
+                title: tr('Live'),
+                subtitle: tr('Reflections & cook-alongs'),
+                onTap: () => context.go(AppRoutes.live),
+              ),
+              _QuickCard(
+                icon: Icons.groups_2_outlined,
+                color: FriendColors.pillarSpiritual,
+                title: tr('Group therapy'),
+                subtitle: tr('Join open listening circles'),
+                onTap: () => context.go(AppRoutes.groups),
+              ),
+              _QuickCard(
+                icon: Icons.family_restroom_rounded,
+                color: FriendColors.primary,
+                title: tr('Family'),
+                subtitle: tr('Book for your child'),
+                onTap: () => context.go(AppRoutes.family),
+              ),
+              _QuickCard(
+                icon: Icons.edit_note_rounded,
+                color: FriendColors.pillarCooking,
+                title: tr('Worksheets'),
+                subtitle: tr('Thought records and calming exercises'),
+                onTap: () => context.go(AppRoutes.worksheets),
+              ),
+            ],
           ),
+          const SizedBox(height: FriendLayout.sectionGap),
+          _ExploreSupportSection(counts: pillarCounts),
+          const SizedBox(height: 24),
+          _CrisisRow(onTap: () => context.go(AppRoutes.crisis)),
         ],
       ),
     );
@@ -191,77 +190,37 @@ class TodayScreen extends ConsumerWidget {
 }
 
 class _MoodCheckInSection extends ConsumerWidget {
-  const _MoodCheckInSection({
-    required this.streak,
-    required this.sectionTitle,
-  });
+  const _MoodCheckInSection({required this.streak});
 
   final AsyncValue<int> streak;
-  final TextStyle Function(BuildContext) sectionTitle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(stringsProvider);
-    final theme = Theme.of(context).textTheme;
+    final days = streak.valueOrNull ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Text(
-                s.howAreYouFeeling,
-                style: sectionTitle(context),
+            Expanded(child: FriendSectionLabel(s.howAreYouFeeling)),
+            if (days > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  s.dayStreak(days),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textMuted),
+                ),
               ),
-            ),
-            streak.when(
-              loading: () => const SizedBox.shrink(),
-              error: (_, _) => const SizedBox.shrink(),
-              data: (days) {
-                if (days <= 0) return const SizedBox.shrink();
-                return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: FriendColors.accent.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(FriendRadii.pill),
-                    border: Border.all(
-                      color: FriendColors.accent.withValues(alpha: 0.35),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.local_fire_department_rounded,
-                        size: 16,
-                        color: FriendColors.accent,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        s.dayStreak(days),
-                        style: theme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: FriendColors.accent,
-                          fontFamily: 'Geist',
-                          fontFamilyFallback: TodayScreen._ethiopicFallback,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
           ],
         ),
-        const SizedBox(height: 16),
         CandyCard(
-          padding: const EdgeInsets.fromLTRB(12, 16, 12, 20),
+          padding: const EdgeInsets.fromLTRB(8, 14, 8, 14),
           child: Row(
             children: [
-              for (var i = 0; i < 5; i++) ...[
-                if (i > 0) const SizedBox(width: 4),
+              for (var i = 0; i < 5; i++)
                 Expanded(
                   child: _MoodPill(
                     moodIndex: i,
@@ -269,7 +228,6 @@ class _MoodCheckInSection extends ConsumerWidget {
                     onTap: () => context.go(AppRoutes.moodLog),
                   ),
                 ),
-              ],
             ],
           ),
         ),
@@ -279,11 +237,7 @@ class _MoodCheckInSection extends ConsumerWidget {
 }
 
 class _MoodPill extends StatelessWidget {
-  const _MoodPill({
-    required this.moodIndex,
-    required this.label,
-    required this.onTap,
-  });
+  const _MoodPill({required this.moodIndex, required this.label, required this.onTap});
 
   final int moodIndex;
   final String label;
@@ -291,29 +245,25 @@ class _MoodPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).textTheme;
-    return Material(
-      color: Colors.transparent,
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(FriendRadii.small),
+        borderRadius: BorderRadius.circular(FriendRadii.medium),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
             children: [
-              FreudArt.moodFace(mood: moodIndex, size: 44),
+              FreudArt.moodFace(mood: moodIndex, size: 40),
               const SizedBox(height: 8),
               Text(
                 label,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: FriendColors.textSecondary,
-                  fontFamily: 'Geist',
-                  fontFamilyFallback: TodayScreen._ethiopicFallback,
-                ),
+                style: Theme.of(context).textTheme.labelSmall,
               ),
             ],
           ),
@@ -324,237 +274,84 @@ class _MoodPill extends StatelessWidget {
 }
 
 class _ExploreSupportSection extends ConsumerWidget {
-  const _ExploreSupportSection({
-    required this.counts,
-    required this.sectionTitle,
-  });
+  const _ExploreSupportSection({required this.counts});
 
   final AsyncValue<Map<String, int>> counts;
-  final TextStyle Function(BuildContext) sectionTitle;
 
-  static const _cards = [
-    (
-      slug: 'psychiatry',
-      titleKey: _ExploreTitle.therapy,
-      icon: Icons.psychology_rounded,
-      tint: FriendColors.green,
-    ),
-    (
-      slug: 'cooking',
-      titleKey: _ExploreTitle.chef,
-      icon: Icons.restaurant_rounded,
-      tint: FriendColors.accent,
-    ),
-    (
-      slug: 'spiritual-psychiatry',
-      titleKey: _ExploreTitle.spiritual,
-      icon: Icons.volunteer_activism_rounded,
-      tint: FriendColors.wood,
-    ),
-  ];
+  static const _slugs = ['psychiatry', 'spiritual-psychiatry', 'cooking'];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(stringsProvider);
+    final map = counts.valueOrNull ?? const <String, int>{};
 
-    String titleFor(_ExploreTitle key) {
-      switch (key) {
-        case _ExploreTitle.therapy:
-          return s.therapyLabel;
-        case _ExploreTitle.chef:
-          return s.chefSessionsLabel;
-        case _ExploreTitle.spiritual:
-          return s.spiritualCareLabel;
-      }
-    }
+    String titleFor(String slug) => switch (slug) {
+          'psychiatry' => s.therapyLabel,
+          'cooking' => s.chefSessionsLabel,
+          _ => s.spiritualCareLabel,
+        };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: _QuickCard(
-                icon: Icons.sensors_rounded,
-                color: FriendColors.coral,
-                title: tr('Live'),
-                subtitle: tr('Reflections & cook-alongs'),
-                onTap: () => context.go(AppRoutes.live),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _QuickCard(
-                icon: Icons.family_restroom_rounded,
-                color: FriendColors.primary,
-                title: tr('Family'),
-                subtitle: tr('Book for your child'),
-                onTap: () => context.go(AppRoutes.family),
-              ),
-            ),
-          ],
+        FriendSectionLabel(
+          s.exploreSupport,
+          action: s.seeAll,
+          onAction: () => context.go(AppRoutes.home),
         ),
-        const SizedBox(height: 28),
-        Row(
+        FriendListGroup(
+          dividerIndent: 72,
           children: [
-            Expanded(
-              child: Text(
-                s.exploreSupport,
-                style: sectionTitle(context),
+            for (final slug in _slugs)
+              _ExploreRow(
+                pillar: AkililPillars.bySlug(slug)!,
+                title: titleFor(slug),
+                subtitle: (map[slug] ?? 0) > 0 ? s.professionalsAvailable(map[slug]!) : null,
+                onTap: () {
+                  ref.read(discoverPillarProvider.notifier).state = slug;
+                  context.go(AppRoutes.home);
+                },
               ),
-            ),
-            TextButton(
-              onPressed: () => context.go(AppRoutes.home),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                minimumSize: const Size(0, 36),
-              ),
-              child: Text(
-                s.seeAll,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: FriendColors.primary,
-                      fontFamily: 'Geist',
-                      fontFamilyFallback: TodayScreen._ethiopicFallback,
-                    ),
-              ),
-            ),
           ],
-        ),
-        const SizedBox(height: 12),
-        counts.when(
-          loading: () => const _CardSpinner(),
-          error: (_, _) => Column(
-            children: [
-              for (final card in _cards)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _ExploreCategoryCard(
-                    title: titleFor(card.titleKey),
-                    subtitle: null,
-                    icon: card.icon,
-                    tint: card.tint,
-                    onTap: () {
-                      ref.read(discoverPillarProvider.notifier).state =
-                          card.slug;
-                      context.go(AppRoutes.home);
-                    },
-                  ),
-                ),
-            ],
-          ),
-          data: (map) {
-            return Column(
-              children: [
-                for (final card in _cards) ...[
-                  _ExploreCategoryCard(
-                    title: titleFor(card.titleKey),
-                    subtitle: _subtitleFor(s, map[card.slug]),
-                    icon: card.icon,
-                    tint: card.tint,
-                    onTap: () {
-                      ref.read(discoverPillarProvider.notifier).state =
-                          card.slug;
-                      context.go(AppRoutes.home);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ],
-            );
-          },
         ),
       ],
     );
   }
-
-  String? _subtitleFor(S s, int? count) {
-    if (count == null || count <= 0) return null;
-    return s.professionalsAvailable(count);
-  }
 }
 
-enum _ExploreTitle { therapy, chef, spiritual }
+class _ExploreRow extends StatelessWidget {
+  const _ExploreRow({required this.pillar, required this.title, required this.subtitle, required this.onTap});
 
-class _ExploreCategoryCard extends StatelessWidget {
-  const _ExploreCategoryCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.tint,
-    required this.onTap,
-  });
-
+  final AkililPillar pillar;
   final String title;
   final String? subtitle;
-  final IconData icon;
-  final Color tint;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).textTheme;
-    final radius = BorderRadius.circular(FriendRadii.card);
-    return Material(
-      color: FriendColors.surface,
-      borderRadius: radius,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            border: Border.all(color: FriendColors.border),
-            color: FriendColors.surface,
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: tint.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(FriendRadii.small),
-                ),
-                child: Icon(icon, size: 22, color: tint),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3,
-                        color: FriendColors.textPrimary,
-                        fontFamily: 'Geist',
-                        fontFamilyFallback: TodayScreen._ethiopicFallback,
-                      ),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle!,
-                        style: theme.bodySmall?.copyWith(
-                          color: FriendColors.textSecondary,
-                          fontFamily: 'Geist',
-                          fontFamilyFallback: TodayScreen._ethiopicFallback,
-                        ),
-                      ),
-                    ],
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            FriendIconTile(icon: pillar.icon, color: pillar.color, size: 40),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: theme.textTheme.titleSmall),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(subtitle!, style: theme.textTheme.bodySmall),
                   ],
-                ),
+                ],
               ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                size: 22,
-                color: FriendColors.textMuted,
-              ),
-            ],
-          ),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 22, color: FriendColors.textMuted),
+          ],
         ),
       ),
     );
@@ -569,6 +366,7 @@ class _NextSessionHero extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(stringsProvider);
+    final theme = Theme.of(context);
     return nextAppt.when(
       loading: () => const _CardSpinner(),
       error: (e, st) => _QuietNote(message: s.couldntLoadPros),
@@ -576,117 +374,88 @@ class _NextSessionHero extends ConsumerWidget {
         if (appt == null) return const _NoSessionPanel();
 
         final when = DateTime.parse(appt['scheduled_at'] as String).toLocal();
-        final proName =
-            (appt['professional'] as Map<String, dynamic>?)?['name']
-                    as String? ??
-                tr('Akilil');
+        final proName = (appt['professional'] as Map<String, dynamic>?)?['name'] as String? ?? tr('Akilil');
         final status = appt['status'] as String? ?? 'pending';
         final duration = appt['duration_minutes'] as int? ?? 45;
         final end = when.add(Duration(minutes: duration));
         final until = when.difference(DateTime.now());
-        final hours = until.inHours;
-        final mins = until.inMinutes.remainder(60).abs();
         final priceCents = (appt['price_cents'] as num?)?.toInt() ?? -1;
         final minsUntil = until.inMinutes;
-        final canJoin = (status == 'pending' ||
-                status == 'confirmed' ||
-                status == 'in_progress') &&
-            (priceCents == 0 ||
-                (minsUntil <= 15 && minsUntil >= -(duration + 30)));
+        final canJoin = (status == 'pending' || status == 'confirmed' || status == 'in_progress') &&
+            (priceCents == 0 || (minsUntil <= 15 && minsUntil >= -(duration + 30)));
+        final soon = minsUntil <= 15;
 
-        final timeRange =
-            '${trDate('h:mm a', when)} – ${trDate('h:mm a', end)}';
-
-        return CandyCard(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                until.isNegative ? s.sessionReady : s.startsIn(hours, mins),
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: FriendColors.accent,
-                      fontFamily: 'Geist',
-                      fontFamilyFallback: TodayScreen._ethiopicFallback,
-                    ),
-              ),
-              const SizedBox(height: 12),
-              Row(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FriendSectionLabel(tr('Next session')),
+            CandyCard(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  FriendAvatar(
-                    size: 48,
-                    initials:
-                        personInitial(proName, 'A'),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          proName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.4,
-                                color: FriendColors.textPrimary,
-                                fontFamily: 'Geist',
-                                fontFamilyFallback: TodayScreen._ethiopicFallback,
-                              ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${s.videoTherapy} · $timeRange',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: FriendColors.textSecondary,
-                                fontFamily: 'Geist',
-                                fontFamilyFallback: TodayScreen._ethiopicFallback,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => context.go(AppRoutes.appts),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: FriendColors.textPrimary,
-                        side: const BorderSide(color: FriendColors.border),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(FriendRadii.pill),
+                  Row(
+                    children: [
+                      FriendAvatar(size: 44, initials: personInitial(proName, 'A')),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(proName, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${trDate('EEE d MMM', when)} · ${trDate('h:mm', when)}–${trDate('h:mm a', end)}',
+                              style: theme.textTheme.bodySmall?.copyWith(fontFeatures: friendTabular),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Text(s.reschedule),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: FriendGlowButton(
-                      label: s.join,
-                      icon: Icons.videocam_rounded,
-                      expanded: true,
-                      onPressed: canJoin
-                          ? () => context.go(
-                                '${AppRoutes.appts}/${appt['id']}/room',
-                              )
-                          : () => context.go(
-                                '${AppRoutes.appts}/${appt['id']}/setup',
-                              ),
-                    ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      if (soon) ...[const FriendLivePulse(size: 6, color: FriendColors.success), const SizedBox(width: 6)],
+                      Text(
+                        until.isNegative ? s.sessionReady : s.startsIn(until.inHours, until.inMinutes.remainder(60).abs()),
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: soon ? FriendColors.success : FriendColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(s.videoTherapy, style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textMuted)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FriendGlowButton(
+                          label: tr('Manage'),
+                          secondary: true,
+                          expanded: true,
+                          onPressed: () => context.go(AppRoutes.appts),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FriendGlowButton(
+                          label: canJoin ? s.join : tr('Check camera'),
+                          icon: canJoin ? Icons.videocam_rounded : null,
+                          expanded: true,
+                          onPressed: () => context.go(
+                            canJoin ? '${AppRoutes.appts}/${appt['id']}/room' : '${AppRoutes.appts}/${appt['id']}/setup',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -699,116 +468,52 @@ class _NoSessionPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(stringsProvider);
-    return Container(
-      decoration: BoxDecoration(
-        color: FriendColors.surface,
-        borderRadius: BorderRadius.circular(FriendRadii.card),
-        border: Border.all(color: FriendColors.border),
-      ),
-      padding: const EdgeInsets.all(22),
+    final theme = Theme.of(context);
+    return CandyCard(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            s.noSessionBooked,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                  color: FriendColors.textPrimary,
-                  fontFamily: 'Geist',
-                  fontFamilyFallback: TodayScreen._ethiopicFallback,
-                ),
-          ),
+          Text(s.noSessionBooked, style: theme.textTheme.titleMedium),
           const SizedBox(height: 6),
-          Text(
-            s.findListenerPrompt,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  height: 1.45,
-                  color: FriendColors.textSecondary,
-                  fontFamily: 'Geist',
-                  fontFamilyFallback: TodayScreen._ethiopicFallback,
-                ),
-          ),
+          Text(s.findListenerPrompt, style: theme.textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary)),
           const SizedBox(height: 18),
-          FriendGlowButton(
-            label: s.findAListener,
-            icon: Icons.arrow_forward_rounded,
-            onPressed: () => context.go(AppRoutes.home),
-          ),
+          FriendGlowButton(label: s.findAListener, onPressed: () => context.go(AppRoutes.home)),
         ],
       ),
     );
   }
 }
 
-class _RoundIconButton extends StatelessWidget {
-  const _RoundIconButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-  });
+/// Always-present, unobtrusive route to urgent help.
+class _CrisisRow extends StatelessWidget {
+  const _CrisisRow({required this.onTap});
 
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onPressed;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: FriendColors.surfaceLowest,
-        shape: const CircleBorder(),
-        child: InkWell(
-          onTap: onPressed,
-          customBorder: const CircleBorder(),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: FriendColors.border),
-              color: FriendColors.surfaceLowest,
-            ),
-            child: Icon(icon, size: 21, color: FriendColors.textPrimary),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NotificationChip extends StatelessWidget {
-  const _NotificationChip({required this.tooltip, required this.onPressed});
-
-  final String tooltip;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: FriendColors.surfaceLowest,
-        shape: const CircleBorder(),
-        child: InkWell(
-          onTap: onPressed,
-          customBorder: const CircleBorder(),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: FriendColors.border),
-              color: FriendColors.surfaceLowest,
-            ),
-            child: const Icon(
-              Icons.notifications_none_rounded,
-              size: 21,
-              color: FriendColors.textPrimary,
+    final theme = Theme.of(context);
+    return CandyCard(
+      onTap: onTap,
+      tint: FriendColors.error,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          const Icon(Icons.support_rounded, size: 22, color: FriendColors.error),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(tr('Need to talk to someone now?'), style: theme.textTheme.titleSmall),
+                const SizedBox(height: 2),
+                Text(tr('Crisis support, emergency numbers and your safety plan'), style: theme.textTheme.bodySmall),
+              ],
             ),
           ),
-        ),
+          const Icon(Icons.chevron_right_rounded, size: 22, color: FriendColors.textMuted),
+        ],
       ),
     );
   }
@@ -823,11 +528,7 @@ class _CardSpinner extends StatelessWidget {
       child: Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 22),
-          child: SizedBox(
-            width: 22,
-            height: 22,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       ),
     );
@@ -844,18 +545,13 @@ class _QuietNote extends StatelessWidget {
     return CandyCard(
       child: Text(
         message,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: FriendColors.textSecondary,
-              fontFamily: 'Geist',
-              fontFamilyFallback: TodayScreen._ethiopicFallback,
-            ),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: FriendColors.textSecondary),
       ),
     );
   }
 }
 
-/// Compact shortcut tile on the home screen.
+/// Shortcut tile on Home.
 class _QuickCard extends StatelessWidget {
   const _QuickCard({
     required this.icon,
@@ -880,24 +576,11 @@ class _QuickCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(height: 12),
-          Text(title, style: theme.textTheme.titleSmall),
+          FriendIconTile(icon: icon, color: color, size: 34),
+          const Spacer(),
+          Text(title, style: theme.textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 2),
-          Text(
-            subtitle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
-          ),
+          Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall),
         ],
       ),
     );

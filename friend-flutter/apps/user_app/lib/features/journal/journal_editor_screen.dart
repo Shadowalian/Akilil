@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:core/core.dart';
 
+import '../brand/freud_art.dart';
+
 /// Journal editor — create or edit an entry. Sends the body markdown
 /// to the server. The 1–7 mood picker is part of the spec — feeds
 /// into the analytics chart on the next screen.
@@ -38,8 +40,8 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
       final data = res.data?['data'] as Map<String, dynamic>? ?? res.data ?? const {};
       setState(() {
         _title.text = data['title'] as String? ?? '';
-        _body.text = data['body_md'] as String? ?? '';
-        _mood = data['mood_at_write'] as int?;
+        _body.text = data['content'] as String? ?? '';
+        _mood = (data['mood_score'] as num?)?.toInt();
       });
     } catch (_) {
       // Will show empty editor if load fails; the user can re-type.
@@ -49,9 +51,9 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
   }
 
   Future<void> _save() async {
-    if (_title.text.trim().isEmpty && _body.text.trim().isEmpty) {
+    if (_body.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr('Add a title or some text first.'))),
+        SnackBar(content: Text(tr('Write something first.'))),
       );
       return;
     }
@@ -59,9 +61,9 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
     try {
       final dio = ref.read(dioProvider);
       final payload = {
-        'title': _title.text.trim(),
-        'body_md': _body.text,
-        if (_mood != null) 'mood_at_write': _mood,
+        'title': _title.text.trim().isEmpty ? null : _title.text.trim(),
+        'content': _body.text,
+        'mood_score': _mood,
       };
       if (widget.entryId == null) {
         await dio.post('/journal-entries', data: payload);
@@ -122,14 +124,14 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                icon: const Icon(Icons.arrow_back_rounded, size: 24),
                 onPressed: () => context.pop(),
               ),
             ),
           ),
           FriendPageHeader(
             eyebrow: tr('Journal'),
-            title: widget.entryId == null ? 'New entry' : tr('Edit entry'),
+            title: widget.entryId == null ? tr('New entry') : tr('Edit entry'),
             subtitle: tr('Your entries are encrypted at rest.'),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -142,9 +144,10 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
                   ),
                   const SizedBox(width: 8),
                 ],
-                FriendGlowButton(
-                  label: _busy ? 'Saving…' : tr('Save'),
+                FilledButton(
+                  style: FilledButton.styleFrom(minimumSize: const Size(0, 40), padding: const EdgeInsets.symmetric(horizontal: 18)),
                   onPressed: _busy ? null : _save,
+                  child: Text(_busy ? tr('Saving…') : tr('Save')),
                 ),
               ],
             ),
@@ -193,29 +196,29 @@ class _MoodPicker extends StatelessWidget {
   final int? value;
   final ValueChanged<int?> onChanged;
 
-  static const _faces = ['😔', '😕', '😐', '🙂', '😊', '😄', '✨'];
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
+    return Row(
       children: [
-        for (var i = 0; i < _faces.length; i++)
-          GestureDetector(
-            onTap: () => onChanged(value == i + 1 ? null : i + 1),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: value == i + 1
-                    ? FriendColors.primary.withValues(alpha: 0.15)
-                    : Theme.of(context).colorScheme.surfaceContainerHighest,
-                border: Border.all(
-                  color: value == i + 1 ? FriendColors.primary : Colors.transparent,
-                  width: 2,
+        Text(tr('Mood'), style: Theme.of(context).textTheme.labelMedium),
+        const SizedBox(width: 12),
+        for (var i = 1; i <= 7; i++)
+          Expanded(
+            child: Semantics(
+              button: true,
+              selected: value == i,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => onChanged(value == i ? null : i),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 150),
+                    opacity: value == null || value == i ? 1 : 0.45,
+                    child: FreudArt.moodFaceAt(valence: (i - 1) / 6, size: 34, selected: value == i),
+                  ),
                 ),
-                borderRadius: BorderRadius.circular(12),
               ),
-              child: Center(child: Text(_faces[i], style: const TextStyle(fontSize: 24))),
             ),
           ),
       ],

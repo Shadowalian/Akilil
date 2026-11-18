@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/design_tokens.dart';
 import '../ui/candy_widgets.dart';
@@ -65,7 +64,7 @@ class SessionCallChrome extends StatelessWidget {
                           title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.urbanist(
+                          style: friendFont(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
                             fontSize: 16,
@@ -77,7 +76,7 @@ class SessionCallChrome extends StatelessWidget {
                             subtitle!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.urbanist(
+                            style: friendFont(
                               color: Colors.white.withValues(alpha: 0.78),
                               fontWeight: FontWeight.w500,
                               fontSize: 12,
@@ -137,7 +136,7 @@ class SessionChromeChip extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   label,
-                  style: GoogleFonts.urbanist(
+                  style: friendFont(
                     color: fg,
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
@@ -199,7 +198,7 @@ class SessionConnectingView extends StatelessWidget {
                   Text(
                     message,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.urbanist(
+                    style: friendFont(
                       color: FriendColors.textPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,

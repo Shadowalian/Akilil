@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:friend_professional/l10n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -66,11 +67,11 @@ class _S extends ConsumerState<OnboardingScreen> {
     } on DioException catch (e) {
       setState(() {
         _error = e.response?.data is Map
-            ? ((e.response!.data['message'] ?? 'Save failed') as String)
-            : 'Save failed.';
+            ? ((e.response!.data['message'] ?? tr('Save failed')) as String)
+            : tr('Save failed.');
       });
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : tr('Something went wrong. Please try again.'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -95,11 +96,11 @@ class _S extends ConsumerState<OnboardingScreen> {
     } on DioException catch (e) {
       setState(() {
         _error = e.response?.data is Map
-            ? ((e.response!.data['message'] ?? 'Upload failed') as String)
-            : 'Upload failed.';
+            ? ((e.response!.data['message'] ?? tr('Upload failed')) as String)
+            : tr('Upload failed.');
       });
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : tr('Something went wrong. Please try again.'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -109,7 +110,7 @@ class _S extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Set up your practice'),
+        title: Text(tr('Set up your practice')),
         leading: _step > 0
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -136,12 +137,12 @@ class _S extends ConsumerState<OnboardingScreen> {
               child: _busy
                   ? const SizedBox(width: 18, height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
-                  : Text(_step == _lastStep ? 'Finish' : 'Continue'),
+                  : Text(_step == _lastStep ? 'Finish' : tr('Continue')),
             ),
             if (_step < _lastStep)
               TextButton(
                 onPressed: () => context.go('/'),
-                child: const Text('Finish later'),
+                child: Text(tr('Finish later')),
               ),
           ],
         ),
@@ -152,36 +153,36 @@ class _S extends ConsumerState<OnboardingScreen> {
   Widget _buildStep() {
     return switch (_step) {
       0 => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Tell clients about yourself', style: Theme.of(context).textTheme.titleLarge),
+          Text(tr('Tell clients about yourself'), style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           TextField(
             controller: _headline,
-            decoration: const InputDecoration(
-              labelText: 'Headline',
-              hintText: 'Compassionate listener • 5 yrs',
+            decoration: InputDecoration(
+              labelText: tr('Headline'),
+              hintText: tr('Compassionate listener • 5 yrs'),
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _bio,
             minLines: 4, maxLines: 8,
-            decoration: const InputDecoration(
-              labelText: 'About you',
+            decoration: InputDecoration(
+              labelText: tr('About you'),
               alignLabelWithHint: true,
             ),
           ),
         ]),
       1 => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Choose your Akilil practice',
+          Text(tr('Choose your Akilil practice'),
               style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(
-            'You can only practice in one of these three pillars.',
+            tr('You can only practice in one of these three pillars.'),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: FriendColors.textSecondary,
                 ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Expanded(
             child: SingleChildScrollView(
               child: FriendPillarPicker(
@@ -194,39 +195,39 @@ class _S extends ConsumerState<OnboardingScreen> {
           ),
         ]),
       2 => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Set your rate', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          const Text(
-            'You can change this anytime. Akilil takes a 15% service fee on the platform total.',
+          Text(tr('Set your rate'), style: Theme.of(context).textTheme.titleLarge),
+          SizedBox(height: 8),
+          Text(
+            tr('You can change this anytime. Akilil takes a 15% service fee on the platform total.'),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           TextField(
             controller: _rate,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Hourly rate (USD)',
-              prefixIcon: Icon(Icons.attach_money),
+            decoration: InputDecoration(
+              labelText: tr('Price per session (ETB)'),
+              prefixIcon: Icon(Icons.payments_outlined),
             ),
           ),
         ]),
       3 => ListView(children: [
-          Text('Verify your credentials', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          const Text(
-            'Upload a licence, degree or ID so we can verify you. '
-            'You can skip this and add it later from your profile.',
+          Text(tr('Verify your credentials'), style: Theme.of(context).textTheme.titleLarge),
+          SizedBox(height: 8),
+          Text(
+            tr('Upload a licence, degree or ID so we can verify you. '
+                'You can skip this and add it later from your profile.'),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           DropdownButtonFormField<String>(
             initialValue: _docType,
-            decoration: const InputDecoration(labelText: 'Document type'),
-            items: const [
-              DropdownMenuItem(value: 'professional_license', child: Text('Professional licence')),
-              DropdownMenuItem(value: 'government_id', child: Text('Government ID')),
-              DropdownMenuItem(value: 'degree', child: Text('Degree')),
-              DropdownMenuItem(value: 'certification', child: Text('Certification')),
-              DropdownMenuItem(value: 'background_check', child: Text('Background check')),
-              DropdownMenuItem(value: 'other', child: Text('Other')),
+            decoration: InputDecoration(labelText: tr('Document type')),
+            items: [
+              DropdownMenuItem(value: 'professional_license', child: Text(tr('Professional licence'))),
+              DropdownMenuItem(value: 'government_id', child: Text(tr('Government ID'))),
+              DropdownMenuItem(value: 'degree', child: Text(tr('Degree'))),
+              DropdownMenuItem(value: 'certification', child: Text(tr('Certification'))),
+              DropdownMenuItem(value: 'background_check', child: Text(tr('Background check'))),
+              DropdownMenuItem(value: 'other', child: Text(tr('Other'))),
             ],
             onChanged: (v) => setState(() => _docType = v ?? 'professional_license'),
           ),
@@ -234,11 +235,11 @@ class _S extends ConsumerState<OnboardingScreen> {
           OutlinedButton.icon(
             onPressed: _busy ? null : _uploadDocument,
             icon: const Icon(Icons.upload_file),
-            label: const Text('Choose a file'),
+            label: Text(tr('Choose a file')),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'JPG or PNG, up to 10 MB.',
+          Text(
+            tr('JPG or PNG, up to 10 MB.'),
             style: TextStyle(color: FriendColors.textSecondary),
           ),
           for (final name in _uploaded)
@@ -247,16 +248,16 @@ class _S extends ConsumerState<OnboardingScreen> {
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.check_circle, color: FriendColors.primary),
               title: Text(name, overflow: TextOverflow.ellipsis),
-              subtitle: const Text('In review'),
+              subtitle: Text(tr('In review')),
             ),
         ]),
       _ => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Icon(Icons.check_circle, size: 64, color: FriendColors.primary),
           const SizedBox(height: 16),
-          Text('You\'re ready', style: Theme.of(context).textTheme.headlineMedium),
+          Text(tr('You\'re ready'), style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 8),
-          const Text(
-            'Your profile is in review. We\'ll let you know within 48 hours when you can start accepting bookings.',
+          Text(
+            tr('Your profile is in review. We\'ll let you know within 48 hours when you can start accepting bookings.'),
           ),
         ]),
     };

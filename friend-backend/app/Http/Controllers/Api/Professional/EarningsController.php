@@ -60,7 +60,7 @@ class EarningsController extends Controller
                 'gifts'    => (int) ($byKind['gift']->net ?? 0),
             ],
             'total_cents' => $total,
-            'currency'    => $user->professionalProfile?->currency ?: 'USD',
+            'currency'    => $user->professionalProfile?->currency ?: config('akilil.currency'),
             'series'      => $series,
         ]);
     }

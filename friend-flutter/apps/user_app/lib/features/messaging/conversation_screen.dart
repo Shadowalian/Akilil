@@ -92,7 +92,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                icon: const Icon(Icons.arrow_back_rounded, size: 24),
                 onPressed: () => context.pop(),
               ),
             ),
@@ -203,11 +203,8 @@ class _MessageBubble extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   trDate('h:mm a', createdAt),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: (fromMe ? Colors.white : FriendColors.textSecondary)
-                        .withValues(alpha: 0.7),
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: (fromMe ? Colors.white : FriendColors.textSecondary)
+                        .withValues(alpha: 0.7)),
                 ),
               ),
           ],

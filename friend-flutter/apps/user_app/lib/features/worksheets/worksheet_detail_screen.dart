@@ -1,7 +1,6 @@
 import 'package:friend_user/l10n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:core/core.dart';
 import '../core_data/seed_data.dart';
 import 'box_breathing_dialog.dart';
@@ -94,7 +93,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
             Expanded(
               child: Text(
                 tr('Saved on this phone. Bring it to your next session if you want to talk it through.'),
-                style: GoogleFonts.urbanist(fontWeight: FontWeight.w600),
+                style: friendFont(fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -115,20 +114,16 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
     return Scaffold(
       backgroundColor: FriendColors.background,
       appBar: AppBar(
-        backgroundColor: FriendColors.surface,
+        backgroundColor: FriendColors.background,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          icon: const Icon(Icons.arrow_back_rounded, size: 24),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           title,
-          style: GoogleFonts.urbanist(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            color: FriendColors.textPrimary,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
         ),
         actions: [
           if (isCompleted)
@@ -146,11 +141,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                   const SizedBox(width: 4),
                   Text(
                     tr('Completed'),
-                    style: GoogleFonts.urbanist(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: FriendColors.primaryDeep,
-                    ),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.primaryDeep),
                   ),
                 ],
               ),
@@ -162,7 +153,6 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
         children: [
           // Clinical Header Banner
           CandyCard(
-            tint: FriendColors.primary,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -176,12 +166,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                       ),
                       child: Text(
                         category,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          color: FriendColors.primaryDeep,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.primaryDeep),
                       ),
                     ),
                     const Spacer(),
@@ -189,33 +174,19 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                     const SizedBox(width: 4),
                     Text(
                       tr('Self-guided'),
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: FriendColors.textSecondary,
-                      ),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textSecondary),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text(
                   title,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                    color: FriendColors.textPrimary,
-                  ),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: FriendColors.textPrimary),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   desc,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 14,
-                    height: 1.5,
-                    fontWeight: FontWeight.w500,
-                    color: FriendColors.textSecondary,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                 ),
               ],
             ),
@@ -230,25 +201,18 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                   const Icon(Icons.air_rounded, size: 48, color: FriendColors.primary),
                   const SizedBox(height: 12),
                   Text(
-                    tr('Ready for Box Breathing?'),
-                    style: GoogleFonts.urbanist(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: FriendColors.textPrimary,
-                    ),
+                    tr('Ready for box breathing?'),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     tr('Tap below to launch the full animated visual breathing guide with audio timing cues.'),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      color: FriendColors.textSecondary,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                   ),
                   const SizedBox(height: 20),
                   FriendGlowButton(
-                    label: tr('Start Breathing Exercise'),
+                    label: tr('Start breathing exercise'),
                     icon: Icons.play_arrow_rounded,
                     onPressed: () => BoxBreathingDialog.show(context),
                   ),
@@ -271,7 +235,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                 Expanded(
                   child: Text(
                     tr('Your answers stay on this phone. Nobody else sees them unless you choose to share.'),
-                    style: GoogleFonts.urbanist(fontSize: 12, color: FriendColors.textSecondary),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(color: FriendColors.textSecondary),
                   ),
                 ),
               ],
@@ -303,11 +267,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
         children: [
           Text(
             label,
-            style: GoogleFonts.urbanist(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: FriendColors.textPrimary,
-            ),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.textPrimary),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -327,11 +287,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                   }
                 },
                 selectedColor: FriendColors.primaryLight,
-                labelStyle: GoogleFonts.urbanist(
-                  fontSize: 12,
-                  fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
-                  color: isSel ? FriendColors.primaryDeep : FriendColors.textPrimary,
-                ),
+                labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(color: isSel ? FriendColors.primaryDeep : FriendColors.textPrimary),
                 backgroundColor: FriendColors.surface,
                 side: BorderSide(
                   color: isSel ? FriendColors.primary : FriendColors.border,
@@ -350,28 +306,17 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
       children: [
         Text(
           label,
-          style: GoogleFonts.urbanist(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: FriendColors.textPrimary,
-          ),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.textPrimary),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           maxLines: 3,
           minLines: 2,
-          style: GoogleFonts.urbanist(
-            fontSize: 14,
-            height: 1.45,
-            color: FriendColors.textPrimary,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textPrimary),
           decoration: InputDecoration(
             hintText: placeholder,
-            hintStyle: GoogleFonts.urbanist(
-              fontSize: 13,
-              color: FriendColors.textMuted,
-            ),
+            hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textMuted),
             filled: true,
             fillColor: FriendColors.surface,
             border: OutlineInputBorder(

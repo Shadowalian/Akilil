@@ -160,7 +160,7 @@ class _ThreadTile extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(color: FriendColors.primary, borderRadius: BorderRadius.circular(10)),
-                    child: Text('$unread', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                    child: Text('$unread', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white)),
                   ),
                 ],
               ],
