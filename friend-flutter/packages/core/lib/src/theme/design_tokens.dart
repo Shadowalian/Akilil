@@ -1,4 +1,6 @@
-/// Akilil design tokens — v3 "Calm": creamy white, aqua blue, sunny yellow.
+/// Akilil design tokens — v4 "Warm & bright": cream canvas, orange for
+/// energy, aqua for calm, yellow for optimism, lavender for reflection,
+/// green for growth.
 ///
 /// Principles
 /// - Paper, ink and one brand colour. Warm off-white canvas, white surfaces
@@ -20,84 +22,100 @@ import '../util/i18n.dart';
 class FriendColors {
   FriendColors._();
 
-  // ── Canvas & surfaces: creamy white, warm and soft ───────────────────────
-  static const background = Color(0xFFFFFAF0); // cream
-  static const surface = Color(0xFFFFFFFF); // cards, sheets
+  // ── Canvas: warm cream ───────────────────────────────────────────────────
+  static const background = Color(0xFFFFF8EE);
+  static const surface = Color(0xFFFFFFFF);
   static const surfaceLowest = Color(0xFFFFFFFF);
-  static const recessed = Color(0xFFFBF3E2); // inputs, wells, tracks
-  static const surfaceContainer = Color(0xFFFCF5E7);
-  static const surfaceContainerHigh = Color(0xFFF8EEDA);
-  static const surfaceVariant = Color(0xFFF1E6CF);
+  static const recessed = Color(0xFFFFF0DC);
+  static const surfaceContainer = Color(0xFFFFF3E3);
+  static const surfaceContainerHigh = Color(0xFFFDEAD2);
+  static const surfaceVariant = Color(0xFFF7DFC2);
 
-  // ── Ink: soft blue-slate rather than black ───────────────────────────────
-  static const ink = Color(0xFF1E2B30);
-  static const textPrimary = Color(0xFF1E2B30);
-  static const textSecondary = Color(0xFF4A5A60);
-  static const textMuted = Color(0xFF5E6E74); // 5:1 on cream
+  // ── Ink ──────────────────────────────────────────────────────────────────
+  static const ink = Color(0xFF1F2A37);
+  static const textPrimary = Color(0xFF1F2A37);
+  static const textSecondary = Color(0xFF4B5563);
+  static const textMuted = Color(0xFF6B7280);
 
-  // ── Lines: warm, barely there ────────────────────────────────────────────
-  static const border = Color(0xFFEFE5D2);
-  static const borderStrong = Color(0xFFE2D5BC);
-  static const divider = Color(0xFFF4ECDC);
+  // ── Lines ────────────────────────────────────────────────────────────────
+  static const border = Color(0xFFF3E3CC);
+  static const borderStrong = Color(0xFFE8D2B4);
+  static const divider = Color(0xFFF7EBDA);
 
-  // ── Aqua blue: the action colour ─────────────────────────────────────────
-  /// Deep enough for white text on buttons (5:1).
-  static const primary = Color(0xFF087A89);
-  static const primaryDeep = Color(0xFF066672);
-  /// Bright aqua for icons, selections, progress and the logo.
-  static const aqua = Color(0xFF1FA5B8);
-  static const primaryLight = Color(0xFFDFF4F6); // soft aqua fills
-  static const primaryContainer = Color(0xFF1FA5B8);
+  // ── Orange: energy and encouragement, the action colour ──────────────────
+  /// Deep enough for white text (4.6:1).
+  static const primary = Color(0xFFCC4A0A);
+  static const primaryDeep = Color(0xFFA83C08);
+  /// Vivid orange for icons, highlights and the top of button gradients.
+  static const orange = Color(0xFFF97316);
+  static const primaryLight = Color(0xFFFFEDD5);
+  static const primaryContainer = orange;
   static const onPrimary = Color(0xFFFFFFFF);
-  static const onPrimaryContainer = Color(0xFF053E45);
+  static const onPrimaryContainer = Color(0xFF6B2304);
 
   /// Fill for selected chips, days, times and segments.
   static const selected = primary;
 
-  // ── Sunny yellow: warmth, highlights, streaks ────────────────────────────
-  static const accent = Color(0xFFF6C445);
-  static const accentDeep = Color(0xFF8A5A00); // readable yellow-family text
-  static const accentLight = Color(0xFFFFF3CF);
-  static const onAccent = Color(0xFF1E2B30); // dark text on yellow
+  // ── Aqua: calm and trust ─────────────────────────────────────────────────
+  static const aqua = Color(0xFF0EA5B7);
+  static const aquaDeep = Color(0xFF0E7C8C);
+  static const aquaLight = Color(0xFFD9F6F9);
+
+  // ── Sunny yellow: optimism ───────────────────────────────────────────────
+  static const accent = Color(0xFFFBBF24);
+  static const accentDeep = Color(0xFF92400E);
+  static const accentLight = Color(0xFFFEF3C7);
+  static const onAccent = Color(0xFF1F2A37);
   static const yellow = accent;
 
-  /// Live broadcasts and urgent moments: a soft coral, not alarm red.
-  static const live = Color(0xFFE5604B);
+  // ── Lavender: reflection and faith ───────────────────────────────────────
+  static const lavender = Color(0xFF7C5CD6);
+  static const lavenderLight = Color(0xFFEDE7FC);
+
+  // ── Green: growth and progress ───────────────────────────────────────────
+  static const green = Color(0xFF16A34A);
+  static const greenDeep = Color(0xFF15803D);
+  static const greenSoft = Color(0xFFDCFCE7);
+
+  // ── Rose: live and urgent ────────────────────────────────────────────────
+  static const live = Color(0xFFE11D48);
+  static const roseLight = Color(0xFFFFE4E6);
 
   // ── Status ───────────────────────────────────────────────────────────────
-  static const success = Color(0xFF2E8B57);
-  static const successLight = Color(0xFFE3F5EA);
-  static const warning = Color(0xFF8A5A00);
-  static const warningLight = Color(0xFFFFF3CF);
-  static const error = Color(0xFFC0392B);
-  static const errorContainer = Color(0xFFFDECEA);
-  static const onErrorContainer = Color(0xFF6B1D14);
-  static const info = primary;
+  static const success = greenDeep;
+  static const successLight = greenSoft;
+  static const warning = accentDeep;
+  static const warningLight = accentLight;
+  static const error = Color(0xFFDC2626);
+  static const errorContainer = Color(0xFFFEE2E2);
+  static const onErrorContainer = Color(0xFF7F1D1D);
+  static const info = aquaDeep;
 
-  // ── Pillars (identification only) ────────────────────────────────────────
-  static const pillarSpiritual = Color(0xFF7B68B5); // soft lavender
-  static const pillarSpiritualLight = Color(0xFFF0EDF8);
+  // ── Pillars ──────────────────────────────────────────────────────────────
   static const pillarMind = aqua;
-  static const pillarMindLight = primaryLight;
-  static const pillarCooking = Color(0xFFD9961A); // golden
-  static const pillarCookingLight = Color(0xFFFFF3CF);
+  static const pillarMindLight = aquaLight;
+  static const pillarSpiritual = lavender;
+  static const pillarSpiritualLight = lavenderLight;
+  static const pillarCooking = Color(0xFFF59E0B);
+  static const pillarCookingLight = accentLight;
 
-  // ── v1 aliases ───────────────────────────────────────────────────────────
+  /// The cheerful set used to colour tiles, avatars and charts in turn.
+  static const vivid = [orange, aqua, lavender, green, Color(0xFFF59E0B), Color(0xFFEC4899)];
+
+  // ── v1/v2 aliases ────────────────────────────────────────────────────────
   static const secondaryFixed = aqua;
-  static const secondaryFixedDim = primary;
-  static const wood = pillarSpiritual;
-  static const woodLight = pillarSpiritualLight;
-  static const woodDeep = Color(0xFF5A4A92);
-  static const green = primary;
-  static const greenSoft = primaryLight;
-  static const aquaSoft = primaryLight;
+  static const secondaryFixedDim = aquaDeep;
+  static const wood = lavender;
+  static const woodLight = lavenderLight;
+  static const woodDeep = Color(0xFF5B3FB8);
+  static const aquaSoft = aquaLight;
   static const sky = aqua;
   static const cream = background;
   static const peach = recessed;
-  static const apricot = accentLight;
-  static const sunset = accent;
+  static const apricot = primaryLight;
+  static const sunset = orange;
   static const coral = live;
-  static const spark = aqua;
+  static const spark = orange;
   static const inkSoft = primary;
 }
 
@@ -191,7 +209,7 @@ class FriendElevation {
   static const List<BoxShadow> glowPressed = [];
 
   static const List<BoxShadow> focusRing = [
-    BoxShadow(color: Color(0x33087A89), blurRadius: 0, spreadRadius: 3),
+    BoxShadow(color: Color(0x33F97316), blurRadius: 0, spreadRadius: 3),
   ];
 }
 
@@ -205,20 +223,49 @@ class FriendLayout {
 
 /// v1 gradient tokens, now flat. Kept so older widgets render the new
 /// language without a rewrite.
+/// Gradients for the few hero surfaces and the primary button.
 class FriendGradients {
   FriendGradients._();
 
-  static const spectrum = LinearGradient(colors: [FriendColors.primary, FriendColors.primary]);
-  static const spectrumHot = spectrum;
-  static const spectrumHotPressed =
-      LinearGradient(colors: [FriendColors.primaryDeep, FriendColors.primaryDeep]);
-  static const hero = spectrum;
-  static const accentRing = LinearGradient(colors: [FriendColors.primary, FriendColors.primary]);
-  static const ink = spectrum;
+  /// Primary buttons: vivid orange into deep orange.
+  static const action = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFF26A1B), Color(0xFFCC4A0A)],
+  );
+
+  /// Calm hero (next session, focus cards): aqua into deep teal.
+  static const calm = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF14B8CC), Color(0xFF0E7C8C)],
+  );
+
+  /// Warm hero (welcome, earnings): orange into rose.
+  static const sunrise = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFF97316), Color(0xFFE5486B)],
+  );
+
+  /// Reflective hero (faith, journal): lavender into indigo.
+  static const dusk = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF8B6CE0), Color(0xFF5B3FB8)],
+  );
+
+  // v1 names.
+  static const spectrum = action;
+  static const spectrumHot = action;
+  static const spectrumHotPressed = LinearGradient(colors: [Color(0xFFCC4A0A), Color(0xFFA83C08)]);
+  static const hero = calm;
+  static const accentRing = action;
+  static const ink = action;
   static const woodWash = LinearGradient(colors: [FriendColors.recessed, FriendColors.recessed]);
 
   static LinearGradient cardTint(Color color) {
-    final c = Color.alphaBlend(color.withValues(alpha: 0.08), FriendColors.surface);
+    final c = Color.alphaBlend(color.withValues(alpha: 0.10), FriendColors.surface);
     return LinearGradient(colors: [c, c]);
   }
 }

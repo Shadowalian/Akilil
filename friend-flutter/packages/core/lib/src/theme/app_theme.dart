@@ -19,9 +19,9 @@ class FriendAppTheme {
       onPrimary: FriendColors.onPrimary,
       primaryContainer: FriendColors.primaryLight,
       onPrimaryContainer: FriendColors.onPrimaryContainer,
-      secondary: FriendColors.primary,
+      secondary: FriendColors.aqua,
       onSecondary: FriendColors.onPrimary,
-      secondaryContainer: FriendColors.primaryLight,
+      secondaryContainer: FriendColors.aquaLight,
       onSecondaryContainer: FriendColors.onPrimaryContainer,
       tertiary: FriendColors.accent,
       onTertiary: FriendColors.onAccent,
@@ -41,9 +41,9 @@ class FriendAppTheme {
       outlineVariant: FriendColors.border,
       shadow: FriendColors.ink,
       scrim: Color(0x6617191C),
-      inverseSurface: FriendColors.selected,
+      inverseSurface: FriendColors.ink,
       onInverseSurface: Colors.white,
-      inversePrimary: FriendColors.aqua,
+      inversePrimary: FriendColors.orange,
       surfaceTint: Colors.transparent,
     );
     return _build(cs);
@@ -322,7 +322,7 @@ class FriendAppTheme {
       switchTheme: SwitchThemeData(
         thumbColor: const WidgetStatePropertyAll(Colors.white),
         trackColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? FriendColors.primary : FriendColors.surfaceVariant),
+            s.contains(WidgetState.selected) ? FriendColors.green : FriendColors.surfaceVariant),
         trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
         thumbIcon: const WidgetStatePropertyAll(null),
       ),
@@ -370,7 +370,7 @@ class FriendAppTheme {
 
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: FriendColors.selected,
+        backgroundColor: FriendColors.ink,
         contentTextStyle: text.bodyMedium?.copyWith(color: Colors.white),
         actionTextColor: FriendColors.accent,
         elevation: 0,
@@ -433,7 +433,7 @@ class FriendAppTheme {
       ),
 
       tooltipTheme: TooltipThemeData(
-        decoration: BoxDecoration(color: FriendColors.selected, borderRadius: BorderRadius.circular(FriendRadii.small)),
+        decoration: BoxDecoration(color: FriendColors.ink, borderRadius: BorderRadius.circular(FriendRadii.small)),
         textStyle: text.labelMedium?.copyWith(color: Colors.white),
       ),
 

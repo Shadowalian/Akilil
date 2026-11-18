@@ -165,14 +165,14 @@ class TodayScreen extends ConsumerWidget {
               ),
               _QuickCard(
                 icon: Icons.family_restroom_rounded,
-                color: FriendColors.primary,
+                color: FriendColors.orange,
                 title: tr('Family'),
                 subtitle: tr('Book for your child'),
                 onTap: () => context.go(AppRoutes.family),
               ),
               _QuickCard(
                 icon: Icons.edit_note_rounded,
-                color: FriendColors.pillarCooking,
+                color: FriendColors.green,
                 title: tr('Worksheets'),
                 subtitle: tr('Thought records and calming exercises'),
                 onTap: () => context.go(AppRoutes.worksheets),
@@ -389,24 +389,29 @@ class _NextSessionHero extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             FriendSectionLabel(tr('Next session')),
-            CandyCard(
+            FriendGradientCard(
+              gradient: FriendGradients.calm,
               padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
                     children: [
-                      FriendAvatar(size: 44, initials: personInitial(proName, 'A')),
+                      Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                        child: FriendAvatar(size: 44, initials: personInitial(proName, 'A')),
+                      ),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(proName, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium),
+                            Text(proName, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white)),
                             const SizedBox(height: 2),
                             Text(
                               '${trDate('EEE d MMM', when)} · ${trDate('h:mm', when)}–${trDate('h:mm a', end)}',
-                              style: theme.textTheme.bodySmall?.copyWith(fontFeatures: friendTabular),
+                              style: theme.textTheme.bodySmall?.copyWith(color: Colors.white.withValues(alpha: 0.9), fontFeatures: friendTabular),
                             ),
                           ],
                         ),
@@ -414,39 +419,54 @@ class _NextSessionHero extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      if (soon) ...[const FriendLivePulse(size: 6, color: FriendColors.success), const SizedBox(width: 6)],
-                      Text(
-                        until.isNegative ? s.sessionReady : s.startsIn(until.inHours, until.inMinutes.remainder(60).abs()),
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: soon ? FriendColors.success : FriendColors.textSecondary,
-                          fontWeight: FontWeight.w600,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(FriendRadii.pill)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (soon) ...[const FriendLivePulse(size: 6, color: FriendColors.accent), const SizedBox(width: 6)],
+                        Icon(Icons.schedule_rounded, size: 14, color: Colors.white.withValues(alpha: 0.95)),
+                        const SizedBox(width: 6),
+                        Text(
+                          until.isNegative ? s.sessionReady : s.startsIn(until.inHours, until.inMinutes.remainder(60).abs()),
+                          style: theme.textTheme.labelMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
                         ),
-                      ),
-                      const Spacer(),
-                      Text(s.videoTherapy, style: theme.textTheme.labelMedium?.copyWith(color: FriendColors.textMuted)),
-                    ],
+                        Text('  ·  ${s.videoTherapy}', style: theme.textTheme.labelMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85))),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
-                        child: FriendGlowButton(
-                          label: tr('Manage'),
-                          secondary: true,
-                          expanded: true,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.transparent,
+                            side: BorderSide(color: Colors.white.withValues(alpha: 0.6)),
+                          ),
                           onPressed: () => context.go(AppRoutes.appts),
+                          child: Text(tr('Manage')),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: FriendGlowButton(
-                          label: canJoin ? s.join : tr('Check camera'),
-                          icon: canJoin ? Icons.videocam_rounded : null,
-                          expanded: true,
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: FriendColors.aquaDeep,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                          ),
                           onPressed: () => context.go(
                             canJoin ? '${AppRoutes.appts}/${appt['id']}/room' : '${AppRoutes.appts}/${appt['id']}/setup',
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (canJoin) ...[const Icon(Icons.videocam_rounded, size: 18), const SizedBox(width: 6)],
+                              Flexible(child: Text(canJoin ? s.join : tr('Test camera'), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                            ],
                           ),
                         ),
                       ),
@@ -572,11 +592,12 @@ class _QuickCard extends StatelessWidget {
     final theme = Theme.of(context);
     return CandyCard(
       onTap: onTap,
+      tint: color,
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          FriendIconTile(icon: icon, color: color, size: 34),
+          FriendIconTile(icon: icon, color: color, size: 36),
           const Spacer(),
           Text(title, style: theme.textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 2),

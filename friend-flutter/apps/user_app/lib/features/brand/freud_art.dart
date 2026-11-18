@@ -13,15 +13,15 @@ import 'package:flutter/material.dart';
 class FreudArt {
   FreudArt._();
 
-  /// Ordered five-step Freud mood ramp:
-  /// Aqua → gray → Zen Yellow → Serenity Green →
-  /// Empathy Orange.
+  /// Five-step mood ramp, chosen for how each feeling reads: a soft
+  /// lavender for awful, slate for low, sunny yellow for okay, fresh green
+  /// for good and bright orange for great.
   static const moodColors = <Color>[
-    FriendColors.primary,
-    Color(0xFFA1A4B2),
-    Color(0xFFFFBD1A),
-    FriendColors.green,
+    FriendColors.lavender,
+    Color(0xFF94A3B8),
     FriendColors.accent,
+    FriendColors.green,
+    FriendColors.orange,
   ];
 
   /// Light-on-deep-blue mark for the splash screen.

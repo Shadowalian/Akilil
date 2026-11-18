@@ -247,14 +247,14 @@ class _StatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Widget cell(String value, String label, {VoidCallback? onTap}) => Expanded(
+    Widget cell(String value, String label, {VoidCallback? onTap, Color color = FriendColors.textPrimary}) => Expanded(
           child: InkWell(
             onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 14),
               child: Column(
                 children: [
-                  Text(value, style: theme.textTheme.titleLarge?.copyWith(fontFeatures: friendTabular)),
+                  Text(value, style: theme.textTheme.titleLarge?.copyWith(color: color, fontFeatures: friendTabular)),
                   const SizedBox(height: 2),
                   Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelSmall),
                 ],
@@ -267,11 +267,11 @@ class _StatsCard extends StatelessWidget {
       child: IntrinsicHeight(
         child: Row(
           children: [
-            cell('$today', tr('Sessions today')),
+            cell('$today', tr('Sessions today'), color: FriendColors.aquaDeep),
             const VerticalDivider(width: 1),
-            cell(earned, tr('ETB earned, 30 days'), onTap: onEarnings),
+            cell(earned, tr('ETB earned, 30 days'), onTap: onEarnings, color: FriendColors.primary),
             const VerticalDivider(width: 1),
-            cell(rating, tr('Rating')),
+            cell(rating, tr('Rating'), color: FriendColors.accentDeep),
           ],
         ),
       ),
@@ -388,69 +388,91 @@ class _ActiveQueueCard extends StatelessWidget {
                 : trDate('EEE d MMM', startsAt);
     final note = (appt['client_note'] as String?)?.trim();
 
-    return CandyCard(
-      padding: const EdgeInsets.all(16),
+    final white70 = Colors.white.withValues(alpha: 0.85);
+    return FriendGradientCard(
+      gradient: FriendGradients.calm,
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              FriendAvatar(size: 44, initials: personInitial(name)),
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                child: FriendAvatar(size: 44, initials: personInitial(name)),
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: theme.textTheme.titleMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(name, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 2),
                     Text(
                       '${_formatLabel(appt)} · ${trDate('h:mm a', startsAt)} · ${trx('$duration min', '$duration ደቂቃ')}',
-                      style: theme.textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall?.copyWith(color: white70),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              if (soon) const FriendLivePulse(size: 7),
+              if (soon) const FriendLivePulse(size: 7, color: FriendColors.accent),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            startsLabel,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: soon ? FriendColors.live : FriendColors.textSecondary,
-              fontWeight: FontWeight.w600,
+          const SizedBox(height: 12),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(FriendRadii.pill)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.schedule_rounded, size: 14),
+                  const SizedBox(width: 6),
+                  Text(startsLabel, style: theme.textTheme.labelMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+                ],
+              ),
             ),
           ),
           if (note != null && note.isNotEmpty) ...[
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: FriendColors.recessed, borderRadius: BorderRadius.circular(FriendRadii.medium)),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(FriendRadii.medium)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(tr('Client note'), style: theme.textTheme.labelSmall),
+                  Text(tr('Client note'), style: theme.textTheme.labelSmall?.copyWith(color: white70)),
                   const SizedBox(height: 2),
-                  Text(note, style: theme.textTheme.bodySmall?.copyWith(color: FriendColors.textPrimary), maxLines: 3, overflow: TextOverflow.ellipsis),
+                  Text(note, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white), maxLines: 3, overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: FriendGlowButton(label: tr('Client record'), secondary: true, expanded: true, onPressed: () => onDossier(guest, 1)),
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.transparent,
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.6)),
+                  ),
+                  onPressed: () => onDossier(guest, 1),
+                  child: Text(tr('Client record')),
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: FriendGlowButton(
-                  label: tr('Start'),
-                  icon: Icons.videocam_rounded,
-                  expanded: true,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: FriendColors.aquaDeep),
                   onPressed: () => onLaunchMeet(id),
+                  icon: const Icon(Icons.videocam_rounded, size: 18),
+                  label: Text(tr('Start')),
                 ),
               ),
             ],
