@@ -34,7 +34,7 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen> {
     try {
       final dio = ref.read(dioProvider);
       await dio.post('/mood-logs', data: {
-        'mood': _mood,
+        'mood_score': _mood,
         if (_note.text.trim().isNotEmpty) 'note': _note.text.trim(),
       });
       setState(() {

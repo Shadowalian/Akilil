@@ -123,11 +123,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
         ),
         title: Text(
           title,
-          style: friendFont(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: FriendColors.textPrimary,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
         ),
         actions: [
           if (isCompleted)
@@ -145,11 +141,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                   const SizedBox(width: 4),
                   Text(
                     tr('Completed'),
-                    style: friendFont(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: FriendColors.primaryDeep,
-                    ),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.primaryDeep),
                   ),
                 ],
               ),
@@ -174,12 +166,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                       ),
                       child: Text(
                         category,
-                        style: friendFont(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                          color: FriendColors.primaryDeep,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.primaryDeep),
                       ),
                     ),
                     const Spacer(),
@@ -187,33 +174,19 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                     const SizedBox(width: 4),
                     Text(
                       tr('Self-guided'),
-                      style: friendFont(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: FriendColors.textSecondary,
-                      ),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textSecondary),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text(
                   title,
-                  style: friendFont(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.5,
-                    color: FriendColors.textPrimary,
-                  ),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: FriendColors.textPrimary),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   desc,
-                  style: friendFont(
-                    fontSize: 14,
-                    height: 1.5,
-                    fontWeight: FontWeight.w500,
-                    color: FriendColors.textSecondary,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                 ),
               ],
             ),
@@ -229,20 +202,13 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                   const SizedBox(height: 12),
                   Text(
                     tr('Ready for box breathing?'),
-                    style: friendFont(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: FriendColors.textPrimary,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     tr('Tap below to launch the full animated visual breathing guide with audio timing cues.'),
                     textAlign: TextAlign.center,
-                    style: friendFont(
-                      fontSize: 14,
-                      color: FriendColors.textSecondary,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                   ),
                   const SizedBox(height: 20),
                   FriendGlowButton(
@@ -269,7 +235,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                 Expanded(
                   child: Text(
                     tr('Your answers stay on this phone. Nobody else sees them unless you choose to share.'),
-                    style: friendFont(fontSize: 12, color: FriendColors.textSecondary),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(color: FriendColors.textSecondary),
                   ),
                 ),
               ],
@@ -301,11 +267,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
         children: [
           Text(
             label,
-            style: friendFont(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: FriendColors.textPrimary,
-            ),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.textPrimary),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -325,11 +287,7 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
                   }
                 },
                 selectedColor: FriendColors.primaryLight,
-                labelStyle: friendFont(
-                  fontSize: 12,
-                  fontWeight: isSel ? FontWeight.w600 : FontWeight.w500,
-                  color: isSel ? FriendColors.primaryDeep : FriendColors.textPrimary,
-                ),
+                labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(color: isSel ? FriendColors.primaryDeep : FriendColors.textPrimary),
                 backgroundColor: FriendColors.surface,
                 side: BorderSide(
                   color: isSel ? FriendColors.primary : FriendColors.border,
@@ -348,28 +306,17 @@ class _WorksheetDetailScreenState extends ConsumerState<WorksheetDetailScreen> {
       children: [
         Text(
           label,
-          style: friendFont(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: FriendColors.textPrimary,
-          ),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.textPrimary),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           maxLines: 3,
           minLines: 2,
-          style: friendFont(
-            fontSize: 14,
-            height: 1.45,
-            color: FriendColors.textPrimary,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textPrimary),
           decoration: InputDecoration(
             hintText: placeholder,
-            hintStyle: friendFont(
-              fontSize: 13,
-              color: FriendColors.textMuted,
-            ),
+            hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textMuted),
             filled: true,
             fillColor: FriendColors.surface,
             border: OutlineInputBorder(

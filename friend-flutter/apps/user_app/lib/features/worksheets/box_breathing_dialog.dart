@@ -132,19 +132,11 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
                     children: [
                       Text(
                         tr('Box Breathing'),
-                        style: friendFont(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: FriendColors.textPrimary,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
                       ),
                       Text(
                         tr('Slows your heart and calms your body'),
-                        style: friendFont(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: FriendColors.textSecondary,
-                        ),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: FriendColors.textSecondary),
                       ),
                     ],
                   ),
@@ -238,20 +230,11 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
                           children: [
                             Text(
                               '$_secondsInPhase',
-                              style: friendFont(
-                                fontSize: 36,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                              ),
+                              style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: Colors.white),
                             ),
                             Text(
                               _phaseLabel.toUpperCase(),
-                              style: friendFont(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1.2,
-                                color: Colors.white.withValues(alpha: 0.9),
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white.withValues(alpha: 0.9)),
                             ),
                           ],
                         ),
@@ -266,11 +249,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
             Text(
               _phaseHint,
               textAlign: TextAlign.center,
-              style: friendFont(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: FriendColors.textSecondary,
-              ),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.textSecondary),
             ),
             const SizedBox(height: 16),
 
@@ -283,11 +262,7 @@ class _BoxBreathingDialogState extends State<BoxBreathingDialog>
               ),
               child: Text(
                 trx('Completed cycles: $_cycleCount', 'የተጠናቀቁ ዙሮች፦ $_cycleCount'),
-                style: friendFont(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: FriendColors.primaryDeep,
-                ),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.primaryDeep),
               ),
             ),
             const SizedBox(height: 24),

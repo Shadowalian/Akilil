@@ -180,7 +180,7 @@ class _S extends ConsumerState<TwoFactorSetupScreen> {
                               ),
                               child: Text(
                                 _secret!,
-                                style: const TextStyle(fontFamily: 'monospace', fontSize: 14),
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
                           ),

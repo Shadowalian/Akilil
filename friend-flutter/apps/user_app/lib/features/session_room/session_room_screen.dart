@@ -151,21 +151,14 @@ class _SessionRoomScreenState extends ConsumerState<SessionRoomScreen> {
                       const SizedBox(width: 8),
                       Text(
                         tr('Camera & audio check'),
-                        style: friendFont(
-                          fontWeight: FontWeight.w600,
-                          fontSize: FriendTypeScale.headlineSmall,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
                     tr('Your camera and microphone turn on when you join. You can switch your camera off at any time inside the room.'),
-                    style: friendFont(
-                      fontSize: FriendTypeScale.bodySmall,
-                      height: 1.45,
-                      color: FriendColors.textSecondary,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                   ),
                 ],
               ),
@@ -228,12 +221,7 @@ class _WaitingRoomCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       tr('ROOM READY'),
-                      style: friendFont(
-                        fontSize: FriendTypeScale.micro,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                        color: FriendColors.accent,
-                      ),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.accent),
                     ),
                   ],
                 ),
@@ -243,11 +231,7 @@ class _WaitingRoomCard extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 tr('PRIVATE'),
-                style: friendFont(
-                  fontSize: FriendTypeScale.micro,
-                  fontWeight: FontWeight.w600,
-                  color: FriendColors.textSecondary,
-                ),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textSecondary),
               ),
             ],
           ),
@@ -272,19 +256,12 @@ class _WaitingRoomCard extends StatelessWidget {
                   children: [
                     Text(
                       clinicianName,
-                      style: friendFont(
-                        fontSize: FriendTypeScale.headlineSmall,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       tr('Your professional joins at the session time. You will see them here when they arrive.'),
-                      style: friendFont(
-                        fontSize: FriendTypeScale.bodySmall,
-                        color: FriendColors.textSecondary,
-                        height: 1.4,
-                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.textSecondary),
                     ),
                   ],
                 ),

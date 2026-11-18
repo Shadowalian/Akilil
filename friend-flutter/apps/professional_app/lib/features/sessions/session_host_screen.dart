@@ -87,11 +87,7 @@ class _SessionHostScreenState extends ConsumerState<SessionHostScreen> {
               SizedBox(height: 16),
               Text(
                 tr('Starting live session…'),
-                style: TextStyle(
-                  color: FriendDarkColors.textSecondary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendDarkColors.textSecondary),
               ),
             ],
           ),

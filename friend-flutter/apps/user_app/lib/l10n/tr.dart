@@ -17,6 +17,12 @@ bool trAmharic = false;
 String tr(String en) => trAmharic ? (_am[en] ?? en) : en;
 
 const Map<String, String> _am = {
+  'Write something first.': 'መጀመሪያ የሆነ ነገር ይጻፉ።',
+  'Other ways to get support': 'ሌሎች የድጋፍ መንገዶች',
+  'Find someone to talk to': 'የሚያናግሩት ሰው ያግኙ',
+  'See who has open times today': 'ዛሬ ክፍት ሰዓት ያላቸውን ይመልከቱ',
+  'In danger right now?': 'አሁን አደጋ ላይ ነዎት?',
+  'If you might hurt yourself or someone else, call now or go to the nearest hospital.': 'ራስዎን ወይም ሌላ ሰው ሊጎዱ የሚችሉ ከሆነ፣ አሁኑኑ ይደውሉ ወይም በአቅራቢያ ወዳለ ሆስፒታል ይሂዱ።',
   // Catalogue names that come from the server.
   'Faith & anxiety': 'እምነትና ጭንቀት',
   'Grief & meaning': 'ሐዘንና የሕይወት ትርጉም',

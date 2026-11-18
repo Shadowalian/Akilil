@@ -102,7 +102,7 @@ class ProWordmark extends StatelessWidget {
       children: [
         Text(
           tr('Akilil'),
-          style: friendFont(fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: -0.4, color: FriendColors.textPrimary),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
         ),
         const SizedBox(width: 6),
         Container(
@@ -110,7 +110,7 @@ class ProWordmark extends StatelessWidget {
           decoration: BoxDecoration(color: FriendColors.ink, borderRadius: BorderRadius.circular(5)),
           child: Text(
             'Pro',
-            style: friendFont(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white, height: 1.3),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white),
           ),
         ),
       ],
@@ -251,7 +251,7 @@ class ProStitchLivePill extends StatelessWidget {
           if (pulse) ...[const FriendLivePulse(size: 6), const SizedBox(width: 4)],
           Text(
             label,
-            style: friendFont(fontSize: 12, fontWeight: FontWeight.w600, color: FriendColors.live, height: 1.3),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.live),
           ),
         ],
       ),

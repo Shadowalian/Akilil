@@ -133,13 +133,13 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                 children: [
                   Text(
                     "Thank you for being honest. You don't have to carry this alone.",
-                    style: friendFont(fontSize: 16, fontWeight: FontWeight.w600, color: FriendColors.onErrorContainer),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.onErrorContainer),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     tr('If you might act on these thoughts, call 907 for an ambulance now, or go to the nearest hospital. '
                     'Otherwise, please talk to someone today. When you save this check-in, our safety team is told so someone can check on you.'),
-                    style: friendFont(fontSize: 13, height: 1.4, color: FriendColors.onErrorContainer),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: FriendColors.onErrorContainer),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -162,7 +162,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                     const SizedBox(height: 10),
                     Text(
                       tr('Our safety team has been told and will contact you.'),
-                      style: friendFont(fontSize: 13, fontWeight: FontWeight.w600, color: FriendColors.onErrorContainer),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.onErrorContainer),
                     ),
                   ],
                 ],
@@ -192,11 +192,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                   child: Center(
                     child: Text(
                       complete ? '$score' : '–',
-                      style: friendFont(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: severityColor,
-                      ),
+                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: severityColor),
                     ),
                   ),
                 ),
@@ -207,20 +203,12 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                     children: [
                       Text(
                         severityTitle,
-                        style: friendFont(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: FriendColors.textPrimary,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: FriendColors.textPrimary),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         severityDesc,
-                        style: friendFont(
-                          fontSize: 12,
-                          height: 1.4,
-                          color: FriendColors.textSecondary,
-                        ),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: FriendColors.textSecondary),
                       ),
                     ],
                   ),
@@ -232,11 +220,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
 
           Text(
             tr(meta['subtitle'] as String? ?? ''),
-            style: friendFont(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: FriendColors.textSecondary,
-            ),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.textSecondary),
           ),
           const SizedBox(height: 14),
 
@@ -248,11 +232,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                 children: [
                   Text(
                     '${i + 1}. ${questions[i]}',
-                    style: friendFont(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: FriendColors.textPrimary,
-                    ),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(color: FriendColors.textPrimary),
                   ),
                   const SizedBox(height: 12),
                   for (var val = 0; val < _scaleLabels.length; val++) ...[
@@ -276,15 +256,9 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
                             Expanded(
                               child: Text(
                                 _scaleLabels[val],
-                                style: friendFont(
-                                  fontSize: 13,
-                                  color: answers[i] == val
+                                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: answers[i] == val
                                       ? FriendColors.primaryDeep
-                                      : FriendColors.textPrimary,
-                                  fontWeight: answers[i] == val
-                                      ? FontWeight.w600
-                                      : FontWeight.w500,
-                                ),
+                                      : FriendColors.textPrimary),
                               ),
                             ),
                           ],
@@ -303,7 +277,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
             Text(
               trx('Last time: $_lastResult', 'ባለፈው ጊዜ፦ $_lastResult'),
               textAlign: TextAlign.center,
-              style: friendFont(fontSize: 12, color: FriendColors.textSecondary),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: FriendColors.textSecondary),
             ),
             const SizedBox(height: 10),
           ],
@@ -330,7 +304,7 @@ class _SymptomTrackerScreenState extends ConsumerState<SymptomTrackerScreen> {
           Text(
             tr('This is a screening tool, not a diagnosis.'),
             textAlign: TextAlign.center,
-            style: friendFont(fontSize: 12, color: FriendColors.textMuted),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: FriendColors.textMuted),
           ),
           const SizedBox(height: 36),
         ],
@@ -369,11 +343,7 @@ class _TabButton extends StatelessWidget {
           child: Center(
             child: Text(
               title,
-              style: friendFont(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : FriendColors.textPrimary,
-              ),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: isSelected ? Colors.white : FriendColors.textPrimary),
             ),
           ),
         ),

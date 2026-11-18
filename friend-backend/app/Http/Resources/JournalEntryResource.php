@@ -13,6 +13,7 @@ class JournalEntryResource extends JsonResource
             'client_uuid'       => $this->client_uuid,
             'mood_score'        => $this->mood_score,
             'mood_tags'         => $this->mood_tags,
+            'title'             => $this->title,
             'content'           => $this->content,
             'is_private'        => (bool) $this->is_private,
             'created_client_at' => optional($this->created_client_at)?->toIso8601String(),

@@ -12,7 +12,7 @@ class JournalEntry extends Model
 
     protected $fillable = [
         'user_id', 'client_uuid', 'mood_score', 'mood_tags',
-        'content', 'is_private', 'created_client_at',
+        'title', 'content', 'is_private', 'created_client_at',
     ];
 
     protected function casts(): array
@@ -20,6 +20,7 @@ class JournalEntry extends Model
         return [
             'mood_tags'        => 'array',
             // Private writing: encrypted at rest, as the app promises.
+            'title'            => 'encrypted',
             'content'          => 'encrypted',
             'is_private'       => 'boolean',
             'created_client_at'=> 'datetime',

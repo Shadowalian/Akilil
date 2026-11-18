@@ -21,6 +21,10 @@ String trDate(String pattern, DateTime date) {
 }
 
 const Map<String, String> _am = {
+  "Couldn't load this record.": 'ይህን መዝገብ መጫን አልተቻለም።',
+  "Couldn't open a conversation.": 'ውይይት መክፈት አልተቻለም።',
+  "No note written for this session.": 'ለዚህ ቆይታ ማስታወሻ አልተጻፈም።',
+  "Session": 'ቆይታ',
   // Catalogue names that come from the server.
   'Faith & anxiety': 'እምነትና ጭንቀት',
   'Grief & meaning': 'ሐዘንና የሕይወት ትርጉም',

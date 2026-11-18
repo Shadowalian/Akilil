@@ -40,8 +40,8 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
       final data = res.data?['data'] as Map<String, dynamic>? ?? res.data ?? const {};
       setState(() {
         _title.text = data['title'] as String? ?? '';
-        _body.text = data['body_md'] as String? ?? '';
-        _mood = data['mood_at_write'] as int?;
+        _body.text = data['content'] as String? ?? '';
+        _mood = (data['mood_score'] as num?)?.toInt();
       });
     } catch (_) {
       // Will show empty editor if load fails; the user can re-type.
@@ -51,9 +51,9 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
   }
 
   Future<void> _save() async {
-    if (_title.text.trim().isEmpty && _body.text.trim().isEmpty) {
+    if (_body.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr('Add a title or some text first.'))),
+        SnackBar(content: Text(tr('Write something first.'))),
       );
       return;
     }
@@ -61,9 +61,9 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
     try {
       final dio = ref.read(dioProvider);
       final payload = {
-        'title': _title.text.trim(),
-        'body_md': _body.text,
-        if (_mood != null) 'mood_at_write': _mood,
+        'title': _title.text.trim().isEmpty ? null : _title.text.trim(),
+        'content': _body.text,
+        'mood_score': _mood,
       };
       if (widget.entryId == null) {
         await dio.post('/journal-entries', data: payload);

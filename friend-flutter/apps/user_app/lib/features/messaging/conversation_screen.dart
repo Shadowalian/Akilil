@@ -203,11 +203,8 @@ class _MessageBubble extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   trDate('h:mm a', createdAt),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: (fromMe ? Colors.white : FriendColors.textSecondary)
-                        .withValues(alpha: 0.7),
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: (fromMe ? Colors.white : FriendColors.textSecondary)
+                        .withValues(alpha: 0.7)),
                 ),
               ),
           ],
