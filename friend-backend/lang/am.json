@@ -94,5 +94,6 @@
   "Teen login created.": "የታዳጊው መግቢያ ተፈጥሯል።",
   "Top up your wallet to send this gift.": "ይህን ስጦታ ለመላክ ቦርሳዎን ይሙሉ።",
   "Two-factor authentication enabled.": "ባለሁለት ደረጃ መግቢያ በርቷል።",
-  "Two-factor authentication must be set up before using admin features.": "የአስተዳዳሪ ገጾችን ከመጠቀምዎ በፊት ባለሁለት ደረጃ መግቢያን ማብራት አለብዎት።"
+  "Two-factor authentication must be set up before using admin features.": "የአስተዳዳሪ ገጾችን ከመጠቀምዎ በፊት ባለሁለት ደረጃ መግቢያን ማብራት አለብዎት።",
+  "Payments are not set up yet. Please try again later.": "ክፍያ ገና አልተዘጋጀም። እባክዎ ቆይተው ይሞክሩ።"
 }

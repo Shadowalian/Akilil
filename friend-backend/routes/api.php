@@ -66,8 +66,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('throttle:60,1')->group(function () {
     Route::post('auth/register',              RegisterController::class)->name('auth.register');
     Route::post('auth/register-professional', RegisterProfessionalController::class)->name('auth.register-professional');
-    Route::post('auth/login',                 LoginController::class)->name('auth.login');
 });
+
+// Login: 5 tries a minute per email+IP, on top of a 60/min IP ceiling.
+Route::post('auth/login', LoginController::class)
+    ->middleware(['throttle:60,1', 'throttle:login'])
+    ->name('auth.login');
 
 Route::middleware('throttle:20,1')->group(function () {
     Route::post('auth/forgot-password', [PasswordController::class, 'sendLink'])->name('auth.forgot');

@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Behind nginx / a load balancer: trust X-Forwarded-* so request()->ip()
+        // and https detection are correct. TRUSTED_PROXIES narrows it.
+        $middleware->trustProxies(at: env('TRUSTED_PROXIES', '*'));
         $middleware->api(prepend: [
             \App\Http\Middleware\LocalizeApiResponse::class,
         ]);
@@ -21,5 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Payment provider problems are a temporary outage for the user, not
+        // a server crash: answer 503 with a readable message.
+        $exceptions->render(function (\App\Services\Payments\GatewayException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $e->getMessage()], 503);
+            }
+        });
     })->create();
