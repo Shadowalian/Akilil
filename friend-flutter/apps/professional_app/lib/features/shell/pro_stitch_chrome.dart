@@ -107,7 +107,7 @@ class ProWordmark extends StatelessWidget {
         const SizedBox(width: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(color: FriendColors.ink, borderRadius: BorderRadius.circular(5)),
+          decoration: BoxDecoration(color: FriendColors.selected, borderRadius: BorderRadius.circular(5)),
           child: Text(
             'Pro',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white),

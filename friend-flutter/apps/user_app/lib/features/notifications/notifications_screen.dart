@@ -31,7 +31,7 @@ _Presented _present(Map<String, dynamic> n) {
   return switch (type) {
     'booking_confirmed' => _Presented(Icons.event_available_rounded, FriendColors.primary, tr('Session booked'),
         trx('With $pro${at.isEmpty ? '' : ' · $at'}', 'ከ$pro ጋር${at.isEmpty ? '' : ' · $at'}'), '/appointments', 'Sessions'),
-    'reminder_24h' => _Presented(Icons.alarm_rounded, FriendColors.accent, tr('Your session is tomorrow'),
+    'reminder_24h' => _Presented(Icons.alarm_rounded, FriendColors.accentDeep, tr('Your session is tomorrow'),
         at.isEmpty ? tr('Check your sessions for the time.') : at, '/appointments', 'Sessions'),
     'reminder_1h' => _Presented(Icons.videocam_rounded, FriendColors.coral, tr('Your session starts in an hour'),
         tr('Open the waiting room a few minutes early.'), appt == null ? '/appointments' : '/appointments/$appt/room', 'Sessions'),

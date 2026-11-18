@@ -104,7 +104,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           ),
           Expanded(
             child: RefreshIndicator(
-              color: FriendColors.accent,
+              color: FriendColors.primary,
               onRefresh: _refresh,
               child: _messages.isEmpty
                   ? ListView(

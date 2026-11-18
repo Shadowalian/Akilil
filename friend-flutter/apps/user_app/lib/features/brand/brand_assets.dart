@@ -9,7 +9,7 @@ class BrandAssets {
   BrandAssets._();
 
   /// The Akilil mark: an open teal ring around a clay core.
-  static Widget mark({double size = 56, Color color = FriendColors.primary, Color core = FriendColors.accent}) {
+  static Widget mark({double size = 56, Color color = FriendColors.aqua, Color core = FriendColors.accent}) {
     return AkililMark(size: size, ring: color, core: core);
   }
 

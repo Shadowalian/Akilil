@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../theme/design_tokens.dart';
 
-/// The Akilil mark: an open teal ring around a warm clay core.
+/// The Akilil mark: an open aqua ring around a sunny yellow core.
 /// Shared by both apps so the brand is drawn the same way everywhere.
 class AkililMark extends StatelessWidget {
-  const AkililMark({super.key, this.size = 40, this.ring = FriendColors.primary, this.core = FriendColors.accent});
+  const AkililMark({super.key, this.size = 40, this.ring = FriendColors.aqua, this.core = FriendColors.accent});
 
   final double size;
   final Color ring;

@@ -221,7 +221,7 @@ class _WaitingRoomCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       tr('ROOM READY'),
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.accent),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.accentDeep),
                     ),
                   ],
                 ),
@@ -230,7 +230,7 @@ class _WaitingRoomCard extends StatelessWidget {
               Icon(Icons.lock_outline_rounded, size: 16, color: FriendColors.primary),
               const SizedBox(width: 4),
               Text(
-                tr('PRIVATE'),
+                tr('Private'),
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(color: FriendColors.textSecondary),
               ),
             ],
@@ -239,16 +239,7 @@ class _WaitingRoomCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 56,
-                height: 56,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3.5,
-                  color: FriendColors.accent,
-                  backgroundColor: FriendColors.surfaceContainerHigh,
-                  value: 0.72,
-                ),
-              ),
+              FriendAvatar(size: 56, initials: personInitial(clinicianName)),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(

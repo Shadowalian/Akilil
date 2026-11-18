@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/design_tokens.dart';
-import '../util/i18n.dart';
 
 // ─── Canvas ─────────────────────────────────────────────────────────────────
 
@@ -407,8 +406,8 @@ class FriendIconChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final button = Material(
-      color: filled ? FriendColors.ink : FriendColors.surface,
-      shape: CircleBorder(side: BorderSide(color: filled ? FriendColors.ink : FriendColors.border)),
+      color: filled ? FriendColors.selected : FriendColors.surface,
+      shape: CircleBorder(side: BorderSide(color: filled ? FriendColors.selected : FriendColors.border)),
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onPressed,
@@ -540,11 +539,11 @@ class FriendAvatar extends StatelessWidget {
   final bool verified;
 
   static const _tones = [
-    (Color(0xFFE6EFEE), Color(0xFF0D5C63)),
-    (Color(0xFFEFECF4), Color(0xFF55477A)),
-    (Color(0xFFF7EEDF), Color(0xFF8A5517)),
-    (Color(0xFFF7EAE2), Color(0xFF8F4524)),
-    (Color(0xFFE5F2EA), Color(0xFF2F6B47)),
+    (Color(0xFFDFF4F6), Color(0xFF066672)), // aqua
+    (Color(0xFFFFF3CF), Color(0xFF8A5A00)), // sunny
+    (Color(0xFFF0EDF8), Color(0xFF5A4A92)), // lavender
+    (Color(0xFFFFE9E2), Color(0xFFA2412F)), // peach
+    (Color(0xFFE3F5EA), Color(0xFF256E45)), // mint
   ];
 
   @override

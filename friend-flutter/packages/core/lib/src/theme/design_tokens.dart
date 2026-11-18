@@ -1,4 +1,4 @@
-/// Akilil design tokens — v2 "Calm".
+/// Akilil design tokens — v3 "Calm": creamy white, aqua blue, sunny yellow.
 ///
 /// Principles
 /// - Paper, ink and one brand colour. Warm off-white canvas, white surfaces
@@ -20,76 +20,84 @@ import '../util/i18n.dart';
 class FriendColors {
   FriendColors._();
 
-  // ── Canvas & surfaces ────────────────────────────────────────────────────
-  static const background = Color(0xFFF6F4EF); // paper
+  // ── Canvas & surfaces: creamy white, warm and soft ───────────────────────
+  static const background = Color(0xFFFFFAF0); // cream
   static const surface = Color(0xFFFFFFFF); // cards, sheets
   static const surfaceLowest = Color(0xFFFFFFFF);
-  static const recessed = Color(0xFFEFECE6); // inputs, wells, segmented tracks
-  static const surfaceContainer = Color(0xFFF1EEE8);
-  static const surfaceContainerHigh = Color(0xFFEAE6DF);
-  static const surfaceVariant = Color(0xFFE4DFD6);
+  static const recessed = Color(0xFFFBF3E2); // inputs, wells, tracks
+  static const surfaceContainer = Color(0xFFFCF5E7);
+  static const surfaceContainerHigh = Color(0xFFF8EEDA);
+  static const surfaceVariant = Color(0xFFF1E6CF);
 
-  // ── Ink ──────────────────────────────────────────────────────────────────
-  static const ink = Color(0xFF17191C);
-  static const textPrimary = Color(0xFF17191C);
-  static const textSecondary = Color(0xFF5D6168);
-  static const textMuted = Color(0xFF73777D); // 4.5:1 on paper
+  // ── Ink: soft blue-slate rather than black ───────────────────────────────
+  static const ink = Color(0xFF1E2B30);
+  static const textPrimary = Color(0xFF1E2B30);
+  static const textSecondary = Color(0xFF4A5A60);
+  static const textMuted = Color(0xFF5E6E74); // 5:1 on cream
 
-  // ── Lines ────────────────────────────────────────────────────────────────
-  static const border = Color(0xFFE3DED5); // hairline around surfaces
-  static const borderStrong = Color(0xFFD3CCC1); // inputs, outlined buttons
-  static const divider = Color(0xFFECE8E1);
+  // ── Lines: warm, barely there ────────────────────────────────────────────
+  static const border = Color(0xFFEFE5D2);
+  static const borderStrong = Color(0xFFE2D5BC);
+  static const divider = Color(0xFFF4ECDC);
 
-  // ── Brand: deep teal (the only action colour) ────────────────────────────
-  static const primary = Color(0xFF0D5C63);
-  static const primaryDeep = Color(0xFF094A50);
-  static const primaryLight = Color(0xFFE6EFEE); // selected fills, soft badges
-  static const primaryContainer = Color(0xFF3B8C91);
+  // ── Aqua blue: the action colour ─────────────────────────────────────────
+  /// Deep enough for white text on buttons (5:1).
+  static const primary = Color(0xFF087A89);
+  static const primaryDeep = Color(0xFF066672);
+  /// Bright aqua for icons, selections, progress and the logo.
+  static const aqua = Color(0xFF1FA5B8);
+  static const primaryLight = Color(0xFFDFF4F6); // soft aqua fills
+  static const primaryContainer = Color(0xFF1FA5B8);
   static const onPrimary = Color(0xFFFFFFFF);
-  static const onPrimaryContainer = Color(0xFF062F32);
+  static const onPrimaryContainer = Color(0xFF053E45);
 
-  // ── Clay: live, urgent, and the occasional warm highlight ────────────────
-  static const accent = Color(0xFFB4582F);
-  static const accentDeep = Color(0xFF8F4524);
-  static const accentLight = Color(0xFFF7EAE2);
-  static const onAccent = Color(0xFFFFFFFF);
-  static const live = Color(0xFFC63D2F);
+  /// Fill for selected chips, days, times and segments.
+  static const selected = primary;
+
+  // ── Sunny yellow: warmth, highlights, streaks ────────────────────────────
+  static const accent = Color(0xFFF6C445);
+  static const accentDeep = Color(0xFF8A5A00); // readable yellow-family text
+  static const accentLight = Color(0xFFFFF3CF);
+  static const onAccent = Color(0xFF1E2B30); // dark text on yellow
+  static const yellow = accent;
+
+  /// Live broadcasts and urgent moments: a soft coral, not alarm red.
+  static const live = Color(0xFFE5604B);
 
   // ── Status ───────────────────────────────────────────────────────────────
-  static const success = Color(0xFF2F7A4F);
-  static const successLight = Color(0xFFE5F2EA);
-  static const warning = Color(0xFF9A6410);
-  static const warningLight = Color(0xFFF8EED9);
-  static const error = Color(0xFFB3261E);
-  static const errorContainer = Color(0xFFFBEAE8);
-  static const onErrorContainer = Color(0xFF5F1A14);
+  static const success = Color(0xFF2E8B57);
+  static const successLight = Color(0xFFE3F5EA);
+  static const warning = Color(0xFF8A5A00);
+  static const warningLight = Color(0xFFFFF3CF);
+  static const error = Color(0xFFC0392B);
+  static const errorContainer = Color(0xFFFDECEA);
+  static const onErrorContainer = Color(0xFF6B1D14);
   static const info = primary;
 
   // ── Pillars (identification only) ────────────────────────────────────────
-  static const pillarSpiritual = Color(0xFF6A5A8C); // muted plum
-  static const pillarSpiritualLight = Color(0xFFEFECF4);
-  static const pillarMind = primary;
+  static const pillarSpiritual = Color(0xFF7B68B5); // soft lavender
+  static const pillarSpiritualLight = Color(0xFFF0EDF8);
+  static const pillarMind = aqua;
   static const pillarMindLight = primaryLight;
-  static const pillarCooking = Color(0xFFB0702A); // saffron
-  static const pillarCookingLight = Color(0xFFF7EEDF);
+  static const pillarCooking = Color(0xFFD9961A); // golden
+  static const pillarCookingLight = Color(0xFFFFF3CF);
 
   // ── v1 aliases ───────────────────────────────────────────────────────────
-  static const secondaryFixed = primaryContainer;
+  static const secondaryFixed = aqua;
   static const secondaryFixedDim = primary;
   static const wood = pillarSpiritual;
   static const woodLight = pillarSpiritualLight;
-  static const woodDeep = Color(0xFF4F4270);
+  static const woodDeep = Color(0xFF5A4A92);
   static const green = primary;
   static const greenSoft = primaryLight;
-  static const aqua = primary;
   static const aquaSoft = primaryLight;
-  static const sky = primaryContainer;
+  static const sky = aqua;
   static const cream = background;
   static const peach = recessed;
-  static const apricot = pillarCookingLight;
+  static const apricot = accentLight;
   static const sunset = accent;
   static const coral = live;
-  static const spark = primaryContainer;
+  static const spark = aqua;
   static const inkSoft = primary;
 }
 
@@ -168,13 +176,13 @@ class FriendElevation {
   /// Surfaces rely on hairlines; this is a barely-there lift for cards that
   /// sit on paper.
   static const List<BoxShadow> card = [
-    BoxShadow(color: Color(0x0A17191C), blurRadius: 2, offset: Offset(0, 1)),
+    BoxShadow(color: Color(0x0A5A4A20), blurRadius: 2, offset: Offset(0, 1)),
   ];
 
   /// Floating chrome: the tab bar, sheets, toasts.
   static const List<BoxShadow> raised = [
-    BoxShadow(color: Color(0x0F17191C), blurRadius: 3, offset: Offset(0, 1)),
-    BoxShadow(color: Color(0x1417191C), blurRadius: 24, offset: Offset(0, 10)),
+    BoxShadow(color: Color(0x0F5A4A20), blurRadius: 3, offset: Offset(0, 1)),
+    BoxShadow(color: Color(0x145A4A20), blurRadius: 24, offset: Offset(0, 10)),
   ];
 
   // v1 names. Buttons no longer glow.
@@ -183,7 +191,7 @@ class FriendElevation {
   static const List<BoxShadow> glowPressed = [];
 
   static const List<BoxShadow> focusRing = [
-    BoxShadow(color: Color(0x330D5C63), blurRadius: 0, spreadRadius: 3),
+    BoxShadow(color: Color(0x33087A89), blurRadius: 0, spreadRadius: 3),
   ];
 }
 
